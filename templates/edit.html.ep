@@ -1,0 +1,26 @@
+<!-- /templates/edit.html.ep -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Stash Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/edit/variables.css">
+    <link rel="stylesheet" href="/css/edit/canvas.css">
+    <link rel="stylesheet" href="/css/edit/interactions.css">
+    <link rel="stylesheet" href="/css/edit/animations.css">
+    <link rel="stylesheet" href="/css/edit/responsive.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <link rel="shortcut icon" href="favicon.ico"/>
+</head>
+<body class="text-gray-200 font-sans edit-mode">
+
+    <%= include 'topbar' %>
+    <%= include '/edit/canvas' %>
+    <%= include '/edit/controls' %>
+    <%= include '/edit/modal' %>
+
+    <script type="module" src="/js/edit/main.js"></script>
+</body>
+</html>

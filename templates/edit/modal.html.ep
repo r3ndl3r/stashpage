@@ -1,0 +1,219 @@
+<!-- /templates/edit/modal.html.ep -->
+
+<!-- Enhanced Modal Container -->
+<div id="modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+    <div class="bg-gray-800/95 backdrop-blur-lg rounded-xl shadow-2xl w-full max-w-md border border-gray-700" id="modal-content">
+        <!-- Modal content will be dynamically inserted here -->
+    </div>
+</div>
+
+<!-- Modal Templates (hidden, used by JavaScript to generate modal content) -->
+<script type="text/template" id="add-category-modal-template">
+    <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-semibold text-white">Add New Category</h3>
+            <button type="button" onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <form class="space-y-4" onsubmit="handleAddCategory(event)">
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Category Name</label>
+                <input type="text" name="title" required 
+                       class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                       placeholder="e.g., Social Media, Tools, Entertainment">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Icon URL (optional)</label>
+                <input type="url" name="icon" 
+                       class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                       placeholder="https://example.com/icon.png">
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" onclick="closeModal()" 
+                        class="px-4 py-2 text-gray-400 hover:text-white transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" 
+                        class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
+                    Add Category
+                </button>
+            </div>
+        </form>
+    </div>
+</script>
+
+<script type="text/template" id="edit-category-modal-template">
+    <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-semibold text-white">Edit Category</h3>
+            <button type="button" onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <form class="space-y-4" onsubmit="handleEditCategory(event)">
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Category Name</label>
+                <input type="text" name="title" required 
+                       class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                       placeholder="Category name">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Icon URL</label>
+                <input type="url" name="icon" 
+                       class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                       placeholder="https://example.com/icon.png">
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" onclick="closeModal()" 
+                        class="px-4 py-2 text-gray-400 hover:text-white transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</script>
+
+<script type="text/template" id="add-stash-modal-template">
+    <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-semibold text-white">Add New Link</h3>
+            <button type="button" onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <form class="space-y-4" onsubmit="handleAddStash(event)">
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Link Name</label>
+                <input type="text" name="name" required 
+                       class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                       placeholder="e.g., GitHub, Gmail, Netflix">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">URL</label>
+                <input type="url" name="url" required 
+                       class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                       placeholder="https://example.com">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Icon URL (optional)</label>
+                <input type="url" name="icon" 
+                       class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                       placeholder="https://example.com/favicon.ico">
+                <p class="text-xs text-gray-400 mt-1">Leave empty to auto-detect favicon</p>
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" onclick="closeModal()" 
+                        class="px-4 py-2 text-gray-400 hover:text-white transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" 
+                        class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
+                    Add Link
+                </button>
+            </div>
+        </form>
+    </div>
+</script>
+
+<script type="text/template" id="edit-stash-modal-template">
+    <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-semibold text-white">Edit Link</h3>
+            <button type="button" onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <form class="space-y-4" onsubmit="handleEditStash(event)">
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Link Name</label>
+                <input type="text" name="name" required 
+                       class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">URL</label>
+                <input type="url" name="url" required 
+                       class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Icon URL</label>
+                <input type="url" name="icon" 
+                       class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4">
+                <button type="button" onclick="closeModal()" 
+                        class="px-4 py-2 text-gray-400 hover:text-white transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</script>
+
+<script type="text/template" id="confirm-delete-modal-template">
+    <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-semibold text-white">Confirm Deletion</h3>
+            <button type="button" onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="mb-6">
+            <div class="flex items-center mb-4">
+                <div class="bg-red-100 rounded-full p-2 mr-3">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-white font-medium">Are you sure you want to delete this?</p>
+                    <p class="text-gray-400 text-sm">This action cannot be undone.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex justify-end space-x-3">
+            <button type="button" onclick="closeModal()" 
+                    class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                Cancel
+            </button>
+            <button type="button" onclick="confirmDelete()" 
+                    class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                Delete
+            </button>
+        </div>
+    </div>
+</script>

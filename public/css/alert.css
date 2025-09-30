@@ -1,0 +1,105 @@
+/* /css/alert.css */
+
+/**
+ * Alert Display Styling Module
+ *
+ * This specialized stylesheet provides the complete visual system for displaying
+ * application alert messages with sophisticated presentation and user experience
+ * enhancements. It creates a dedicated alert display environment that combines
+ * the application's signature gradient background with polished alert components.
+ */
+
+body {
+    background-color: #111827; /* Deep slate gray foundation for dark theme consistency */
+    background-image:
+        radial-gradient(at 0% 0%, rgba(129, 140, 248, 0.08) 0px, transparent 50%), /* Top-left indigo accent light */
+        radial-gradient(at 100% 0%, rgba(250, 204, 21, 0.06) 0px, transparent 50%), /* Top-right amber accent light */
+        radial-gradient(at 0% 100%, rgba(239, 68, 68, 0.08) 0px, transparent 50%), /* Bottom-left red accent light */
+        radial-gradient(at 100% 100%, rgba(34, 197, 94, 0.06) 0px, transparent 50%); /* Bottom-right green accent light */
+    background-size: cover; /* Ensure gradient system fills complete viewport */
+    background-position: center; /* Center gradient pattern for balanced appearance */
+    background-attachment: fixed; /* Maintain background stability during any scrolling */
+    overflow-x: hidden; /* Prevent horizontal scrollbars on constrained viewports */
+    font-family: 'Inter', sans-serif; /* Modern, highly legible typeface for alert text */
+    display: flex; /* Enable flexbox layout system for optimal alert centering */
+    justify-content: center; /* Center alert content horizontally in viewport */
+    align-items: center; /* Center alert content vertically in viewport */
+    height: 100vh; /* Full viewport height ensures proper vertical centering */
+    margin: 0; /* Remove default browser margins for clean presentation */
+}
+
+/**
+ * Main Content Container for Alert Display
+ *
+ * Provides transparent container that allows the sophisticated background
+ * gradient system to remain fully visible while ensuring alert content
+ * is properly structured. The minimal styling approach prevents visual
+ * competition between container and alert content.
+ */
+.main {
+    background: none; /* Full transparency to showcase gradient background */
+    border: none; /* Clean presentation without decorative elements */
+    box-shadow: none; /* Minimal styling approach for content focus */
+    padding: 0; /* No spacing constraints on alert content */
+    width: auto; /* Natural width based on alert content requirements */
+}
+
+/**
+ * Alert Component Comprehensive Styling System
+ *
+ * Creates the complete visual presentation for alert messages with sophisticated
+ * gradient styling, optimal typography, and smooth animations. The design uses
+ * warm gradient colors and modern styling techniques to create professional,
+ * attention-getting alerts that maintain excellent readability and user comfort.
+ */
+.alert {
+    background: linear-gradient(135deg, #ffdde1, #ee9ca7); /* Sophisticated warm gradient for attention */
+    color: #3a0d0d; /* Deep reddish text color optimized for gradient contrast */
+    border-left: 6px solid #ff4b5c; /* Prominent accent border emphasizes alert importance */
+    border-radius: 12px; /* Modern rounded corners for friendly, approachable appearance */
+    padding: 18px 24px; /* Generous internal padding for comfortable text presentation */
+    font-size: 17px; /* Enhanced text size ensures alert message visibility */
+    font-weight: 600; /* Semi-bold typography weight emphasizes message importance */
+    letter-spacing: 0.3px; /* Subtle character spacing improves text readability */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* Soft drop shadow provides depth and elevation */
+    animation: popIn 0.4s ease-out; /* Smooth entrance animation draws immediate attention */
+
+    display: flex; /* Flexbox layout enables precise icon and text alignment */
+    align-items: center; /* Vertical center alignment for all alert content elements */
+    gap: 12px; /* Consistent spacing between emoji icon and message text */
+
+    max-width: 800px; /* Prevent alert expansion beyond readable width on large displays */
+    width: 90%; /* Responsive width with appropriate viewport margins */
+    text-align: left; /* Left text alignment for optimal reading experience */
+
+    white-space: normal; /* Enable text wrapping for lengthy alert messages */
+    word-wrap: break-word; /* Ensure long words break appropriately within constraints */
+    overflow-wrap: anywhere; /* Modern text overflow handling for optimal flow */
+}
+
+/**
+ * Alert Icon Presentation System
+ *
+ * Provides consistent emoji icon display using CSS pseudo-element technique
+ * that ensures the warning icon maintains proper positioning and sizing
+ * regardless of alert message length or text wrapping behavior.
+ */
+.alert::before {
+    content: "⚠️"; /* Warning emoji provides immediate visual message classification */
+    font-size: 22px; /* Enlarged icon size ensures prominence and visibility */
+    flex-shrink: 0; /* Prevent icon compression when alert text content wraps */
+}
+
+/**
+ * Alert Entrance Animation System
+ *
+ * Creates engaging, professional entrance effect for alert messages using
+ * sophisticated multi-stage animation that combines opacity transitions
+ * with subtle scaling and vertical movement. The animation draws immediate
+ * user attention while maintaining polished, non-intrusive presentation.
+ */
+@keyframes popIn {
+    0%   { opacity: 0; transform: scale(0.9) translateY(-15px); } /* Start transparent, smaller, above final position */
+    60%  { opacity: 1; transform: scale(1.05) translateY(3px); } /* Brief overshoot creates natural bounce feel */
+    100% { opacity: 1; transform: scale(1) translateY(0); } /* Settle at natural size and final position */
+}

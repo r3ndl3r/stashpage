@@ -1,0 +1,167 @@
+/* /css/edit/animations.css */
+
+/**
+ * Animation and Visual Effects Module
+ * 
+ * This stylesheet defines all keyframe animations, transitions, and dynamic visual
+ * effects used throughout the stash dashboard editor. It provides smooth, polished
+ * user interactions while maintaining performance and accessibility standards.
+ */
+
+/**
+ * Modal Dialog Entrance Animation
+ * 
+ * Creates a smooth, professional entrance effect for modal dialogs that feels
+ * responsive and polished. The animation combines opacity fade-in with subtle
+ * vertical movement and scaling to create depth and draw user attention.
+ */
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;                           /* Start completely transparent */
+    transform: translateY(-20px) scale(0.95); /* Begin above final position, slightly smaller */
+  }
+  
+  to {
+    opacity: 1;                           /* End fully opaque */
+    transform: translateY(0) scale(1);    /* Settle at natural position and size */
+  }
+}
+
+/**
+ * Loading Spinner Animation
+ * 
+ * Provides continuous rotation for loading indicators and progress spinners.
+ * Uses efficient transform-only animation for smooth performance across devices.
+ * The rotation is linear and infinite to indicate ongoing processing.
+ */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);            /* Complete full rotation every cycle */
+  }
+}
+
+/**
+ * Save Button Pulse Animation
+ * 
+ * Draws attention to unsaved changes through rhythmic shadow pulsing effect.
+ * The animation cycles between normal and highlighted states to create urgency
+ * without being overly distracting. Uses green accent color to indicate positive
+ * action availability while maintaining visual hierarchy.
+ */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+  
+  50% {
+    box-shadow: 0 15px 35px rgba(34, 197, 94, 0.6), 0 0 0 3px rgba(34, 197, 94, 0.3);
+  }
+  
+  100% {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+}
+
+/**
+ * Modal Container Backdrop Styling
+ * 
+ * Creates the modal overlay background with blur effect for focus isolation.
+ * The backdrop-filter provides modern glass morphism effect while ensuring
+ * content behind the modal is visually de-emphasized but still partially visible.
+ */
+#modal {
+  backdrop-filter: blur(8px);             /* Modern glass morphism effect */
+  transition: all 0.3s ease;             /* Smooth appearance and disappearance */
+}
+
+/**
+ * Modal Content Container Styling
+ * 
+ * Handles the visual presentation and behavior of modal dialog content including
+ * entrance animation, responsive sizing, and scrollable content management.
+ * Ensures modals work well across different screen sizes and content lengths.
+ */
+#modal-content {
+  animation: modalSlideIn 0.3s ease-out;  /* Apply entrance animation on appearance */
+  max-height: 90vh;                       /* Ensure modal fits on small screens with margin */
+  overflow-y: auto;                       /* Enable scrolling for tall modal content */
+  border-radius: var(--border-radius);   /* Consistent corner rounding from design system */
+}
+
+/**
+ * Save Button State Indicator
+ * 
+ * Applies pulsing animation to save buttons when unsaved changes exist.
+ * This provides immediate visual feedback about data state and encourages
+ * users to save their work. The animation class is toggled by JavaScript
+ * based on form dirty state detection.
+ */
+.save-button.has-changes {
+  animation: pulse 2s infinite;           /* Continuous attention-getting pulse */
+}
+
+/**
+ * Custom Scrollbar Styling System
+ * 
+ * Provides consistent, modern scrollbar appearance for modal content across
+ * WebKit browsers (Chrome, Safari, Edge). The styling creates a minimal,
+ * unobtrusive scrollbar that matches the overall dark theme design.
+ */
+
+/**
+ * Scrollbar Track Styling
+ * 
+ * Defines the background channel where the scrollbar thumb moves.
+ * Uses subtle transparency to blend with modal background while remaining
+ * visible enough for user orientation and interaction targeting.
+ */
+#modal-content::-webkit-scrollbar {
+  width: 6px;                             /* Minimal width for unobtrusive appearance */
+}
+
+#modal-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);         /* Subtle dark background for thumb contrast */
+}
+
+/**
+ * Scrollbar Thumb Styling and Interactive States
+ * 
+ * Styles the draggable portion of the scrollbar with hover feedback.
+ * Uses transparency and rounded corners to create modern, touch-friendly
+ * scrolling controls that integrate well with the dark theme design.
+ */
+#modal-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);  /* Semi-transparent white for visibility */
+  border-radius: 3px;                     /* Rounded corners match overall design */
+}
+
+#modal-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);  /* Increased opacity on hover for feedback */
+}
+
+/**
+ * Performance Optimization Hints
+ * 
+ * These properties help browsers optimize animation performance by indicating
+ * which properties will change frequently and should be prepared for efficient
+ * rendering using GPU acceleration.
+ */
+.modal-content,
+.save-button.has-changes {
+  will-change: transform, opacity, box-shadow; /* Hint browser to optimize these properties */
+}
+
+/**
+ * Animation State Management
+ * 
+ * Helper classes for JavaScript to control animation states without
+ * directly manipulating CSS animation properties. Provides clean separation
+ * between presentation logic (CSS) and interaction logic (JavaScript).
+ */
+.animation-paused {
+  animation-play-state: paused !important; /* Allow JS to pause animations */
+}
+
+.animation-disabled {
+  animation: none !important;              /* Completely disable animations when needed */
+}

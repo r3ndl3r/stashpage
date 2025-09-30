@@ -1,0 +1,23 @@
+<!-- /templates/stash.html.ep -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stash Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/stash.css">
+    <link rel="shortcut icon" href="favicon.ico"/>
+</head>
+<body class="text-gray-200 font-sans <%= $show_index_page ? 'dashboard-index' : 'dashboard-canvas' %>">
+   
+    <%= include 'topbar' %>
+   
+    <% if ($show_index_page) { %>
+        <%= include 'index' %>
+    <% } else { %>
+        <%= include 'dashboard' %>
+    <% } %>
+    <script src="/js/stash.js"></script>
+</body>
+</html>

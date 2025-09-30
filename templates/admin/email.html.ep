@@ -1,0 +1,138 @@
+<!-- /templates/admin_email.html.ep -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Settings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="shortcut icon" href="favicon.ico"/>
+</head>
+<body class="bg-gray-900 text-white">
+    <%= include 'topbar' %>
+    
+    <div class="container mx-auto px-4 pt-16">
+        <h1 class="text-3xl font-bold mb-8">Email Settings</h1>
+        
+        <% if (my $msg = flash('message')) { %>
+            <div class="bg-green-600 text-white p-4 rounded mb-6">
+                <%= $msg %>
+            </div>
+        <% } %>
+        
+        <div class="bg-gray-800 p-6 rounded-lg max-w-2xl">
+            <h2 class="text-xl font-semibold mb-4">Configure Email Notifications</h2>
+            
+            <div class="bg-blue-900 border border-blue-700 text-blue-100 p-4 rounded mb-6">
+                <h3 class="font-semibold mb-2">Gmail Setup Instructions:</h3>
+                <ol class="list-decimal list-inside space-y-1 text-sm">
+                    <li>Enable 2-Factor Authentication on your Google account if not already enabled</li>
+                    <li>Go to <a href="https://myaccount.google.com/apppasswords" target="_blank" class="text-blue-300 hover:text-blue-200 underline">Google App Passwords</a></li>
+                    <li>Generate a new app password for "Mail" or "Other (Custom name)"</li>
+                    <li>Copy the 16-character app password</li>
+                    <li>Use that app password below (not your regular Gmail password)</li>
+                </ol>
+            </div>
+            
+            <form method="POST" action="/admin/email">
+                <div class="mb-4">
+                    <label for="gmail_email" class="block text-sm font-medium text-gray-300 mb-2">Gmail Email Address:</label>
+                    <input type="email" id="gmail_email" name="gmail_email" 
+                           value="<%= $settings->{gmail_email} %>"
+                           class="w-full p-2 rounded-md text-sm bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="your-email@gmail.com">
+                </div>
+                
+                <div class="mb-4">
+                    <label for="gmail_app_password" class="block text-sm font-medium text-gray-300 mb-2">Gmail App Password:</label>
+                    <input type="password" id="gmail_app_password" name="gmail_app_password" 
+                           value="<%= $settings->{gmail_app_password} %>"
+                           class="w-full p-2 rounded-md text-sm bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="16-character app password">
+                    <p class="text-xs text-gray-400 mt-1">Use the app password from Google, not your regular password</p>
+                </div>
+                
+                <div class="mb-6">
+                    <label for="from_name" class="block text-sm font-medium text-gray-300 mb-2">From Name:</label>
+                    <input type="text" id="from_name" name="from_name" 
+                           value="<%= $settings->{from_name} %>"
+                           class="w-full p-2 rounded-md text-sm bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="Stashpage">
+                    <p class="text-xs text-gray-400 mt-1">The name that appears in the "From" field of emails</p>
+                </div>
+                
+                <div class="flex space-x-4">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">
+                        Save Settings
+                    </button>
+                    <button type="button" onclick="testEmail()" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">
+                        Test Email
+                    </button>
+                    <a href="/admin" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded inline-block">
+                        Back to Admin
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Test Email Modal -->
+        <div id="testModal" class="fixed inset-0 bg-black bg-opacity-75 items-center justify-center z-50" style="display: none;">
+            <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-lg">
+                <h3 class="text-xl text-white mb-4">Test Email</h3>
+                <div class="mb-4">
+                    <label for="test_email" class="block text-sm font-medium text-gray-300 mb-2">Send test email to:</label>
+                    <input type="email" id="test_email" class="w-full p-2 rounded-md text-sm bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="test@example.com">
+                </div>
+                <div class="flex space-x-4">
+                    <button onclick="sendTestEmail()" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">Send</button>
+                    <button onclick="closeTestModal()" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded">Cancel</button>
+                </div>
+                <div id="testResult" class="mt-4 text-sm"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function testEmail() {
+            document.getElementById('testModal').style.display = 'flex';
+        }
+        
+        function closeTestModal() {
+            document.getElementById('testModal').style.display = 'none';
+            document.getElementById('testResult').innerHTML = '';
+        }
+        
+        async function sendTestEmail() {
+            const email = document.getElementById('test_email').value;
+            const resultDiv = document.getElementById('testResult');
+            
+            if (!email) {
+                resultDiv.innerHTML = '<div class="text-red-400">Please enter an email address</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<div class="text-blue-400">Sending test email...</div>';
+            
+            try {
+                const response = await fetch('/admin/email/test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ test_email: email })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultDiv.innerHTML = '<div class="text-green-400">Test email sent successfully!</div>';
+                } else {
+                    resultDiv.innerHTML = '<div class="text-red-400">Failed to send test email: ' + (result.error || 'Unknown error') + '</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="text-red-400">Error: ' + error.message + '</div>';
+            }
+        }
+    </script>
+</body>
+</html>

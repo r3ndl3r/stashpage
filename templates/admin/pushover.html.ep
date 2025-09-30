@@ -1,0 +1,55 @@
+<!-- /templates/admin_pushover.html.ep -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pushover Settings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="shortcut icon" href="favicon.ico"/>
+</head>
+<body class="bg-gray-900 text-white">
+    <%= include 'topbar' %>
+    
+    <div class="container mx-auto px-4 pt-16">
+        <h1 class="text-3xl font-bold mb-8">Pushover Settings</h1>
+        
+        <% if (my $msg = flash('message')) { %>
+            <div class="bg-green-600 text-white p-4 rounded mb-6">
+                <%= $msg %>
+            </div>
+        <% } %>
+        
+        <div class="bg-gray-800 p-6 rounded-lg max-w-lg">
+            <h2 class="text-xl font-semibold mb-4">Configure Pushover Notifications</h2>
+            
+            <form method="POST" action="/admin/pushover">
+                <div class="mb-4">
+                    <label for="user_key" class="block text-sm font-medium text-gray-300 mb-2">User Key:</label>
+                    <input type="text" id="user_key" name="user_key" 
+                           value="<%= $settings->{user_key} %>"
+                           class="w-full p-2 rounded-md text-sm bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="Your Pushover user key">
+                </div>
+                
+                <div class="mb-6">
+                    <label for="app_token" class="block text-sm font-medium text-gray-300 mb-2">App Token:</label>
+                    <input type="text" id="app_token" name="app_token" 
+                           value="<%= $settings->{app_token} %>"
+                           class="w-full p-2 rounded-md text-sm bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="Your app token">
+                </div>
+                
+                <div class="flex space-x-4">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">
+                        Save Settings
+                    </button>
+                    <a href="/admin" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded inline-block">
+                        Back to Admin
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

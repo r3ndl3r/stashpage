@@ -1,0 +1,88 @@
+<!-- /templates/admin_index.html.ep -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="shortcut icon" href="favicon.ico"/>
+</head>
+<body class="bg-gray-900 text-white">
+    <%= include 'topbar' %>
+    
+    <div class="container mx-auto px-4 pt-16">
+        <h1 class="text-3xl font-bold mb-8">Admin Dashboard</h1>
+       
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <!-- User Management -->
+            <div class="bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    User Management
+                </h2>
+                <a href="/users" class="block bg-blue-600 hover:bg-blue-700 text-center py-3 px-4 rounded font-medium">
+                    Manage Users
+                </a>
+            </div>
+
+            <!-- System Administration -->
+            <div class="bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                    </svg>
+                    System
+                </h2>
+                <div class="space-y-3">
+                    <a href="/admin/logs" class="block bg-green-600 hover:bg-green-700 text-center py-2 px-4 rounded">
+                        View Logs
+                    </a>
+                    <a href="/admin/restart" class="block bg-red-600 hover:bg-red-700 text-center py-2 px-4 rounded">
+                        Restart App
+                    </a>
+                </div>
+            </div>
+
+            <!-- Configuration -->
+            <div class="bg-gray-800 p-6 rounded-lg">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    Configuration
+                </h2>
+                <div class="space-y-3">
+                    <a href="/admin/pushover" class="block bg-purple-600 hover:bg-purple-700 text-center py-2 px-4 rounded">
+                        Pushover Settings
+                    </a>
+                    <a href="/admin/email" class="block bg-orange-600 hover:bg-orange-700 text-center py-2 px-4 rounded">
+                        Email Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 bg-gray-800 p-6 rounded-lg">
+            <h2 class="text-xl font-semibold mb-4">Quick Overview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center max-w-4xl mx-auto">
+                    <div class="bg-gray-700 p-4 rounded">
+                        <div class="text-2xl font-bold text-blue-400"><%= $stats->{total_users} %></div>
+                        <div class="text-sm text-gray-300">Total Users</div>
+                    </div>
+                    <div class="bg-gray-700 p-4 rounded">
+                        <div class="text-2xl font-bold text-yellow-400"><%= $stats->{pending_users} %></div>
+                        <div class="text-sm text-gray-300">Pending Approval</div>
+                    </div>
+                    <div class="bg-gray-700 p-4 rounded">
+                        <div class="text-2xl font-bold text-purple-400"><%= $stats->{total_stashes} %></div>
+                        <div class="text-sm text-gray-300">Total Stashes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

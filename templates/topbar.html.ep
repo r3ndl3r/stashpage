@@ -1,0 +1,26 @@
+<!-- /templates/topbar.html.ep -->
+<a href="/stash" id="home-link" class="fixed top-0 left-0 z-[1001] text-white hover:text-gray-300 p-6" title="Back to Lobby">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+    </svg>
+</a>
+<div class="fixed top-0 right-0 z-[1001] p-6">
+    <button id="settings-button" class="text-gray-400 hover:text-white p-1 rounded-full focus:outline-none" onclick="toggleDropdown(event)">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.942 3.313.823 2.306 2.373a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.942 1.543-.823 3.313-2.373 2.306a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.942-3.313-.823-2.306-2.373a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.942-1.543.823-3.313 2.373-2.306a1.724 1.724 0 002.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+    </button>
+    <div id="settings-dropdown" class="absolute right-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-2000 hidden">
+        <% if ($c->is_logged_in) { %>
+            <div class="px-4 py-2 text-sm text-gray-400 border-b border-gray-600">
+                Hello, <%= $c->session('user') %>
+            </div>
+            <% if ($c->is_admin) { %>
+            <a href="/admin" class="block px-4 py-2 text-sm text-green-300 hover:bg-gray-600">Admin Panel</a>
+            <% } %>
+            <a href="/logout" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-600">Logout</a>
+        <% } else { %>
+        <a href="/login" class="block px-4 py-2 text-sm text-gray-200 hover:bg-gray-600">Login</a>
+        <% } %>
+    </div>
+</div>

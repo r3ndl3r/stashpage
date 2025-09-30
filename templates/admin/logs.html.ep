@@ -1,0 +1,96 @@
+<!-- /templates/admin_logs.html.ep -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Logs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="shortcut icon" href="favicon.ico"/>
+</head>
+<body class="bg-gray-900 text-white">
+    <%= include 'topbar' %>
+    
+    <div class="container mx-auto px-4 pt-16">
+        <h1 class="text-3xl font-bold mb-6">Application Logs</h1>
+        
+        <div class="bg-gray-800 p-4 rounded-lg mb-6">
+            <form method="GET" action="/admin/logs" class="flex flex-wrap gap-4 items-end">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Limit:</label>
+                    <select name="limit" class="bg-gray-700 border border-gray-600 rounded px-3 py-1">
+                        <option value="50" <%= $limit == 50 ? 'selected' : '' %>>50</option>
+                        <option value="100" <%= $limit == 100 ? 'selected' : '' %>>100</option>
+                        <option value="500" <%= $limit == 500 ? 'selected' : '' %>>500</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-1">Level:</label>
+                    <select name="level" class="bg-gray-700 border border-gray-600 rounded px-3 py-1">
+                        <option value="all" <%= $level eq 'all' ? 'selected' : '' %>>All</option>
+                        <option value="debug" <%= $level eq 'debug' ? 'selected' : '' %>>Debug</option>
+                        <option value="info" <%= $level eq 'info' ? 'selected' : '' %>>Info</option>
+                        <option value="warning" <%= $level eq 'warning' ? 'selected' : '' %>>Warning</option>
+                        <option value="error" <%= $level eq 'error' ? 'selected' : '' %>>Error</option>
+                        <option value="critical" <%= $level eq 'critical' ? 'selected' : '' %>>Critical</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-1">Category:</label>
+                    <select name="category" class="bg-gray-700 border border-gray-600 rounded px-3 py-1">
+                        <option value="all" <%= $category eq 'all' ? 'selected' : '' %>>All</option>
+                        <option value="auth" <%= $category eq 'auth' ? 'selected' : '' %>>Auth</option>
+                        <option value="admin" <%= $category eq 'admin' ? 'selected' : '' %>>Admin</option>
+                        <option value="stash" <%= $category eq 'stash' ? 'selected' : '' %>>Stash</option>
+                        <option value="system" <%= $category eq 'system' ? 'selected' : '' %>>System</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-1 rounded">Filter</button>
+            </form>
+        </div>
+        
+        <!-- Logs Table -->
+        <div class="bg-gray-800 rounded-lg overflow-hidden">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-700">
+                    <tr>
+                        <th class="px-4 py-2 text-left">Time</th>
+                        <th class="px-4 py-2 text-left">Level</th>
+                        <th class="px-4 py-2 text-left">Category</th>
+                        <th class="px-4 py-2 text-left">Message</th>
+                        <th class="px-4 py-2 text-left">User</th>
+                        <th class="px-4 py-2 text-left">IP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for my $log (@$logs) { %>
+                    <tr class="border-b border-gray-700 hover:bg-gray-750">
+                        <td class="px-4 py-2 text-xs"><%= $log->{created_at} %></td>
+                        <td class="px-4 py-2">
+                            <span class="px-2 py-1 rounded text-xs
+                                <% if ($log->{level} eq 'error' || $log->{level} eq 'critical') { %>bg-red-600
+                                <% } elsif ($log->{level} eq 'warning') { %>bg-yellow-600
+                                <% } elsif ($log->{level} eq 'info') { %>bg-blue-600
+                                <% } else { %>bg-gray-600<% } %>">
+                                <%= $log->{level} %>
+                            </span>
+                        </td>
+                        <td class="px-4 py-2"><%= $log->{category} %></td>
+                        <td class="px-4 py-2"><%= $log->{message} %></td>
+                        <td class="px-4 py-2"><%= $log->{username} || '-' %></td>
+                        <td class="px-4 py-2 text-xs"><%= $log->{ip_address} || '-' %></td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-4">
+            <a href="/admin" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">← Back to Admin</a>
+        </div>
+    </div>
+</body>
+</html>

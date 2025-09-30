@@ -1,0 +1,73 @@
+<!-- /templates/admin_restart.html.ep -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restart Application</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="shortcut icon" href="favicon.ico"/>
+</head>
+<body class="bg-gray-900 text-white">
+    <%= include 'topbar' %>
+    
+    <div class="container mx-auto px-4 pt-16">
+        <h1 class="text-3xl font-bold mb-8">Restart Application</h1>
+        
+        <div class="bg-gray-800 p-6 rounded-lg max-w-md">
+            <h2 class="text-xl font-semibold mb-4">Confirm Restart</h2>
+            <p class="text-gray-300 mb-6">This will restart the entire application. All users will be temporarily disconnected.</p>
+            
+            <div class="space-x-4">
+                <button onclick="startRestartSequence()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">
+                    Restart Now
+                </button>
+                <a href="/admin" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded inline-block">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restart Modal -->
+    <div id="restart-modal" class="fixed inset-0 bg-black bg-opacity-75 items-center justify-center z-50" style="display: none;">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-sm shadow-lg text-center">
+            <h3 class="text-xl text-white mb-4">Restarting Application</h3>
+            <div id="restart-status" class="text-gray-300 mb-4">Preparing restart...</div>
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+        </div>
+    </div>
+
+    <script>
+        async function startRestartSequence() {
+            const modal = document.getElementById('restart-modal');
+            modal.style.display = 'flex';
+            
+            updateRestartModal('Sending restart command to server...');
+            
+            try {
+                const response = await fetch('/admin/restart', { method: 'POST' });
+                if (!response.ok) {
+                    updateRestartModal(`Restart failed on server side (Status: ${response.status})`);
+                    return;
+                }
+                
+                updateRestartModal('Restart initiated. Waiting for server to reload...');
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                updateRestartModal('Server reloading...');
+                location.reload();
+            } catch (error) {
+                updateRestartModal('Connection lost during restart. Reloading page now.');
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            }
+        }
+        
+        function updateRestartModal(message) {
+            document.getElementById('restart-status').textContent = message;
+        }
+    </script>
+</body>
+</html>

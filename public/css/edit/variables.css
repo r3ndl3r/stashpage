@@ -1,0 +1,75 @@
+/* /css/edit/variables.css */
+
+/**
+ * CSS Custom Properties Configuration Module
+ * 
+ * This stylesheet defines all global CSS custom properties (CSS variables) used
+ * throughout the stash dashboard editor. These variables provide centralized
+ * control over layout dimensions, timing, and visual properties, enabling
+ * consistent theming and easy customization without modifying core stylesheets.
+ * 
+ */
+
+:root {
+  /**
+   * Canvas Layout Configuration
+   * These variables define the virtual canvas space where category cards are positioned
+   * The canvas is much larger than the viewport to allow free-form arrangement
+   */
+  --canvas-width: 4000px;                  /* Total horizontal scrollable space for dashboard */
+  --canvas-height: 2500px;                 /* Total vertical scrollable space for dashboard */
+  --canvas-center-x: 2000px;               /* Horizontal center point for auto-centering viewport */
+  --canvas-center-y: 1250px;               /* Vertical center point for auto-centering viewport */
+  
+  /**
+   * Interface Layout Constants
+   * Fixed dimensions for consistent interface elements across all screen sizes
+   */
+  --topbar-height: 50px;                   /* Height of fixed navigation bar (affects viewport calculations) */
+  
+  /**
+   * Category Card Sizing Constraints
+   * These values ensure cards remain readable and functional across device sizes
+   * while preventing layout issues from extremely narrow or wide content
+   */
+  --card-min-width: 280px;                 /* Minimum width ensures readability on small screens */
+  --card-max-width: 400px;                 /* Maximum width prevents cards from becoming unwieldy */
+  
+  /**
+   * Animation and Interaction Timing
+   * Consistent timing values create smooth, cohesive user experience
+   */
+  --animation-duration: 200ms;             /* Standard transition duration for hover states and animations */
+  
+  /**
+   * Visual Design Constants
+   * Consistent visual properties for modern, cohesive interface design
+   */
+  --border-radius: 0.5rem;                 /* Standard corner radius for cards, buttons, and modals */
+  --backdrop-blur: 16px;                   /* Glass morphism blur intensity for modern card backgrounds */
+}
+
+/**
+ * Accessibility - Motion Sensitivity Support
+ * 
+ * Respects user's system preference for reduced motion by disabling or minimizing
+ * animations and transitions. This is crucial for users with vestibular disorders
+ * or motion sensitivity who may experience discomfort from animated interfaces.
+ * 
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --animation-duration: 0.01ms;           /* Near-zero duration maintains functionality while eliminating motion */
+  }
+  
+  /**
+   * Global Animation Disable
+   * Overrides all animations and transitions throughout the application
+   * Uses !important to ensure accessibility preferences take precedence
+   */
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

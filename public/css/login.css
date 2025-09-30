@@ -1,0 +1,306 @@
+/* /css/login.css */
+
+/**
+ * Login and Authentication Interface Styling Module
+ * 
+ * This stylesheet provides the visual foundation for user authentication pages
+ * including login, registration, and password reset interfaces. It creates a
+ * clean, centered form layout with clear visual hierarchy and comprehensive
+ * feedback systems for various authentication states.
+ */
+
+body {
+    background-color: #111827;                /* Deep slate gray matching application theme */
+    background-image:
+        radial-gradient(at 0% 0%, rgba(129, 140, 248, 0.08) 0px, transparent 50%),     /* Top-left indigo accent for brand consistency */
+        radial-gradient(at 100% 0%, rgba(250, 204, 21, 0.06) 0px, transparent 50%),    /* Top-right amber accent for warmth */
+        radial-gradient(at 0% 100%, rgba(239, 68, 68, 0.08) 0px, transparent 50%),     /* Bottom-left red accent for balance */
+        radial-gradient(at 100% 100%, rgba(34, 197, 94, 0.06) 0px, transparent 50%);   /* Bottom-right green accent for completion */
+    background-size: cover;                   /* Full viewport coverage for gradient pattern */
+    background-position: center;              /* Centered positioning for optimal visual balance */
+    background-attachment: fixed;             /* Stable background during page interactions */
+    overflow-x: hidden;                       /* Prevent horizontal scrolling issues */
+    font-family: Arial, sans-serif;          /* System font for maximum compatibility */
+    display: flex;                            /* Flexbox layout for reliable centering */
+    justify-content: center;                  /* Horizontal centering of login form */
+    align-items: center;                      /* Vertical centering for balanced presentation */
+    height: 100vh;                            /* Full viewport height for complete coverage */
+    margin: 0;                                /* Remove default body margins */
+}
+
+/**
+ * Login Form Container Card
+ * 
+ * Creates a clean, professional container for the authentication form that stands
+ * out against the gradient background while maintaining readability and trust.
+ * The white background creates maximum contrast for form elements while the
+ * subtle shadow provides depth and focus.
+ */
+.main {
+    background-color: white;                  /* Clean white background builds trust and contrast */
+    border-radius: 8px;                       /* Modern rounded corners for approachable design */
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);    /* Subtle shadow creates depth and focus */
+    padding: 20px;                            /* Generous padding for comfortable form interaction */
+    width: 300px;                             /* Fixed width ensures consistent form layout */
+}
+
+/**
+ * Page Heading Typography
+ * 
+ * Creates clear visual hierarchy with centered heading that establishes page
+ * purpose and builds user confidence through professional presentation.
+ */
+h1 {
+    text-align: center;                       /* Centered alignment creates balanced presentation */
+    color: #333;                              /* Dark gray provides good contrast on white background */
+}
+
+/**
+ * Form Field Layout System
+ * 
+ * Implements a grid-based layout that creates optimal alignment between labels
+ * and input fields while maintaining consistent spacing and visual hierarchy.
+ * This approach ensures forms are both functional and visually appealing.
+ */
+.form-group {
+    margin-bottom: 15px;                      /* Consistent spacing between form fields */
+    display: grid;                            /* Grid layout for precise label-input alignment */
+    grid-template-columns: 120px 1fr;        /* Fixed label width, flexible input width */
+    gap: 10px;                                /* Comfortable spacing between label and input */
+    align-items: center;                      /* Vertical centering of labels with inputs */
+}
+
+/**
+ * Form Label Styling
+ * 
+ * Provides clear, readable labels that create strong visual connection to
+ * their associated input fields while maintaining professional appearance.
+ */
+.form-group label {
+    text-align: right;                        /* Right alignment creates visual connection to inputs */
+    font-weight: bold;                        /* Bold weight increases label prominence */
+}
+
+/**
+ * Form Input Field Styling
+ * 
+ * Creates consistent, accessible input fields with clear visual boundaries
+ * and comfortable interaction areas. The styling balances functionality
+ * with visual appeal while maintaining cross-browser compatibility.
+ */
+.form-group input {
+    width: 100%;                              /* Full width utilizes available grid space */
+    padding: 8px;                             /* Comfortable padding for text entry */
+    border: 1px solid #ddd;                  /* Subtle border defines input boundaries */
+    border-radius: 4px;                       /* Rounded corners match container styling */
+    box-sizing: border-box;                   /* Include padding in width calculations */
+}
+
+/**
+ * Form Submission Button Container
+ * 
+ * Centers the primary action button to create clear visual hierarchy and
+ * guide users toward form completion with appropriate spacing.
+ */
+.button-container {
+    text-align: center;                       /* Center alignment emphasizes primary action */
+    margin-top: 20px;                         /* Additional spacing separates button from form fields */
+}
+
+/**
+ * Primary Submit Button Styling
+ * 
+ * Creates a prominent, trust-inspiring submit button with clear visual hierarchy
+ * and interactive feedback. The green color scheme suggests positive action
+ * while the generous sizing ensures accessibility across devices.
+ */
+input[type="submit"] {
+    padding: 10px 20px;                       /* Generous padding for comfortable clicking */
+    background-color: #4CAF50;                /* Green background suggests positive action */
+    color: white;                             /* White text ensures high contrast readability */
+    border: none;                             /* Remove default button borders for clean appearance */
+    border-radius: 5px;                       /* Rounded corners maintain design consistency */
+    cursor: pointer;                          /* Pointer cursor indicates interactive element */
+    font-size: 16px;                          /* Large font size ensures readability */
+}
+
+/**
+ * Submit Button Hover State
+ * 
+ * Provides immediate visual feedback when users hover over the submit button,
+ * creating engaging interaction and confirming button functionality.
+ */
+input[type="submit"]:hover {
+    background-color: #45a049;                /* Darker green on hover provides feedback */
+}
+
+/**
+ * Supplementary Text Styling
+ * 
+ * Styles supplementary content like registration links and additional information
+ * with centered alignment that maintains visual balance with the form.
+ */
+p {
+    text-align: center;                       /* Center alignment maintains visual balance */
+    margin-top: 20px;                         /* Spacing separates from primary form content */
+}
+
+/**
+ * Link Styling System
+ * 
+ * Provides consistent, accessible styling for navigation links within the
+ * authentication interface while maintaining visual hierarchy and trust.
+ */
+a {
+    color: #4CAF50;                           /* Green color matches submit button for consistency */
+    text-decoration: none;                    /* Remove default underlines for clean appearance */
+}
+
+a:hover {
+    text-decoration: underline;               /* Underline on hover provides interaction feedback */
+}
+
+/**
+ * Error Message Styling
+ * 
+ * Creates highly visible error messages that clearly communicate authentication
+ * failures or validation issues while maintaining readability and professional
+ * appearance. The red color scheme universally indicates problems.
+ */
+.error {
+    background-color: #f44336;                /* Red background universally indicates errors */
+    color: white;                             /* White text provides high contrast on red */
+    padding: 10px;                            /* Comfortable padding for message readability */
+    border-radius: 4px;                       /* Rounded corners maintain design consistency */
+    margin-bottom: 15px;                      /* Spacing separates from form fields */
+    text-align: center;                       /* Center alignment emphasizes importance */
+}
+
+/**
+ * Pending State Message Styling
+ * 
+ * Communicates intermediate states like email verification or account approval
+ * using orange color that indicates waiting or in-progress status. Provides
+ * clear feedback for processes that require user patience.
+ */
+.pending {
+    background-color: #ff9800;                /* Orange background indicates pending/waiting state */
+    color: white;                             /* White text ensures readability on orange */
+    padding: 10px;                            /* Comfortable padding matches error styling */
+    border-radius: 4px;                       /* Consistent rounded corners */
+    margin-bottom: 15px;                      /* Standard spacing from other elements */
+    text-align: center;                       /* Centered text emphasizes message importance */
+}
+
+/**
+ * Password Recovery Link Section
+ * 
+ * Provides dedicated styling for password reset functionality with clear
+ * visual hierarchy and appropriate spacing that doesn't compete with
+ * primary form actions.
+ */
+.forgot-password {
+    text-align: center;                       /* Center alignment maintains visual balance */
+    margin: 15px 0;                           /* Vertical spacing separates from other elements */
+}
+
+/**
+ * Password Recovery Link Styling
+ * 
+ * Uses blue color scheme to differentiate password recovery from primary
+ * actions while maintaining accessibility and clear visual hierarchy.
+ */
+.forgot-password a {
+    color: #007bff;                           /* Blue color differentiates from primary green theme */
+    text-decoration: none;                    /* Clean appearance without underlines */
+    font-size: 0.9em;                         /* Slightly smaller size indicates secondary importance */
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;               /* Underline on hover confirms interactivity */
+}
+
+/**
+ * Success Message Styling
+ * 
+ * Communicates successful authentication actions or form submissions using
+ * green color scheme with subtle border treatment that builds confidence
+ * and provides positive reinforcement for completed actions.
+ */
+.success {
+    background-color: #d4edda;                /* Light green background indicates success */
+    color: #155724;                           /* Dark green text ensures high contrast */
+    border: 1px solid #c3e6cb;               /* Subtle green border reinforces success theme */
+    padding: 10px;                            /* Standard padding for comfortable reading */
+    border-radius: 4px;                       /* Consistent corner rounding */
+    margin-bottom: 15px;                      /* Standard spacing from other elements */
+}
+
+/**
+ * GitHub Repository Link Footer
+ * 
+ * Provides subtle, non-intrusive link to project repository for users
+ * interested in viewing source code or contributing. Positioned below
+ * primary authentication actions to maintain focus on core functionality.
+ */
+.github-footer {
+    margin-top: 24px;                         /* Generous spacing separates from form elements */
+    text-align: center;                       /* Center alignment maintains visual balance */
+    padding-top: 20px;                        /* Additional top padding for breathing room */
+    border-top: 1px solid #e0e0e0;           /* Light gray separator for white background */
+}
+
+/**
+ * GitHub Link Styling
+ * 
+ * Creates an inline flex container for icon and text with muted appearance
+ * that doesn't compete with primary authentication actions. Hover states
+ * provide engaging feedback while maintaining professional appearance.
+ */
+.github-link {
+    display: inline-flex;                     /* Inline flex enables icon-text alignment */
+    align-items: center;                      /* Vertical centering of icon and text */
+    gap: 8px;                                 /* Comfortable spacing between icon and text */
+    color: #666;                              /* Gray text for subtle appearance on white */
+    text-decoration: none;                    /* Clean link without default underline */
+    font-size: 13px;                          /* Small font size indicates tertiary importance */
+    font-weight: 500;                         /* Medium weight provides clarity without boldness */
+    transition: all 0.2s ease;                /* Smooth animation for all property changes */
+    padding: 6px 12px;                        /* Comfortable click target with subtle padding */
+    border-radius: 6px;                       /* Rounded corners match overall design language */
+}
+
+/**
+ * GitHub Link Hover State
+ * 
+ * Darkens link on hover with subtle background highlight and lift effect
+ * to provide engaging micro-interaction without overwhelming the interface.
+ */
+.github-link:hover {
+    color: #333;                              /* Darker text on hover improves visibility */
+    background-color: #f5f5f5;               /* Light gray background creates depth on hover */
+    transform: translateY(-1px);              /* Slight upward lift creates engaging feedback */
+}
+
+/**
+ * GitHub Icon Styling
+ * 
+ * Maintains consistent icon dimensions and muted opacity that matches
+ * the overall subtle aesthetic of the footer link.
+ */
+.github-link svg {
+    width: 16px;                              /* Fixed width ensures consistent icon size */
+    height: 16px;                             /* Fixed height maintains square aspect ratio */
+    opacity: 0.7;                             /* Slightly muted icon matches text subtlety */
+    transition: opacity 0.2s ease;            /* Smooth opacity transition on hover */
+}
+
+/**
+ * GitHub Icon Hover State
+ * 
+ * Increases icon opacity on hover to match darkened text and create
+ * cohesive visual feedback across the entire link element.
+ */
+.github-link:hover svg {
+    opacity: 1;                               /* Full opacity on hover provides clear feedback */
+}

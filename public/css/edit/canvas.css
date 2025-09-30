@@ -1,0 +1,210 @@
+/* /css/edit/canvas.css */
+
+/**
+ * Dashboard Canvas Layout and Styling Module
+ * 
+ * This stylesheet defines the core layout system and visual presentation for the
+ * stash dashboard editor interface. It creates a large, scrollable canvas where
+ * users can freely position category cards and provides modern visual styling
+ * with glass morphism effects, smooth animations, and responsive behavior.
+ * 
+ * Key Features:
+ * - Large virtual canvas (4000x2500px) for free-form card arrangement
+ * - Modern glass morphism design with backdrop blur effects
+ * - Smooth hover animations and visual feedback systems
+ * - GPU-accelerated transforms for optimal performance
+ * - Responsive card sizing with min/max width constraints
+ * - Visual center marker for spatial orientation
+ * - Consistent spacing and typography throughout interface
+ * 
+ * Dependencies:
+ * - variables.css: Uses CSS custom properties for dimensions and timing
+ * - Inter font family: Modern, readable typeface for optimal UX
+ */
+
+/**
+ * Application Background and Typography Foundation
+ * 
+ * Creates the primary visual environment with a sophisticated gradient background
+ * that provides visual interest without overwhelming content. The gradient uses
+ * subtle color accents positioned at corners to create depth and atmosphere while
+ * maintaining excellent readability for dashboard elements.
+ */
+body {
+  background-color: #111827;                /* Deep slate gray base color for dark theme */
+  background-image:
+    radial-gradient(at 0% 0%, rgba(129, 140, 248, 0.08) 0px, transparent 50%),     /* Top-left indigo accent */
+    radial-gradient(at 100% 0%, rgba(250, 204, 21, 0.06) 0px, transparent 50%),    /* Top-right amber accent */
+    radial-gradient(at 0% 100%, rgba(239, 68, 68, 0.08) 0px, transparent 50%),     /* Bottom-left red accent */
+    radial-gradient(at 100% 100%, rgba(34, 197, 94, 0.06) 0px, transparent 50%);   /* Bottom-right green accent */
+  background-size: cover;                   /* Ensure gradients fill entire viewport */
+  background-position: center;              /* Center the gradient pattern */
+  background-attachment: fixed;             /* Keep background stationary during scrolling */
+  overflow: hidden;                         /* Prevent document scrollbars (canvas manages scrolling) */
+  min-height: 100vh;                        /* Ensure full viewport coverage */
+  font-family: 'Inter', sans-serif;        /* Modern, highly legible typeface */
+}
+
+/**
+ * Dashboard Scrollable Container System
+ * 
+ * Creates the primary scrollable viewport that contains the large virtual canvas.
+ * This container handles all scrolling behavior and provides the window through
+ * which users view and navigate the dashboard content. The viewport is sized to
+ * fill the entire screen while the inner canvas extends far beyond for positioning.
+ */
+#dashboard-wrapper {
+  width: 100vw;                             /* Full viewport width for maximum workspace */
+  height: 100vh;                            /* Full viewport height excluding browser chrome */
+  overflow: auto;                           /* Enable scrolling for large canvas navigation */
+}
+
+/**
+ * Virtual Canvas Layout Container
+ * 
+ * Defines the large virtual space where category cards can be positioned freely.
+ * This container is much larger than the viewport, allowing users to spread out
+ * their content across a spacious work area. The dimensions are defined by CSS
+ * custom properties to enable easy adjustment of the total workspace size.
+ * 
+ * Spatial Design:
+ * - 4000px width provides extensive horizontal space for card arrangement
+ * - 2500px height accommodates numerous categories without crowding
+ * - Center point (2000, 1250) serves as default positioning reference
+ * - min-width ensures container never shrinks below viewport size
+ */
+#dashboard-main-area {
+  width: var(--canvas-width);               /* Configurable total canvas width (4000px default) */
+  height: var(--canvas-height);             /* Configurable total canvas height (2500px default) */
+  min-width: 100%;                          /* Ensure canvas never smaller than viewport */
+}
+
+/**
+ * Category Card Visual Design System
+ * 
+ * Defines the sophisticated visual appearance of draggable category cards using
+ * modern glass morphism design principles. Cards feature semi-transparent
+ * backgrounds with blur effects, subtle borders, and smooth hover animations
+ * that provide excellent visual feedback while maintaining content readability.
+ */
+.card-window {
+  position: absolute;                       /* Enable free positioning anywhere on canvas */
+  background: rgba(0, 0, 0, 0.6);          /* Semi-transparent dark background for content visibility */
+  backdrop-filter: blur(var(--backdrop-blur)); /* Glass morphism blur effect (16px default) */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle light border for card definition */
+  min-width: var(--card-min-width);        /* Minimum width ensures readability (280px default) */
+  max-width: var(--card-max-width);        /* Maximum width prevents unwieldy cards (400px default) */
+  transition: all calc(var(--animation-duration) * 1.5) ease; /* Smooth property transitions (300ms) */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2); /* Layered shadows for depth */
+  border-radius: var(--border-radius);     /* Consistent corner rounding (0.5rem default) */
+}
+
+/**
+ * Card Hover State Enhancement
+ * 
+ * Provides immediate visual feedback when users hover over category cards.
+ * The enhanced border and shadow effects indicate interactivity while
+ * maintaining the sophisticated glass morphism aesthetic. Animations are
+ * GPU-accelerated for smooth 60fps performance.
+ */
+.card-window:hover {
+  border-color: rgba(255, 255, 255, 0.2);  /* Brighter border indicates hover state */
+  box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.5), 0 15px 15px -5px rgba(0, 0, 0, 0.3); /* Enhanced shadows for lift effect */
+}
+
+/**
+ * Canvas Center Reference Marker
+ * 
+ * Provides a visual reference point at the canvas center to help users orient
+ * themselves within the large workspace. The marker is subtle but visible,
+ * serving as a landmark for card positioning and navigation. It's purely
+ * decorative and doesn't interfere with any interactions.
+ */
+.center-marker {
+  position: absolute;                       /* Position precisely at canvas center */
+  width: 24px;                              /* Comfortable size for visibility without obstruction */
+  height: 24px;                             /* Square aspect ratio for perfect circle */
+  top: var(--canvas-center-y);             /* Vertical center position (1250px default) */
+  left: var(--canvas-center-x);            /* Horizontal center position (2000px default) */
+  transform: translate(-50%, -50%);        /* Perfect center alignment regardless of size */
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%); /* Radial fade effect */
+  border: 3px solid rgba(255, 255, 255, 0.8); /* Semi-transparent white border */
+  border-radius: 50%;                       /* Perfect circle shape */
+  pointer-events: none;                     /* Prevent interaction interference */
+  z-index: 1;                               /* Above canvas background, below cards */
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3); /* Subtle glow effect for visibility */
+}
+
+/**
+ * Center Marker Inner Dot
+ * 
+ * Provides a solid inner indicator within the center marker for precise
+ * center point identification. Uses pseudo-element to avoid additional
+ * HTML structure while maintaining clean, centered positioning.
+ */
+.center-marker::after {
+  content: '';                              /* Empty pseudo-element content */
+  position: absolute;                       /* Position relative to parent marker */
+  top: 50%;                                 /* Vertical center within marker */
+  left: 50%;                                /* Horizontal center within marker */
+  width: 8px;                               /* Small solid dot for precise center indication */
+  height: 8px;                              /* Square aspect for perfect circle */
+  background: white;                        /* Solid white for maximum contrast */
+  border-radius: 50%;                       /* Perfect circle shape */
+  transform: translate(-50%, -50%);        /* Perfect center alignment */
+}
+
+/**
+ * Stash Tile Interactive Elements
+ * 
+ * Defines the visual presentation and behavior of individual bookmark tiles
+ * within category cards. Each tile represents a single link/bookmark and
+ * provides hover feedback, smooth animations, and optimal layout for both
+ * content readability and interactive elements like edit/delete buttons.
+ */
+.stash-tile {
+  background: rgba(30, 41, 59, 0.8);       /* Slate gray background darker than cards for hierarchy */
+  transition: all var(--animation-duration) ease; /* Smooth hover transitions (200ms default) */
+  position: relative;                       /* Enable absolute positioning of child elements */
+  overflow: hidden;                         /* Contain any overflowing content cleanly */
+  border-radius: calc(var(--border-radius) * 0.75); /* Slightly smaller radius than cards for visual hierarchy */
+}
+
+/**
+ * Stash Tile Hover Enhancement
+ * 
+ * Provides engaging hover feedback for individual bookmark tiles that indicates
+ * interactivity and draws attention to available actions. The subtle lift effect
+ * using transform creates depth without requiring expensive box-shadow changes.
+ */
+.stash-tile:hover {
+  background: rgba(51, 65, 85, 0.9);       /* Lighter slate gray indicates hover state */
+  transform: translateY(-1px);             /* Subtle upward lift effect (GPU accelerated) */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Gentle shadow reinforces lift effect */
+}
+
+/**
+ * Favicon and Icon Management System
+ * 
+ * Handles the presentation of website favicons and custom icons within stash tiles.
+ * Icons are sized consistently and positioned for optimal readability while
+ * providing smooth hover animations that enhance the overall interactive feel.
+ */
+.stash-icon {
+  width: 24px;                              /* Standard icon size for consistency and readability */
+  height: 24px;                             /* Square aspect maintains icon proportions */
+  object-fit: contain;                      /* Prevent distortion while filling space */
+  transition: all var(--animation-duration) ease; /* Smooth scaling transitions */
+  border-radius: 4px;                       /* Subtle corner rounding for modern appearance */
+}
+
+/**
+ * Icon Hover Animation Enhancement
+ * 
+ * Provides subtle scaling animation when users hover over stash tiles,
+ * creating a cohesive interaction pattern that extends across all tile elements.
+ * The small scale increase (1.05x) is noticeable but not distracting.
+ */
+.stash-tile:hover .stash-icon {
+  transform: scale(1.05);                   /* Subtle enlargement on hover for engagement */
+}

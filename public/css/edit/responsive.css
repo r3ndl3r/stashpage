@@ -1,0 +1,385 @@
+/* /css/edit/responsive.css */
+
+/**
+ * Responsive Design and Mobile Optimization Module
+ * 
+ * This stylesheet handles the transformation of the dashboard editor from its
+ * desktop free-form canvas layout to mobile-optimized linear layouts. It addresses
+ * the fundamental challenge of adapting a large-canvas drag-and-drop interface
+ * for touch devices where precise positioning is difficult and screen space is limited.
+ *
+ */
+
+/**
+ * Primary Mobile Breakpoint Optimization (≤768px)
+ * 
+ * This breakpoint handles the fundamental transformation from desktop canvas mode
+ * to mobile-first linear layout. The changes address several key mobile UX issues:
+ * - Touch screens make precise drag-and-drop positioning difficult
+ * - Limited screen space requires content prioritization
+ * - Vertical scrolling is more natural than complex 2D navigation on mobile
+ */
+@media (max-width: 768px) {
+    /**
+     * Canvas Container Mobile Transformation
+     * 
+     * Converts the large virtual canvas to a standard mobile viewport that works
+     * with natural scrolling behavior. This eliminates the need for users to
+     * navigate a large 2D space on small screens where spatial relationships
+     * are harder to understand and maintain.
+     */
+    #dashboard-main-area {
+        width: 100vw !important;               /* Use full viewport width instead of large canvas */
+        height: auto !important;               /* Natural height based on content instead of fixed canvas */
+        min-width: 100% !important;            /* Ensure minimum viewport coverage */
+    }
+    
+    /**
+     * Dashboard Canvas Mobile Layout
+     * 
+     * Transforms the positioned canvas container into a standard scrollable document
+     * with appropriate padding for mobile interaction patterns. The padding accounts
+     * for fixed toolbars and provides comfortable margins for thumb navigation.
+     */
+    #dashboard-canvas {
+        position: static !important;           /* Remove absolute positioning for normal document flow */
+        width: 100% !important;                /* Full width utilizes available screen space */
+        height: auto !important;               /* Natural height grows with content */
+        padding: 5rem 1rem 6rem 1rem;         /* Top/bottom padding accounts for fixed toolbars */
+    }
+    
+    /**
+     * Category Card Mobile Stacking System
+     * 
+     * Converts draggable positioned cards to full-width stacked elements optimized
+     * for mobile viewing and touch interaction. Full-width cards make better use
+     * of limited screen space and provide larger touch targets for interaction.
+     * 
+     */
+    .card-window {
+        position: relative !important;         /* Natural document flow instead of absolute positioning */
+        left: auto !important;                 /* Remove canvas positioning coordinates */
+        top: auto !important;                  /* Remove canvas positioning coordinates */
+        width: 100% !important;                /* Full width maximizes screen real estate usage */
+        max-width: none !important;            /* Remove desktop width constraints */
+        min-width: auto !important;            /* Remove desktop minimum width requirements */
+        margin-bottom: 1.5rem;                 /* Comfortable spacing between cards for thumb navigation */
+    }
+    
+    /**
+     * Canvas Reference Point Removal
+     * 
+     * Hides the center marker that's useful for desktop canvas navigation but
+     * unnecessary and potentially confusing in mobile linear layout where there's
+     * no free-form positioning capability.
+     */
+    .center-marker {
+        display: none;                         /* Remove spatial reference point not needed in linear layout */
+    }
+
+    /**
+     * Mobile Action Button Optimization
+     * 
+     * Overrides Tailwind CSS padding classes and touch device sizing to create
+     * appropriately sized action buttons for mobile interfaces. Targets buttons
+     * within card containers and stash tiles specifically.
+     */
+    .card-window button {
+        padding: 0.125rem !important;          /* Override Tailwind p-1 class with smaller padding */
+        width: 1.5rem !important;              /* Fixed compact width for mobile */
+        height: 1.5rem !important;             /* Fixed compact height for mobile */
+        min-height: unset !important;          /* Override touch device 44px minimum */
+        min-width: unset !important;           /* Override touch device 44px minimum */
+        display: flex !important;              /* ADD THIS: Flexbox for centering */
+        align-items: center !important;        /* ADD THIS: Vertical center */
+        justify-content: center !important;    /* ADD THIS: Horizontal center */
+    }
+    
+    .card-window button svg {
+        width: 1rem !important;             /* Proportionally smaller icons */
+        height: 1rem !important;            /* Maintain icon clarity */
+    }
+    
+/**
+     * Mobile Stash Tile Button Optimization
+     * 
+     * Provides even more compact sizing for secondary action buttons within
+     * individual stash tiles, maintaining touch accessibility while maximizing
+     * content space efficiency.
+     */
+    .stash-tile button {
+        padding: 0.125rem !important;          /* Minimal padding for space efficiency */
+        width: 1.25rem !important;             /* Ultra-compact width for tile buttons */
+        height: 1.25rem !important;            /* Proportional height */
+        min-height: unset !important;          /* Override accessibility minimums for space savings */
+        min-width: unset !important;           /* Override accessibility minimums for space savings */
+        display: flex !important;              /* ADD THIS: Flexbox for centering */
+        align-items: center !important;        /* ADD THIS: Vertical center */
+        justify-content: center !important;    /* ADD THIS: Horizontal center */
+    }
+    
+    .stash-tile button svg {
+        width: 0.625rem !important;            /* Very small icons for secondary actions */
+        height: 0.625rem !important;           /* Maintain legibility at reduced size */
+    }
+    
+    /**
+     * Mobile Toolbar Optimization System
+     * 
+     * Compacts the editing toolbar to maximize content space while maintaining
+     * all essential functionality. The optimization reduces padding, button sizes,
+     * and spacing while preserving usability and touch accessibility.
+     * 
+     * Space Optimization Strategy:
+     * - Reduced padding creates more content space
+     * - Smaller buttons maintain touch targets while saving space
+     * - Horizontal button layout uses width more efficiently
+     * - Non-essential elements hidden to focus on core functionality
+     */
+    #stashForm {
+        padding: 0.75rem !important;          /* Reduced padding saves vertical space */
+    }
+    
+    #stashForm .bg-gray-800\/95 {
+        padding: 1rem !important;             /* Compact inner spacing for toolbar content */
+    }
+    
+    /**
+     * Mobile Button Layout Optimization
+     * 
+     * Reorganizes toolbar buttons for efficient mobile layout using horizontal
+     * wrapping rows instead of vertical stacking. This approach makes better use
+     * of mobile screen width while maintaining logical grouping.
+     */
+    #stashForm .flex.flex-col.sm\:flex-row {
+        flex-direction: row !important;       /* Horizontal layout uses width efficiently */
+        flex-wrap: wrap !important;           /* Allow wrapping for smaller buttons */
+        gap: 0.5rem !important;               /* Compact spacing between buttons */
+        justify-content: center !important;   /* Center alignment for balanced appearance */
+    }
+    
+    /**
+     * Mobile Button Sizing and Typography
+     * 
+     * Reduces button dimensions and text size for mobile while maintaining
+     * adequate touch targets and readability. The sizing balances space efficiency
+     * with accessibility requirements for touch interaction.
+     */
+    #stashForm button,
+    #stashForm a {
+        padding: 0.5rem 0.75rem !important;   /* Smaller but still touch-friendly padding */
+        font-size: 0.875rem !important;       /* Reduced text size saves space while remaining readable */
+    }
+    
+    /**
+     * Mobile Content Prioritization
+     * 
+     * Hides help text and other non-essential content on mobile to focus screen
+     * space on primary functionality. Users can still access help through other
+     * means while keeping the interface uncluttered.
+     */
+    #stashForm .hidden.lg\:flex {
+        display: none !important;             /* Hide help text to maximize functional space */
+    }
+    
+    /**
+     * Mobile Icon Optimization
+     * 
+     * Scales down SVG icons proportionally with reduced button sizes to maintain
+     * visual balance and ensure icons remain clear and recognizable at smaller sizes.
+     */
+    #stashForm svg {
+        width: 1rem !important;               /* Proportionally smaller icons for compact buttons */
+        height: 1rem !important;              /* Maintain square aspect ratio for clarity */
+    }
+    
+    /**
+     * Mobile Button Group Spacing
+     * 
+     * Optimizes spacing between button groups for mobile layout density while
+     * maintaining logical separation and visual hierarchy between different
+     * functional areas of the toolbar.
+     */
+    #stashForm .flex.flex-col.sm\:flex-row.items-center.gap-3 {
+        gap: 0.5rem !important;               /* Compact spacing for efficient layout */
+        justify-content: center !important;   /* Maintain centered alignment for balance */
+    }
+
+    /**
+     * Enhanced Mobile Button Group Spacing
+     * 
+     * Provides additional spacing between major button groups to create clear
+     * visual separation and improve usability by reducing accidental taps on
+     * adjacent controls during thumb navigation.
+     */
+    #stashForm .flex.flex-col.sm\:flex-row {
+        gap: 3rem !important;                 /* Increased spacing between major button groups */
+        justify-content: center !important;   /* Centered alignment maintains visual balance */
+    }
+}
+
+/**
+ * Ultra-Compact Mobile Breakpoint (≤480px)
+ * 
+ * Handles the smallest mobile screens with even more aggressive space optimization.
+ * This breakpoint is designed for older or smaller mobile devices where every
+ * pixel of screen space is precious and interface elements must be as compact
+ * as possible while remaining usable.
+ * 
+ * Extreme Optimization Strategy:
+ * - Minimal padding reduces interface chrome to absolute minimum
+ * - Icon-only buttons save horizontal space for essential functions
+ * - Ultra-compact button sizing for maximum content space
+ * - Progressive disclosure hides all non-critical interface elements
+ */
+@media (max-width: 480px) {
+    /**
+     * Ultra-Compact Canvas Padding
+     * 
+     * Reduces canvas padding to minimum viable margins for smallest screens
+     * while still maintaining enough space for comfortable content interaction
+     * and preventing content from touching screen edges.
+     */
+    #dashboard-canvas {
+        padding: 5rem 0.5rem 5rem 0.5rem !important; /* Minimal horizontal padding for maximum width */
+    }
+    
+    /**
+     * Ultra-Compact Toolbar Styling
+     * 
+     * Applies most aggressive toolbar compaction for smallest screens where
+     * every pixel matters for content visibility and user interaction space.
+     */
+    #stashForm {
+        padding: 0.5rem !important;           /* Absolute minimum toolbar padding */
+    }
+    
+    /**
+     * Minimal Button Sizing
+     * 
+     * Reduces buttons to smallest viable size while maintaining touch accessibility
+     * standards. The sizing balances extreme space conservation with usability
+     * requirements for finger-based interaction.
+     */
+    #stashForm button,
+    #stashForm a {
+        padding: 0.5rem !important;           /* Minimum viable touch target padding */
+        font-size: 0.8rem !important;         /* Smallest readable text size */
+    }
+    
+    /**
+     * Icon-Only Interface Mode
+     * 
+     * Hides button text labels to create icon-only interface that saves horizontal
+     * space on extremely narrow screens. Icons must be universally recognizable
+     * and include proper accessibility labels for screen readers.
+     */
+    #stashForm .hidden.sm\:inline {
+        display: none !important;             /* Remove button text, show icons only */
+    }
+}
+
+/**
+ * High Contrast Accessibility Enhancement
+ * 
+ * Provides enhanced visual accessibility for users with visual impairments or
+ * those who prefer high contrast interfaces. The styling increases contrast ratios
+ * beyond standard requirements to ensure maximum readability and usability.
+ * 
+ */
+@media (prefers-contrast: high) {
+  /**
+   * High Contrast Card Enhancement
+   * 
+   * Increases card visibility and definition through stronger borders and
+   * more opaque backgrounds that provide better contrast ratios for text
+   * content and interactive elements.
+   */
+  .card-window {
+    border: 2px solid #ffffff;              /* Strong white border for clear definition */
+    background: rgba(0, 0, 0, 0.9);         /* Near-opaque background for maximum text contrast */
+  }
+
+  /**
+   * High Contrast Tile Enhancement
+   * 
+   * Improves individual stash tile visibility within cards through subtle
+   * but visible borders that help users distinguish between interactive
+   * elements and track focus during keyboard navigation.
+   */
+  .stash-tile {
+    border: 1px solid rgba(255, 255, 255, 0.5); /* Semi-transparent border maintains hierarchy */
+  }
+}
+
+/**
+ * Performance Optimization for Mobile Devices
+ * 
+ * Mobile-specific optimizations that improve performance on devices with
+ * limited processing power, memory, or network connectivity. These optimizations
+ * can be conditionally applied based on device capabilities or user preferences.
+ */
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+  /**
+   * Motion-Reduced Mobile Optimizations
+   * 
+   * Completely disables animations and transitions on mobile devices when users
+   * have indicated motion sensitivity, improving both accessibility and performance
+   * on devices where animations might cause discomfort or performance issues.
+   */
+  * {
+    animation: none !important;             /* Completely disable all animations */
+    transition: none !important;           /* Remove all transition effects */
+  }
+}
+
+/**
+ * Touch Device Specific Optimizations
+ * 
+ * Enhancements specifically for touch-capable devices that improve interaction
+ * accuracy and provide better visual feedback for touch-based interactions.
+ */
+@media (pointer: coarse) {
+  /**
+   * Enhanced Touch Target Sizing
+   * 
+   * Increases button padding and touch targets for devices with coarse pointer
+   * capabilities (primarily touch screens) to meet accessibility guidelines
+   * and improve interaction accuracy.
+   */
+  .action-btn,
+  .item-action-btn {
+    min-height: 44px;                       /* WCAG minimum touch target size */
+    min-width: 44px;                        /* Ensure adequate touch area for all directions */
+  }
+}
+
+/**
+ * Print Media Optimization
+ * 
+ * Basic print styling for users who want to create physical copies of their
+ * dashboard layouts for reference or backup purposes. Simplifies the interface
+ * and focuses on content rather than interactive elements.
+ */
+@media print {
+  /**
+   * Print Layout Simplification
+   * 
+   * Removes interactive elements and optimizes layout for paper-based viewing
+   * while maintaining content hierarchy and readability.
+   */
+  #dashboard-wrapper {
+    overflow: visible !important;           /* Show all content without scrolling */
+  }
+  
+  .action-btn,
+  .item-action-btn,
+  .save-button {
+    display: none !important;               /* Hide interactive elements irrelevant to print */
+  }
+  
+  .card-window {
+    break-inside: avoid;                    /* Prevent cards from breaking across pages */
+    margin-bottom: 1rem;                    /* Consistent spacing for print layout */
+  }
+}

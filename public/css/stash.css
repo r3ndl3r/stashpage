@@ -1,0 +1,494 @@
+/* /css/stash.css */
+
+/**
+ * Stash Application Styling Module
+ * 
+ * This stylesheet provides comprehensive styling for all stash-related pages including
+ * the dashboard index (stash list), dashboard canvas (individual stash view), and
+ * edit mode interfaces. It handles multiple layout paradigms and responsive behavior
+ * for optimal user experience across devices.
+ */
+
+body.dashboard-index {
+    background-image:
+        radial-gradient(at 0% 0%, rgba(129, 140, 248, 0.05) 0px, transparent 50%),    /* Subtle indigo accent top-left */
+        radial-gradient(at 100% 0%, rgba(250, 204, 21, 0.03) 0px, transparent 50%),   /* Warm amber accent top-right */
+        radial-gradient(at 0% 100%, rgba(239, 68, 68, 0.05) 0px, transparent 50%),    /* Red accent bottom-left for balance */
+        radial-gradient(at 100% 100%, rgba(34, 197, 94, 0.03) 0px, transparent 50%);  /* Green accent bottom-right */
+    background-size: cover;                   /* Full viewport coverage */
+    background-position: center;              /* Centered gradient positioning */
+    background-attachment: fixed;             /* Stable background during scrolling */
+    background-color: #111827;                /* Deep slate gray base color */
+    font-family: 'Inter', sans-serif;        /* Modern, readable typography */
+    margin: 0;                                /* Remove default margins */
+}
+
+/**
+ * Dashboard Canvas Page Foundation
+ * 
+ * Creates the specialized layout for individual stash view pages where categories
+ * are positioned absolutely on a large virtual canvas. Includes flexbox centering
+ * to position the scrollable viewport optimally within the browser window.
+ * 
+ * Canvas Approach:
+ * - Large virtual space (4000x2500px) for free-form category arrangement
+ * - Absolute positioning enables drag-and-drop functionality
+ * - Flexbox centering provides optimal initial viewport positioning
+ * - Full viewport height ensures complete space utilization
+ */
+body.dashboard-canvas {
+    background-image:
+        radial-gradient(at 0% 0%, rgba(129, 140, 248, 0.05) 0px, transparent 50%),    /* Consistent gradient pattern */
+        radial-gradient(at 100% 0%, rgba(250, 204, 21, 0.03) 0px, transparent 50%),   /* Matches index page aesthetics */
+        radial-gradient(at 0% 100%, rgba(239, 68, 68, 0.05) 0px, transparent 50%),    /* Visual continuity across pages */
+        radial-gradient(at 100% 100%, rgba(34, 197, 94, 0.03) 0px, transparent 50%);  /* Completes corner gradient system */
+    background-size: cover;                   /* Full coverage for seamless appearance */
+    background-position: center;              /* Centered positioning for balance */
+    background-attachment: fixed;             /* Prevents background shifting during canvas navigation */
+    overflow-x: hidden;                       /* Prevents horizontal body scrolling */
+    font-family: 'Inter', sans-serif;        /* Typography consistency */
+    background-color: #111827;                /* Base dark theme color */
+    display: flex;                            /* Flexbox container for viewport centering */
+    justify-content: center;                  /* Horizontal centering of canvas viewport */
+    align-items: center;                      /* Vertical centering for balanced presentation */
+    height: 100vh;                            /* Full viewport height utilization */
+    margin: 0;                                /* Clean margin reset */
+}
+
+/**
+ * Canvas Viewport Management
+ * 
+ * Defines the scrollable viewport through which users navigate the large
+ * virtual canvas. This container handles all scrolling behavior while
+ * maintaining the canvas's large dimensions for category positioning.
+ */
+#dashboard-wrapper {
+    width: 100vw;                             /* Full viewport width for maximum workspace */
+    height: 100vh;                            /* Full viewport height for complete canvas access */
+    overflow: auto;                           /* Enable scrolling for canvas navigation */
+}
+
+/**
+ * Interactive Stash Card System
+ * 
+ * Provides modern glass morphism styling for stash cards in the index view
+ * with smooth hover animations that enhance user engagement and provide
+ * clear visual feedback for interactive elements.
+ */
+.stash-card {
+    background-color: rgba(30, 41, 59, 0.7);  /* Semi-transparent slate background */
+    backdrop-filter: blur(10px);              /* Glass morphism blur effect */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle light border for definition */
+    transition: all 0.3s ease-in-out;        /* Smooth multi-property transitions */
+}
+
+.stash-card:hover {
+    background-color: rgba(51, 65, 85, 0.9);  /* Darker background on hover for feedback */
+    transform: translateY(-2px);             /* Subtle lift effect creates depth */
+    border-color: rgba(255, 255, 255, 0.2);  /* Enhanced border visibility on hover */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2); /* Layered shadows for elevation */
+}
+
+/**
+ * Category Card Canvas Positioning
+ * 
+ * Handles the specialized styling for category cards in canvas mode where
+ * they are absolutely positioned and draggable. Uses glass morphism effects
+ * to maintain visual consistency while enabling free-form arrangement.
+ */
+.card-window {
+    position: absolute;                       /* Enable free positioning anywhere on canvas */
+    background-color: rgba(0, 0, 0, 0.4);    /* Dark semi-transparent background for content contrast */
+    backdrop-filter: blur(10px);              /* Blur effect maintains readability over background */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border for card definition */
+    min-width: 280px;                         /* Minimum width ensures readability on all screen sizes */
+}
+
+/**
+ * Individual Stash Tile Styling
+ * 
+ * Provides consistent styling for individual bookmark tiles within categories
+ * with smooth hover effects that indicate interactivity and enhance the
+ * overall user experience through subtle visual feedback.
+ */
+.stash-tile {
+    background-color: rgba(30, 41, 59, 0.7);  /* Darker background differentiates from container */
+    transition: all 0.2s ease-in-out;        /* Quick transitions maintain responsiveness */
+}
+
+.stash-tile:hover {
+    background-color: rgba(51, 65, 85, 0.9);  /* Lighter background provides hover feedback */
+    transform: translateY(-2px);             /* Consistent lift effect across interface */
+}
+
+/**
+ * Icon Standardization System
+ * 
+ * Ensures consistent sizing and presentation of website favicons and
+ * custom icons throughout the interface while maintaining aspect ratios
+ * and preventing distortion from various icon sources.
+ */
+.stash-icon {
+    width: 24px;                              /* Standard icon size for consistency */
+    height: 24px;                             /* Square aspect maintains proportions */
+    object-fit: contain;                      /* Prevents distortion while filling space */
+}
+
+/**
+ * Floating Edit Button Positioning
+ * 
+ * Positions the primary edit action button in a consistent, accessible
+ * location that remains visible during scrolling and doesn't interfere
+ * with content interaction.
+ */
+.edit-button {
+    position: fixed;                          /* Consistent positioning regardless of scroll */
+    bottom: 20px;                             /* Comfortable margin from viewport edge */
+    right: 20px;                              /* Standard right-side placement for primary actions */
+    z-index: 100;                             /* Above content but below modals */
+}
+
+/**
+ * Enhanced Quick Create Section
+ * 
+ * Creates an attractive gradient background for the prominent quick create
+ * section with layered effects that draw attention without overwhelming
+ * the interface or reducing usability.
+ */
+.quick-create-gradient {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); /* Blue to purple gradient */
+    position: relative;                       /* Enable pseudo-element positioning */
+    overflow: hidden;                         /* Contain overlay effects */
+}
+
+.quick-create-gradient::before {
+    content: '';                              /* Empty pseudo-element for overlay */
+    position: absolute;                       /* Cover entire parent element */
+    top: 0;                                   /* Full coverage from top */
+    left: 0;                                  /* Full coverage from left */
+    right: 0;                                 /* Full coverage to right */
+    bottom: 0;                                /* Full coverage to bottom */
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); /* Light reflection overlay */
+    pointer-events: none;                     /* Allow clicks to pass through to content */
+}
+
+/**
+ * Management Tools Section Enhancement
+ * 
+ * Provides consistent styling for the management tools section using
+ * the same glass morphism approach as other interface elements to
+ * maintain visual cohesion throughout the application.
+ */
+.management-tools {
+    background-color: rgba(30, 41, 59, 0.4);  /* Semi-transparent background matches card system */
+    backdrop-filter: blur(10px);              /* Consistent blur effect */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border maintains definition */
+}
+
+/**
+ * Modal Dialog System
+ * 
+ * Provides base styling for modal dialogs with backdrop blur effects
+ * and visibility state management. The system supports multiple modal
+ * types while maintaining consistent visual presentation.
+ */
+#renameModal, #cloneModal, #importModal {
+    display: none;                            /* Hidden by default to prevent layout issues */
+    backdrop-filter: blur(8px);              /* Blur background content during modal display */
+}
+
+#renameModal.is-visible, #cloneModal.is-visible, #importModal.is-visible {
+    display: flex;                            /* Flexbox enables centering when visible */
+}
+
+/**
+ * Enhanced Modal Backgrounds and Content
+ * 
+ * Creates sophisticated modal presentation with layered glass morphism
+ * effects that maintain readability while providing clear visual
+ * separation from background content.
+ */
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.75);    /* Dark overlay reduces background distraction */
+    backdrop-filter: blur(4px);              /* Additional blur layer for focus enhancement */
+}
+
+.modal-content {
+    background-color: rgba(30, 41, 59, 0.95); /* Near-opaque background ensures content readability */
+    backdrop-filter: blur(10px);              /* Glass morphism effect maintains modern aesthetic */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border defines modal boundaries */
+}
+
+/**
+ * Dynamic Content Transitions
+ * 
+ * Provides smooth height transitions for collapsible content areas
+ * such as category link lists, enhancing the user experience through
+ * polished animations that feel responsive and natural.
+ */
+.link-list {
+    transition: max-height 0.3s ease-out;    /* Smooth expand/collapse animation */
+}
+
+/**
+ * Interactive Button Enhancement System
+ * 
+ * Creates engaging hover effects for interactive elements that provide
+ * immediate feedback and enhance the perceived responsiveness of the
+ * interface through subtle lift animations and shadow changes.
+ */
+.btn-hover-lift {
+    transition: all 0.2s ease-in-out;        /* Quick transitions maintain responsiveness */
+}
+
+.btn-hover-lift:hover {
+    transform: translateY(-1px);             /* Subtle lift indicates interactivity */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Enhanced shadow reinforces elevation */
+}
+
+/**
+ * Empty State Visual Management
+ * 
+ * Handles the presentation of empty states with subtle opacity changes
+ * that draw attention when needed while maintaining visual hierarchy
+ * and not overwhelming users with unnecessary emphasis.
+ */
+.empty-state {
+    opacity: 0.8;                             /* Reduced opacity indicates inactive/empty state */
+    transition: opacity 0.3s ease-in-out;    /* Smooth opacity transitions */
+}
+
+.empty-state:hover {
+    opacity: 1;                               /* Full opacity on hover indicates interactivity */
+}
+
+/**
+ * Mobile Responsive Layout Transformation
+ * 
+ * Completely restructures the dashboard canvas for mobile devices by converting
+ * the absolute positioning system to a linear document flow. This transformation
+ * is necessary because touch devices make precise positioning difficult and
+ * mobile screens benefit from vertical scrolling patterns.
+ * 
+ * Key Changes:
+ * - Converts canvas positioning to natural document flow
+ * - Stacks category cards vertically for thumb navigation
+ * - Removes canvas-specific elements that don't translate to mobile
+ * - Optimizes spacing and sizing for touch interaction
+ */
+@media (max-width: 768px) {
+    /**
+     * Mobile Body Scroll Management
+     * 
+     * Adjusts scroll behavior for mobile devices where the complex canvas
+     * navigation is replaced with standard vertical scrolling patterns
+     * that feel natural on touch devices.
+     */
+    body.dashboard-canvas {
+        overflow-y: auto;                     /* Enable vertical scrolling for mobile content */
+        overflow-x: hidden;                   /* Prevent horizontal scrolling issues */
+    }
+
+    /**
+     * Mobile Canvas Container Transformation
+     * 
+     * Converts the large virtual canvas to a standard mobile viewport
+     * that works with natural scrolling behavior instead of complex
+     * 2D navigation that's difficult on touch screens.
+     */
+    #dashboard-main-area {
+        width: 100vw !important;              /* Use full viewport width instead of large canvas */
+        height: auto !important;              /* Natural height based on content flow */
+        min-width: 100% !important;           /* Ensure minimum viewport coverage */
+    }
+
+    /**
+     * Mobile Layout Flow Conversion
+     * 
+     * This is the critical transformation that converts absolute positioned
+     * elements to natural document flow, making the interface touch-friendly
+     * and eliminating complex spatial relationships that don't work on mobile.
+     */
+    #dashboard-canvas {
+        position: static !important;          /* CRITICAL: Remove absolute positioning for mobile flow */
+        width: 100% !important;               /* Full width utilizes available screen space */
+        height: auto !important;              /* Natural height grows with content */
+        padding: 5rem 1rem 1rem 1rem;        /* Generous padding accounts for fixed navigation */
+    }
+
+    /**
+     * Mobile Card Stacking System
+     * 
+     * Transforms absolutely positioned category cards into a vertical
+     * stack that's optimized for thumb navigation and touch interaction
+     * on mobile devices.
+     */
+    .card-window {
+        position: relative !important;        /* Natural document flow instead of absolute positioning */
+        left: auto !important;                /* Remove canvas positioning coordinates */
+        top: auto !important;                 /* Remove canvas positioning coordinates */
+        width: 100%;                          /* Full width maximizes screen real estate */
+        margin-bottom: 1.5rem;                /* Consistent spacing between stacked cards */
+    }
+
+    /**
+     * Mobile Interface Cleanup
+     * 
+     * Removes desktop-specific interface elements that don't provide
+     * value on mobile devices or might cause confusion in the
+     * simplified mobile layout.
+     */
+    .center-marker {
+        display: none;                        /* Remove spatial reference point unnecessary in linear layout */
+    }
+    
+    /**
+     * Mobile Grid Layout Optimization
+     * 
+     * Simplifies grid layouts to single columns for optimal mobile
+     * viewing and interaction, ensuring content remains accessible
+     * and readable on narrow screens.
+     */
+    .stash-grid {
+        grid-template-columns: 1fr;           /* Single column layout for mobile screens */
+        gap: 1rem;                            /* Reduced gap saves valuable screen space */
+    }
+    
+    /**
+     * Mobile Quick Create Layout
+     * 
+     * Adjusts the quick create section to stack vertically on mobile,
+     * providing better usability for touch input and ensuring buttons
+     * remain accessible with thumb navigation.
+     */
+    .quick-create-content {
+        flex-direction: column;               /* Vertical stacking for mobile layout */
+        gap: 1rem;                            /* Consistent spacing between stacked elements */
+    }
+    
+    .quick-create-input {
+        width: 100%;                          /* Full width input maximizes touch target */
+    }
+}
+
+/**
+ * Ultra-Mobile Optimization (≤480px)
+ * 
+ * Additional optimizations for very small screens where every pixel
+ * matters and interface elements must be as compact as possible while
+ * maintaining usability and accessibility standards.
+ */
+@media (max-width: 480px) {
+    /**
+     * Compact Management Tools
+     * 
+     * Maximizes screen space usage by extending management tools to
+     * screen edges and adjusting button layouts for optimal thumb
+     * accessibility on very small devices.
+     */
+    .management-tools {
+        margin: 0 -1rem;                      /* Extend to screen edges for maximum width */
+        border-radius: 0;                     /* Remove radius for edge-to-edge appearance */
+    }
+    
+    .management-buttons {
+        flex-direction: column;               /* Stack buttons vertically for better touch targets */
+        gap: 0.75rem;                         /* Compact but comfortable spacing */
+    }
+}
+
+/**
+ * Animation Library
+ * 
+ * Provides a collection of smooth, performant animations that enhance
+ * the user experience without overwhelming the interface. All animations
+ * use GPU-accelerated properties for optimal performance across devices.
+ */
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;      /* Smooth fade with subtle movement */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;                           /* Start completely transparent */
+        transform: translateY(10px);         /* Begin slightly below final position */
+    }
+    to {
+        opacity: 1;                           /* End fully opaque */
+        transform: translateY(0);             /* Settle at natural position */
+    }
+}
+
+/**
+ * Slide-up Animation Class
+ * 
+ * Creates engaging upward slide animation for content that appears
+ * dynamically, providing clear visual indication of new content
+ * while maintaining smooth, natural motion.
+ */
+.slide-up {
+    animation: slideUp 0.3s ease-out;        /* Upward slide with deceleration */
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;                           /* Start transparent */
+        transform: translateY(20px);         /* Begin below final position */
+    }
+    to {
+        opacity: 1;                           /* End fully visible */
+        transform: translateY(0);             /* Settle at natural position */
+    }
+}
+
+/**
+ * Accessibility Focus Enhancement
+ * 
+ * Provides clear, high-contrast focus indicators for keyboard navigation
+ * users that meet WCAG accessibility guidelines while maintaining
+ * visual consistency with the overall design system.
+ */
+.focus-ring:focus {
+    outline: 2px solid #3b82f6;              /* High-contrast blue outline meets accessibility standards */
+    outline-offset: 2px;                      /* Separation prevents content overlap */
+}
+
+/**
+ * Loading State Visual Indicator
+ * 
+ * Creates a comprehensive loading state system with spinning animation
+ * that provides clear feedback during asynchronous operations while
+ * preventing user interaction with loading elements.
+ */
+.loading {
+    position: relative;                       /* Enable absolute positioning of spinner */
+    pointer-events: none;                     /* Prevent interaction during loading */
+}
+
+.loading::after {
+    content: '';                              /* Empty pseudo-element for spinner */
+    position: absolute;                       /* Position independently of content */
+    top: 50%;                                 /* Vertical center of loading element */
+    left: 50%;                                /* Horizontal center of loading element */
+    width: 20px;                              /* Standard spinner size for visibility */
+    height: 20px;                             /* Square aspect for perfect circle */
+    margin: -10px 0 0 -10px;                 /* Perfect centering with negative margins */
+    border: 2px solid #3b82f6;               /* Blue spinner color matches brand */
+    border-radius: 50%;                       /* Perfect circle shape */
+    border-top-color: transparent;           /* Transparent top creates rotation effect */
+    animation: spin 1s linear infinite;       /* Continuous smooth rotation */
+}
+
+/**
+ * Spinner Animation Keyframes
+ * 
+ */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);            /* Complete full rotation every cycle */
+    }
+}
+
+
+

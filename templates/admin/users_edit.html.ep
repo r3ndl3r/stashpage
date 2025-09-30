@@ -1,0 +1,109 @@
+<!-- /templates/user_edit.html.ep -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #111827;
+        }
+    </style>
+    <link rel="shortcut icon" href="favicon.ico"/>
+</head>
+<body class="bg-gray-900 text-gray-200 font-sans">
+    <%= include 'topbar' %>
+    
+    <div class="container mx-auto p-4 md:p-8">
+        <div class="max-w-md mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-6">
+                <h1 class="text-2xl font-bold text-white mb-2">Edit User</h1>
+                <p class="text-gray-400">Editing: <span class="text-blue-400 font-medium"><%= $user->{username} %></span></p>
+            </div>
+
+            <!-- Edit Form Card -->
+            <div class="bg-gray-800 rounded-lg p-6 shadow-xl border border-gray-700">
+                <form action="/user/<%= $user->{id} %>/edit" method="POST" class="space-y-4">
+                    
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-300 mb-2">
+                            Username
+                        </label>
+                        <input type="text" 
+                               id="username" 
+                               name="username" 
+                               value="<%= $user->{username} %>" 
+                               class="w-full p-3 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                               required>
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-300 mb-2">
+                            Email Address
+                        </label>
+                        <input type="email" 
+                               id="email" 
+                               name="email" 
+                               value="<%= $user->{email} %>" 
+                               class="w-full p-3 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                               required>
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-300 mb-2">
+                            New Password
+                        </label>
+                        <input type="password" 
+                               id="password" 
+                               name="password" 
+                               class="w-full p-3 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                               placeholder="Leave blank to keep current password">
+                        <p class="text-xs text-gray-400 mt-1">Only fill this if you want to change the password</p>
+                    </div>
+
+                    <div class="flex items-center space-x-3 p-3 bg-gray-700 rounded-md">
+                        <input type="checkbox" 
+                               id="is_admin" 
+                               name="is_admin" 
+                               value="1" 
+                               <% if ($user->{is_admin}) { %>checked<% } %> 
+                               class="w-4 h-4 text-blue-600 bg-gray-600 border-gray-500 rounded focus:ring-blue-500 focus:ring-2">
+                        <label for="is_admin" class="text-sm font-medium text-gray-300">
+                            Administrator privileges
+                        </label>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-3 pt-4">
+                        <button type="submit" 
+                                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            Save Changes
+                        </button>
+                        <a href="/users" 
+                           class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-md text-center transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- User Info Card -->
+            <div class="bg-gray-800 rounded-lg p-4 mt-4 border border-gray-700">
+                <h3 class="text-sm font-medium text-gray-300 mb-3">User Information</h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">User ID:</span>
+                        <span class="text-gray-200"><%= $user->{id} %></span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Current Status:</span>
+                        <span class="text-green-400">Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

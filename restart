@@ -1,0 +1,4 @@
+#!/bin/bash
+cd $HOME/stashpage
+hypnotoad -s stashpage.pl
+hypnotoad stashpage.pl

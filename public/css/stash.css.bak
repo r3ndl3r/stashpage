@@ -1,0 +1,197 @@
+/* /css/stash.css */
+
+/**
+ * Stash View Page Styling Module
+ * 
+ * This stylesheet provides the visual foundation for stash view pages including
+ * the main landing/index page and individual stash display pages. It creates
+ * a clean, centered layout optimized for content consumption and navigation
+ * rather than complex editing interactions.
+ * 
+ * Key Features:
+ * - Sophisticated gradient background matching the overall application theme
+ * - Centered viewport layout for focused content presentation
+ * - Clean container styling that removes default browser chrome
+ * - Enhanced alert system with smooth animations and clear visual hierarchy
+ * - Modern typography using Inter font for optimal readability
+ * - Responsive design principles for cross-device compatibility
+ * 
+ * Design Philosophy:
+ * Unlike the complex canvas-based edit interface, this stylesheet focuses on
+ * simplicity and content clarity. The centered layout draws attention to the
+ * primary content while the gradient background provides visual interest
+ * without overwhelming the interface elements.
+ * 
+ * Dependencies:
+ * - Inter font family: Modern, highly legible typeface
+ * - Compatible with view-only stash interface templates
+ * 
+ * Usage:
+ * This stylesheet is loaded on stash view pages and provides the foundational
+ * styling for content presentation, navigation, and user feedback systems.
+ */
+
+/**
+ * Application Foundation and Background System
+ * 
+ * Creates the primary visual environment for stash view pages with sophisticated
+ * gradient background that provides visual depth and interest while maintaining
+ * excellent readability for content elements. The centered flexbox layout ensures
+ * content is optimally positioned regardless of viewport size.
+ * 
+ * Visual Design Elements:
+ * - Deep slate gray base (#111827) provides optimal contrast for light text
+ * - Four-corner radial gradients create subtle color accents and atmospheric depth
+ * - Fixed background attachment maintains consistent appearance during scrolling
+ * - Centered layout focuses user attention on primary content areas
+ * - Overflow-x hidden prevents horizontal scrollbars on narrow viewports
+ * 
+ * Technical Implementation:
+ * - Multiple layered radial gradients positioned at viewport corners
+ * - Flexbox centering works reliably across all modern browsers
+ * - 100vh height ensures full viewport coverage without content gaps
+ * - Fixed attachment keeps background stationary during page interactions
+ */
+body {
+    background-color: #111827;                /* Deep slate gray base color for dark theme foundation */
+    background-image:
+        radial-gradient(at 0% 0%, rgba(129, 140, 248, 0.08) 0px, transparent 50%),     /* Top-left indigo accent for subtle color variation */
+        radial-gradient(at 100% 0%, rgba(250, 204, 21, 0.06) 0px, transparent 50%),    /* Top-right amber accent for warm contrast */
+        radial-gradient(at 0% 100%, rgba(239, 68, 68, 0.08) 0px, transparent 50%),     /* Bottom-left red accent for visual balance */
+        radial-gradient(at 100% 100%, rgba(34, 197, 94, 0.06) 0px, transparent 50%);   /* Bottom-right green accent for completed color spectrum */
+    background-size: cover;                   /* Ensure gradients fill entire viewport area */
+    background-position: center;              /* Center the gradient pattern for optimal visual balance */
+    background-attachment: fixed;             /* Keep background stationary during page scrolling */
+    overflow-x: hidden;                       /* Prevent horizontal scrollbars on narrow viewports */
+    font-family: 'Inter', sans-serif;        /* Modern, highly legible typeface optimized for UI */
+    display: flex;                            /* Flexbox layout for reliable content centering */
+    justify-content: center;                  /* Horizontal centering of main content area */
+    align-items: center;                      /* Vertical centering creates balanced viewport usage */
+    height: 100vh;                            /* Full viewport height ensures complete coverage */
+    margin: 0;                                /* Remove default body margins for clean layout */
+}
+
+/**
+ * Main Content Container Reset
+ * 
+ * Removes all default styling from the main content container to create a clean
+ * foundation for content presentation. This reset ensures that content appears
+ * without browser-imposed styling constraints or visual artifacts.
+ * 
+ * Reset Strategy:
+ * - Transparent background prevents interference with body gradient
+ * - No borders or shadows create clean content boundaries
+ * - Zero padding allows content to define its own spacing
+ * - Auto width enables responsive content sizing
+ */
+.main {
+    background: none;                         /* Transparent background shows body gradient */
+    border: none;                             /* Remove default container borders */
+    box-shadow: none;                         /* No shadows maintain clean appearance */
+    padding: 0;                               /* Zero padding allows content control spacing */
+    width: auto;                              /* Automatic width enables responsive behavior */
+}
+
+/**
+ * Enhanced Alert System with Animation
+ * 
+ * Creates visually prominent alert messages with sophisticated styling and smooth
+ * entrance animations. The alert system uses warm gradient backgrounds and strong
+ * visual hierarchy to ensure important messages receive appropriate user attention
+ * while maintaining readability and accessibility.
+ * 
+ * Visual Design Features:
+ * - Warm gradient background (coral to rose) draws attention without being harsh
+ * - Left border accent reinforces alert importance and provides visual anchor
+ * - Generous padding creates comfortable reading space and touch targets
+ * - Enhanced typography with increased font weight and letter spacing
+ * - Prominent warning emoji provides immediate visual context
+ * - Smooth drop shadow creates depth and separation from background
+ * 
+ * Accessibility Considerations:
+ * - High contrast dark text on light gradient background
+ * - Generous font size (17px) ensures readability across devices
+ * - Word wrapping handles long messages gracefully
+ * - Icon and text combination provides multiple information channels
+ * - Responsive width adapts to various screen sizes
+ */
+.alert {
+    background: linear-gradient(135deg, #ffdde1, #ee9ca7); /* Warm coral-to-rose gradient for attention */
+    color: #3a0d0d;                          /* Dark red-brown text for high contrast readability */
+    border-left: 6px solid #ff4b5c;          /* Strong red accent border for visual importance */
+    border-radius: 12px;                     /* Generous corner rounding for modern appearance */
+    padding: 18px 24px;                      /* Comfortable padding for content and touch interaction */
+    font-size: 17px;                         /* Large font size ensures readability across devices */
+    font-weight: 600;                        /* Semi-bold weight increases text prominence */
+    letter-spacing: 0.3px;                  /* Subtle letter spacing improves readability */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15); /* Soft shadow creates depth and separation */
+    animation: popIn 0.4s ease-out;          /* Smooth entrance animation draws attention */
+
+    /* Flexbox Layout for Icon and Text */
+    display: flex;                            /* Flexbox layout for icon and text alignment */
+    align-items: center;                      /* Vertical centering of icon and text elements */
+    gap: 12px;                                /* Consistent spacing between icon and text */
+
+    /* Responsive Sizing and Positioning */
+    max-width: 800px;                         /* Prevent overly wide alerts on large screens */
+    width: 90%;                               /* Responsive width with comfortable margins */
+    text-align: left;                         /* Left-aligned text for optimal reading flow */
+
+    /* Text Handling and Overflow Management */
+    white-space: normal;                      /* Allow normal text wrapping behavior */
+    word-wrap: break-word;                    /* Break long words to prevent overflow */
+    overflow-wrap: anywhere;                  /* Aggressive wrapping for edge cases */
+}
+
+/**
+ * Alert Icon Styling
+ * 
+ * Provides a prominent warning icon using emoji for immediate visual context.
+ * The icon is positioned consistently and sized appropriately to complement
+ * the alert text while maintaining visual hierarchy.
+ * 
+ * Design Details:
+ * - Warning emoji (⚠️) provides universal recognition
+ * - Larger size (22px) ensures visibility and prominence
+ * - flex-shrink: 0 prevents icon compression in flexbox layout
+ * - Positioned before text content for logical reading order
+ */
+.alert::before {
+    content: "⚠️";                            /* Universal warning symbol for immediate recognition */
+    font-size: 22px;                         /* Larger size creates visual prominence */
+    flex-shrink: 0;                           /* Prevent icon compression in flexible layout */
+}
+
+/**
+ * Alert Entrance Animation Keyframes
+ * 
+ * Defines a sophisticated "pop-in" animation that draws user attention to alert
+ * messages through a combination of opacity, scaling, and vertical movement.
+ * The animation creates a bouncy, engaging entrance that feels responsive and
+ * polished while not being overly distracting.
+ * 
+ * Animation Phases:
+ * 1. Start (0%): Invisible, slightly smaller, positioned above final location
+ * 2. Peak (60%): Fully visible, slightly oversized, with subtle downward overshoot
+ * 3. Settle (100%): Final state with natural size and position
+ * 
+ * Technical Benefits:
+ * - Transform and opacity properties are GPU-accelerated for smooth performance
+ * - Multi-stage animation creates natural, engaging motion
+ * - Ease-out timing function provides smooth deceleration
+ * - 0.4s duration balances attention-getting with user patience
+ */
+@keyframes popIn {
+    0%   { 
+        opacity: 0;                           /* Start completely transparent */
+        transform: scale(0.9) translateY(-15px); /* Begin smaller and above final position */
+    }
+    60%  { 
+        opacity: 1;                           /* Reach full opacity early in animation */
+        transform: scale(1.05) translateY(3px); /* Slight overshoot creates bounce effect */
+    }
+    100% { 
+        opacity: 1;                           /* Maintain full opacity */
+        transform: scale(1) translateY(0);    /* Settle at natural size and position */
+    }
+}
