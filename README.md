@@ -60,7 +60,7 @@ Perfect for homelab enthusiasts and teams who want to centrally manage and acces
 
 5. **Start the application**:
    ```
-   morbo script/stashpage
+   hypnotoad script/stashpage
    ```
 
 ## Configuration
