@@ -480,8 +480,8 @@ export function addCategory() {
             const wrapper = document.getElementById('dashboard-wrapper');
             if (wrapper) {
                 const rect = cardElement.getBoundingClientRect();
-                wrapper.scrollLeft = newCategory.x - (wrapper.clientWidth / 2) + (rect.width / 2);
-                wrapper.scrollTop = newCategory.y - (wrapper.clientHeight / 2) + 25; // 25 accounts for topbar height
+                wrapper.scrollLeft = newCategory.x - (wrapper.clientWidth / 2);
+                wrapper.scrollTop = newCategory.y - (wrapper.clientHeight / 2);
             }
         }
 
