@@ -41,7 +41,8 @@ sub save {
     if ($c->save_stash_page_data($page_key, $categories)) {
         return $c->redirect_to("/stash?n=$page_key");
     } else {
-        return $c->alert("Failed to save: " . ($c->db->{dbh}->errstr || 'Unknown error'), 500);
+        return $c->alert("Failed to save: " . ($c->db->{dbh}->errstr || ($c->is_demo ? 'demo account cannot save edits' : 'Unknown error')), 500);
+
     }
 }
 
@@ -99,7 +100,10 @@ sub export {
 sub import {
     my $c = shift;
     return $c->redirect_to('/login') unless $c->is_logged_in;
-    
+
+    # Block demo users from importing data
+    return $c->alert('Demo account cannot import data.', 403) if $c->is_demo;
+        
     my $upload = $c->param('import_file');
     
     # Validate file upload

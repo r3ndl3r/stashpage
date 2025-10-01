@@ -25,6 +25,10 @@ sub delete {
     my $c = shift;
     # Enforce user authentication for page deletion
     return $c->redirect_to('/login') unless $c->is_logged_in;
+
+    # Don't allow deletion from demo account.
+    return if $c->is_demo;  # Just redirect, no alert
+
     
     # Extract page identifier from request parameters
     my $page_key = $c->param('page_key');          # Page key to delete
@@ -51,6 +55,7 @@ sub rename {
     my $c = shift;
     # Enforce user authentication for page renaming
     return $c->redirect_to('/login') unless $c->is_logged_in;
+    return $c->alert('Demo account cannot rename pages.', 403) if $c->is_demo;
 
     # Extract rename parameters from form submission
     my $old_name = $c->param('old_page_name');     # Current page name
@@ -92,6 +97,7 @@ sub clone {
     my $c = shift;
     # Enforce user authentication for page cloning
     return $c->redirect_to('/login') unless $c->is_logged_in;
+    return $c->alert('Demo account cannot create new pages.', 403) if $c->is_demo;
 
     # Extract cloning parameters from form submission
     my $source_name = $c->param('source_page_name'); # Source page to clone

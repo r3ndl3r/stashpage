@@ -56,6 +56,18 @@ sub register ($self, $app, $config = {}) {
         return $c->db->is_admin($c->session('user'));  # DB: check admin flag
     });
 
+    # Helper: is_demo
+    # Checks if current user is the demo account with read-only access.
+    # Parameters:
+    #   $c : Mojolicious controller (calling context).
+    # Returns:
+    #   Boolean: 1 if demo user, 0 otherwise.
+    $app->helper(is_demo => sub ($c) {
+        my $user = $c->session('user');
+        return 0 unless $user;                          # Not authenticated
+        return $user eq 'demo' ? 1 : 0;                 # Check if username is 'demo'
+    });
+    
     # Helper: current_user_id
     # Retrieves numeric user ID for database operations.
     # Parameters:

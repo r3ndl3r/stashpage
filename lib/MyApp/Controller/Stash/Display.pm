@@ -91,6 +91,9 @@ sub edit {
 
     # If page does not exist, initialize a new one for this user.
     unless (defined $categories) {
+        # Block demo users from creating new pages
+        return $c->alert('Demo account cannot create new pages.', 403) if $c->is_demo;
+
         my $user_id = $c->current_user_id;                     # Target user id for ownership.
         my $unified = $c->get_unified_stash_data();            # Entire stash structure.
 

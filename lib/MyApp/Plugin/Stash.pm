@@ -146,6 +146,9 @@ sub register ($self, $app, $config = {}) {
         my $user_id = $c->current_user_id;
         return 0 unless $user_id;
 
+        # Block demo user from saving stash data
+        return 0 if $c->is_demo;
+
         # Validate input data structure and limits
         return 0 unless ref($new_data_ref) eq 'ARRAY';
         return 0 if $max_categories_per_page > 0 && @$new_data_ref > $max_categories_per_page;
@@ -208,7 +211,10 @@ sub register ($self, $app, $config = {}) {
         # Verify user authentication for state modification
         my $user_id = $c->current_user_id;
         return 0 unless $user_id;
-        
+
+        # Block demo user from changing category state
+        return 0 if $c->is_demo; 
+
         # Load current configuration for targeted update
         my $unified = $c->get_unified_stash_data();
         return 0 unless exists $unified->{stashes}{$page_key};
