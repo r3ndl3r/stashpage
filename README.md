@@ -14,6 +14,14 @@ Perfect for homelab enthusiasts and teams who want to centrally manage and acces
 * **🎯 Category Organization**: Hierarchical bookmark organization with icons and custom categories
 * **🔒 Secure**: Password hashing, session management, and security best practices built-in
 
+## 🎮 Live Demo
+Try Stashpage without installation:
+- **URL**: [https://stash.rendler.org](https://stash.rendler.org)
+- **Username**: `demo`
+- **Password**: `demo`
+
+*Note: The demo account is read-only. You can explore all features, but changes won't be saved.*
+
 ## Screenshots
 
 ### Dashboard View
