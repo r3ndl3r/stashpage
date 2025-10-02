@@ -42,6 +42,29 @@ Try Stashpage without installation:
 
 ## Quick Start
 
+### 🐳 Docker Deployment
+
+1. Clone the repository:
+```
+git clone https://github.com/r3ndl3r/stashpage.git
+cd stashpage
+```
+
+2. Edit `.env` and modify if needed:
+```
+nano .env
+```
+
+3. Start with Docker Compose:
+
+```
+docker-compose up -d
+```
+
+4. Access at http://localhost:3300
+
+
+
 ### Manual Installation
 1. **Prerequisites**:
    - Perl 5.24+
