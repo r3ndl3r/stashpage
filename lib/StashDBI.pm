@@ -151,7 +151,7 @@ sub create_user {
     $self->ensure_connection;
     
     # Determine if this is the first user for automatic admin privileges
-    my $is_first_user = $self->get_user_count() == 0;       # First user becomes admin automatically
+    my $is_first_user = $self->get_user_count() <= 1;  # First real user (0 or 1 with demo)
     my $is_admin = $is_first_user ? 1 : 0;                  # Admin flag for first user
     my $status = $is_first_user ? 'approved' : 'pending';   # First user auto-approved
 
@@ -219,13 +219,40 @@ sub approve_user {
 #   String: application secret for session encryption.
 sub get_app_secret {
     my ($self) = @_;
-    $self->ensure_connection;
-    my $sth = $self->{dbh}->prepare("SELECT secret_value FROM app_secrets WHERE key_name = 'mojo_app_secret'");
-    $sth->execute();
-    my ($secret) = $sth->fetchrow_array();
-    die "Application secret not found in database" unless $secret;
+    
+    # Determine secret file path based on environment
+    my $secret_file;
+    if (-d '/root/stashpage') {
+        # Docker environment
+        $secret_file = '/root/stashpage/secret_key';
+    } else {
+        # Local development
+        $secret_file = 'secret_key';
+    }
+    
+    # Try to read existing secret
+    if (-f $secret_file) {
+        open(my $fh, '<', $secret_file) or die "Cannot read secret file: $!";
+        my $secret = <$fh>;
+        close($fh);
+        chomp($secret);
+        return $secret if $secret;
+    }
+    
+    # Generate new secret if file doesn't exist
+    print "No app secret found. Generating new secret...\n";
+    my $secret = join('', map { sprintf("%02x", int(rand(256))) } 1..32);
+    
+    # Write to file
+    open(my $fh, '>', $secret_file) or die "Cannot write secret file: $!";
+    print $fh $secret;
+    close($fh);
+    chmod 0600, $secret_file;  # Secure permissions
+    
+    print "App secret generated successfully!\n";
     return $secret;
 }
+
 
 # Check if user has administrative privileges.
 # Parameters:
@@ -255,6 +282,20 @@ sub get_user_id {
     $sth->execute($username);
     my ($id) = $sth->fetchrow_array();
     return $id;
+}
+
+# Retrieve user record by username including status.
+# Parameters:
+#   $self     : StashDBI instance.
+#   $username : Username to retrieve.
+# Returns:
+#   Hashref: user record with id, username, email, is_admin, status or undef if not found.
+sub get_user_by_username {
+    my ($self, $username) = @_;
+    $self->ensure_connection;
+    my $sth = $self->{dbh}->prepare("SELECT id, username, email, is_admin, status FROM users WHERE username = ?");
+    $sth->execute($username);
+    return $sth->fetchrow_hashref();
 }
 
 # Retrieve all users for administrative management.

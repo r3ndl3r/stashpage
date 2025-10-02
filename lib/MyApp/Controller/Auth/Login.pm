@@ -206,9 +206,15 @@ sub register {
         message => "New user registered: $username (email: $email)"
     );
     
-    # Notify user of successful registration and pending approval requirement
-    $c->alert('Registration successful!<br/>Please wait for administrator approval before attempting to log in.', 200);
-}
+    # Check if user was auto-approved (first user)
+    my $user_info = $c->db->get_user_by_username($username);
+    if ($user_info && $user_info->{status} eq 'approved') {
+        return $c->alert("Registration successful!<br>You can now log in with your credentials.", 200);
+    } else {
+        return $c->alert("Registration successful!<br>Please wait for administrator approval before attempting to log in.", 200);
+    }
 
+}
+1;
 
 1;

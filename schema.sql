@@ -67,7 +67,6 @@ CREATE TABLE stashes (
   INDEX idx_updated_at (updated_at),
   
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    COMMENT 'Cascade delete ensures stash cleanup when user is removed'
 ) ENGINE=InnoDB 
   DEFAULT CHARSET=utf8mb4 
   COLLATE=utf8mb4_unicode_ci 
@@ -127,7 +126,6 @@ CREATE TABLE password_reset_tokens (
   INDEX idx_user_id (user_id),
   
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    COMMENT 'Cascade delete ensures token cleanup when user is removed'
 ) ENGINE=InnoDB 
   DEFAULT CHARSET=utf8mb4 
   COLLATE=utf8mb4_unicode_ci 

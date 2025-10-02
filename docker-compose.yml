@@ -1,0 +1,59 @@
+services:
+  # MariaDB Database
+  db:
+    image: mariadb:11.2
+    container_name: stashpage-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-stashpage}
+      MYSQL_USER: ${DB_USER:-stashpage}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-stashpage}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    networks:
+      - stashpage-network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Stashpage Application
+  app:
+    build: .
+    container_name: stashpage-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3300}:3000"
+    environment:
+      # Database Configuration
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-stashpage}
+      DB_USER: ${DB_USER:-stashpage}
+      DB_PASS: ${DB_PASSWORD:-stashpage}
+      
+      # Application Configuration
+      MOJO_MODE: ${MOJO_MODE:-production}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - stashpage-network
+    volumes:
+      - ./log:/app/log
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  db_data:
+    driver: local
+
+networks:
+  stashpage-network:
+    driver: bridge

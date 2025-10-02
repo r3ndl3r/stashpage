@@ -1,0 +1,9 @@
+requires 'Mojolicious', '9.0';
+requires 'DBI', '1.643';
+requires 'DBD::mysql', '4.050';
+requires 'Crypt::Eksblowfish::Bcrypt', '0.009';
+requires 'JSON', '4.10';
+requires 'Time::Piece', '1.3401';
+requires 'Email::Sender::Simple', '2.0';
+requires 'Email::MIME', '1.952';
+requires 'LWP::UserAgent', '6.0';
