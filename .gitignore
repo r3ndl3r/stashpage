@@ -15,3 +15,7 @@ Thumbs.db
 *.db
 *.sqlite
 secret_key
+exclude.txt
+sync-check
+sync-real
+.gitignore
