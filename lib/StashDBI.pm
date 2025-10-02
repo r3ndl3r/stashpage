@@ -771,19 +771,31 @@ sub count_recent_reset_requests {
     return $count || 0;
 }
 
-# Check if email address already exists in database.
+# Check if email address exists in system.
 # Parameters:
-#   $self  : StashDBI instance.
-#   $email : Email address to check.
+#   $self            : StashDBI instance.
+#   $email           : Email address to check for existence.
+#   $exclude_user_id : (Optional) User ID to exclude from check (for updates).
 # Returns:
-#   Boolean: 1 if email exists, 0 if available.
+#   Boolean: 1 if email exists (for another user), 0 if available.
 sub email_exists {
-    my ($self, $email) = @_;
+    my ($self, $email, $exclude_user_id) = @_;
     $self->ensure_connection;
+    
+    # If exclude_user_id provided, check for other users with this email
+    if (defined $exclude_user_id) {
+        my $sth = $self->{dbh}->prepare("SELECT COUNT(*) FROM users WHERE email = ? AND id != ?");
+        $sth->execute($email, $exclude_user_id);
+        my ($count) = $sth->fetchrow_array();
+        return $count > 0;
+    }
+    
+    # Otherwise, check if ANY user has this email (for registration)
     my $sth = $self->{dbh}->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
     $sth->execute($email);
     my ($count) = $sth->fetchrow_array();
     return $count > 0;
 }
+
 
 1;

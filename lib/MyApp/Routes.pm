@@ -103,6 +103,14 @@ sub setup_routes {
     # Backward compatibility routes for existing integrations
     $r->get('/stash/export')->to('stash#export');                      # Legacy export route mapping
     $r->post('/stash/import')->to('stash#import');                     # Legacy import route mapping
+
+    # ============================================================================
+    # User Account Management Routes
+    # ============================================================================
+
+    $r->get('/user/account')->to('user#account');
+    $r->post('/user/update-email')->to('user#update_email');
+    $r->post('/user/update-password')->to('user#update_password');
 }
 
 1;
