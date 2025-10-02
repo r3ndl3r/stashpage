@@ -3,6 +3,7 @@ package MyApp;
 use Mojo::Base 'Mojolicious';
 use strict;
 use warnings;
+use FindBin;
 use StashDBI;
 
 # Application root class for Stashpage.
@@ -34,7 +35,8 @@ sub startup {
 
 
 sub _setup_config {
-    my $self = shift;
+    my $self        = shift;
+    my $config_file = "$FindBin::Bin/stashpage.conf";
 
     # Loads configuration from a static filesystem path into $self->config.
     # Notes:
@@ -44,9 +46,11 @@ sub _setup_config {
     #   - $self: Mojolicious application instance.
     # Returns:
     #   - The configuration hashref from the plugin (assigned but not used directly).
-    my $config = $self->plugin('Config' => {
-        file => "$ENV{HOME}/stashpage/stashpage.conf"
-    });
+    
+    # Use default config if file doesn't exist
+    my $config = -f $config_file 
+        ? $self->plugin('Config' => { file => $config_file })
+        : $self->plugin('Config' => { default => {} });
 }
 
 
