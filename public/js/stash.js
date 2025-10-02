@@ -442,24 +442,21 @@ function closeDeleteModal() {
  * bypassing the form's custom submit handler and allowing normal submission
  */
 function confirmDelete() {
-    // Store reference before closing modal (which nullifies the global reference)
-    const formToSubmit = window.pendingDeleteForm;
-    
-    if (!formToSubmit) {
-        console.error('No pending delete form found');
-        return;
-    }
-    
-    // Close modal first to clean up UI
-    closeDeleteModal();
-    
-    // Mark form as confirmed to bypass the confirmation handler
-    formToSubmit.setAttribute('data-confirmed', 'true');
-    
-    // Dispatch a proper submit event to trigger form submission
-    const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
-    formToSubmit.dispatchEvent(submitEvent);
+  const formToSubmit = window.pendingDeleteForm;
+  if (!formToSubmit) {
+    console.error("No pending delete form found");
+    return;
+  }
+
+  closeDeleteModal();
+
+  // Mark form confirmed to bypass confirmation modal
+  formToSubmit.setAttribute('data-confirmed', 'true');
+
+  // Use native form submission to ensure cross-browser compatibility
+  formToSubmit.submit();
 }
+
 
 /**
  * Delete Confirmation Interface Handler
@@ -544,26 +541,21 @@ document.addEventListener('DOMContentLoaded', function() {
      * instead of browser's default confirm(). Allows confirmed deletions to proceed
      */
     document.addEventListener('submit', function(event) {
-        // Check if this is a delete form submission
-        if (event.target.action && event.target.action.includes('/stash/delete')) {
-            // Check if this is a confirmed deletion (bypass confirmation)
-            if (event.target.getAttribute('data-confirmed') === 'true') {
-                event.target.removeAttribute('data-confirmed');
-                return true; // Allow the submission to proceed
-            }
-            
-            // Prevent initial submission and show confirmation dialog
-            event.preventDefault();
-            
-            // Extract page name for confirmation dialog
-            const pageKeyInput = event.target.querySelector('input[name="page_key"]');
-            const pageKey = pageKeyInput ? pageKeyInput.value : 'this stash';
-            
-            // Show custom modal instead of browser confirm
-            showDeleteModal(pageKey, event.target);
-            return false;
+    if (event.target.action && event.target.action.includes('stash/delete')) {
+        // Allow native submissions after confirmation by checking the flag
+        if (event.target.getAttribute('data-confirmed') === 'true') {
+        event.target.removeAttribute('data-confirmed'); // clean flag
+        return true; // Let submission proceed
         }
+
+        event.preventDefault();
+        const pageKeyInput = event.target.querySelector('input[name=page_key]');
+        const pageKey = pageKeyInput ? pageKeyInput.value : '';
+        showDeleteModal(pageKey, event.target);
+        return false;
+    }
     });
+
     
     /**
      * Dropdown Menu Click Event Management
