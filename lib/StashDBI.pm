@@ -219,40 +219,36 @@ sub approve_user {
 #   String: application secret for session encryption.
 sub get_app_secret {
     my ($self) = @_;
+    $self->ensure_connection();
     
-    # Determine secret file path based on environment
-    my $secret_file;
-    if (-d '/root/stashpage') {
-        # Docker environment
-        $secret_file = '/root/stashpage/secret_key';
-    } else {
-        # Local development
-        $secret_file = 'secret_key';
+    # Try to retrieve existing secret with key_name 'app_secret'
+    my $sth = $self->{dbh}->prepare(
+        "SELECT secret_value FROM app_secrets WHERE key_name = 'app_secret' LIMIT 1"
+    );
+    $sth->execute();
+    my ($secret) = $sth->fetchrow_array();
+    
+    # If no secret exists, generate one automatically
+    unless ($secret) {
+        print "No app secret found. Generating new secret...\n";
+        
+        # Generate random secret using database functions (SHA2 returns 64-char hex string)
+        my $insert_sth = $self->{dbh}->prepare(
+            "INSERT INTO app_secrets (key_name, secret_value) 
+             VALUES ('app_secret', SHA2(CONCAT(RAND(), UUID(), NOW()), 256))"
+        );
+        $insert_sth->execute();
+        
+        # Retrieve the newly created secret
+        $sth->execute();
+        ($secret) = $sth->fetchrow_array();
+        
+        print "App secret generated successfully!\n";
     }
     
-    # Try to read existing secret
-    if (-f $secret_file) {
-        open(my $fh, '<', $secret_file) or die "Cannot read secret file: $!";
-        my $secret = <$fh>;
-        close($fh);
-        chomp($secret);
-        return $secret if $secret;
-    }
-    
-    # Generate new secret if file doesn't exist
-    print "No app secret found. Generating new secret...\n";
-    my $secret = join('', map { sprintf("%02x", int(rand(256))) } 1..32);
-    
-    # Write to file
-    open(my $fh, '>', $secret_file) or die "Cannot write secret file: $!";
-    print $fh $secret;
-    close($fh);
-    chmod 0600, $secret_file;  # Secure permissions
-    
-    print "App secret generated successfully!\n";
+    die "Failed to retrieve or generate application secret\n" unless $secret;
     return $secret;
 }
-
 
 # Check if user has administrative privileges.
 # Parameters:
