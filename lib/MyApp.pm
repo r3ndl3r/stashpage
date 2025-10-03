@@ -59,6 +59,8 @@ sub _setup_database {
 
     # Initializes the database integration and session signing secret.
     # Responsibilities:
+    #   - Load appropriate database driver based on DB_TYPE environment variable.
+    #   - Initialize SQLite database if it doesn't exist.
     #   - Fetch a secret from the database for cookie/session signing.
     #   - Register a reusable 'db' helper for controllers and plugins.
     #   - Ensure DB connections are re-established after process fork.
@@ -66,6 +68,46 @@ sub _setup_database {
     #   - $self: Mojolicious application instance.
     # Returns:
     #   - Undefined; mutates application state.
+    
+    # Check DB_TYPE environment variable (defaults to 'mariadb')
+    my $db_type = $ENV{DB_TYPE} || 'mariadb';
+    print "Initializing database driver: $db_type\n" if $ENV{DEBUG};
+    
+    # SQLite-specific: check if database needs initialization
+    if ($db_type eq 'sqlite') {
+        my $db_file = $ENV{DB_FILE} || "$FindBin::Bin/data/stashpage.db";
+        
+        # Check if database file doesn't exist OR is empty (no tables)
+        my $needs_init = 0;
+        
+        if (!-f $db_file) {
+            $needs_init = 1;
+        } else {
+            # Check if database has tables
+            require DBI;
+            my $check_dbh = DBI->connect("dbi:SQLite:dbname=$db_file", "", "", {
+                RaiseError => 0,
+                PrintError => 0,
+            });
+            if ($check_dbh) {
+                my $tables = $check_dbh->selectall_arrayref(
+                    "SELECT name FROM sqlite_master WHERE type='table'"
+                );
+                $needs_init = 1 if (!$tables || @$tables == 0);
+                $check_dbh->disconnect;
+            }
+        }
+        
+        if ($needs_init) {
+            print "SQLite database needs initialization at: $db_file\n";
+            print "Creating new database and initializing schema...\n";
+            $self->_initialize_sqlite_database($db_file);
+        }
+        
+        # Load SQLite driver (can't use 'use' due to hyphen in filename)
+        require "$FindBin::Bin/lib/StashDBI-SQLite.pm";
+    }
+    
     my $db = StashDBI->new();
     my $secret = $db->get_app_secret();
     $self->secrets([$secret]);
@@ -82,6 +124,39 @@ sub _setup_database {
     });
 }
 
+# Initialize SQLite database on first run.
+# Parameters:
+#   $self    : MyApp instance.
+#   $db_file : Path to SQLite database file.
+# Returns:
+#   None. Creates database file and schema.
+sub _initialize_sqlite_database {
+    my ($self, $db_file) = @_;
+    
+    # Create directory if it doesn't exist
+    use File::Basename;
+    use File::Path qw(make_path);
+    my $db_dir = dirname($db_file);
+    make_path($db_dir) unless -d $db_dir;
+    
+    # Read schema file
+    my $schema_file = "$FindBin::Bin/database/schema_sqlite.sql";
+    
+    unless (-f $schema_file) {
+        die "Schema file not found: $schema_file\n";
+    }
+    
+    print "Creating database schema from: $schema_file\n";
+    
+    # Use sqlite3 command to load schema (preserves order)
+    my $result = system("sqlite3 '$db_file' < '$schema_file'");
+    
+    if ($result != 0) {
+        die "Failed to initialize SQLite database\n";
+    }
+    
+    print "SQLite database initialized successfully at: $db_file\n";
+}
 
 sub _setup_sessions {
     my $self = shift;

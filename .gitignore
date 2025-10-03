@@ -19,3 +19,4 @@ exclude.txt
 sync-check
 sync-real
 .gitignore
+data/
