@@ -56,7 +56,7 @@ my $DEFAULT_STASH = {
                         { name => "Uptime Kuma", url => "http://10.0.1.5:3001/dashboard", icon => "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/webp/uptime-kuma.webp" },
                         { name => "AdGuard", url => "http://10.0.1.6/", icon => "https://w7.pngwing.com/pngs/889/893/png-transparent-adguard-thumbnail.png" },
                     ],
-                    positions => { collapsed => 0, geometry => { x => 1840, y => 1120 } },
+                    positions => { collapsed => 0, geometry => { x => 1860, y => 1120 } },
                 },
             ]
         }
