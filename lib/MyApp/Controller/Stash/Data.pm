@@ -147,4 +147,47 @@ sub import {
     return $c->redirect_to('/stash');
 }
 
+sub search {
+    my $c = shift;
+    
+    return $c->render(json => { error => 'Unauthorized' }, status => 401) 
+        unless $c->is_logged_in;
+    
+    my $query = $c->param('q') || '';
+    $query = lc($query);
+    
+    return $c->render(json => { error => 'Query too short', results => [] }) 
+        if length($query) < 2;
+    
+    my $unified_data = $c->get_unified_stash_data();
+    my $stashes = $unified_data->{stashes} || {};
+    
+    my @results;
+    
+    for my $page_key (keys %$stashes) {
+        my $stash_data = $stashes->{$page_key};
+        my $categories = $stash_data->{categories} || [];
+        
+        for my $category (@$categories) {
+            my $links = $category->{links} || [];
+            
+            for my $link (@$links) {
+                my $name = lc($link->{name} || '');
+                my $url = lc($link->{url} || '');
+                
+                if ($name =~ /\Q$query\E/ || $url =~ /\Q$query\E/) {
+                    push @results, {
+                        name  => $link->{name},
+                        url   => $link->{url},
+                        icon  => $link->{icon} || '',
+                        stash => $page_key
+                    };
+                }
+            }
+        }
+    }
+    
+    $c->render(json => { results => \@results });
+}
+
 1;

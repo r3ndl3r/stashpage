@@ -82,9 +82,11 @@ sub setup_routes {
     
     # Page lifecycle management routes
     $r->post('/stash/delete')->to('stash-pages#delete');               # Delete stash page permanently
-    $r->post('/stash/rename')->to('stash-pages#rename');                     # Rename existing stash page
-    $r->post('/stash/clone')->to('stash-pages#clone');                       # Clone stash page with new name
+    $r->post('/stash/rename')->to('stash-pages#rename');               # Rename existing stash page
+    $r->post('/stash/clone')->to('stash-pages#clone');                 # Clone stash page with new name
     $r->get('/api/v1/stash/pages')->to('stash-pages#list');            # API: list user's stash pages
+    $r->get('/api/search')->to('stash-data#search');                   # API: search bookmarks across all stashes
+
 
     # =============================================================================
     # STASH DATA MANAGEMENT ROUTES

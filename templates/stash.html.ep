@@ -25,5 +25,6 @@
         <%= include 'dashboard' %>
     <% } %>
     <script src="/js/stash.js"></script>
+    <script src="/js/search.js"></script>
 </body>
 </html>

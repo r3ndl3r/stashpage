@@ -606,6 +606,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+
 /**
  * Global Function Exposure
  * 

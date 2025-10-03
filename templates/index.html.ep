@@ -25,11 +25,46 @@
             </div>
         </div>
 
-
         <!-- Existing Stashes Grid -->
         <% if (@$page_names) { %>
         <div class="mb-8">
-            <h2 class="text-2xl font-semibold text-white mb-6">Your Stashes</h2>
+        <div class="flex items-center gap-3 mb-6">
+            <h2 class="text-2xl font-semibold text-white">Your Stashes</h2>
+            <button id="global-search-toggle" class="text-gray-400 hover:text-white hover:bg-gray-700/50 p-2 rounded-lg transition-all duration-200 hover:scale-110" title="Search all bookmarks (Ctrl+K)">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Global Search Bar (hidden by default) -->
+        <div id="global-search-container" class="mb-6 hidden">
+            <div class="relative">
+                <input 
+                    type="text" 
+                    id="global-search-input" 
+                    placeholder="Search bookmarks across all stashes..." 
+                    class="w-full px-4 py-3 pl-12 pr-12 bg-gray-800/95 text-white rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                    autocomplete="off"
+                />
+                <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <button id="clear-global-search" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors hidden">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div id="global-search-status" class="mt-2 text-sm text-gray-400 text-center"></div>
+            
+            <!-- Search Results -->
+            <div id="global-search-results" class="mt-4 hidden">
+                <div class="bg-gray-800/80 backdrop-blur-sm rounded-lg border border-gray-700/50">
+                    <div id="global-search-results-list" class="divide-y divide-gray-700/50"></div>
+                </div>
+            </div>
+        </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <% for my $page_name (@$page_names) { %>
                 <a href="/stash?n=<%= $page_name %>" class="block bg-gray-800/80 backdrop-blur-sm hover:bg-gray-750/90 rounded-lg p-6 border border-gray-700/50 hover:border-gray-600/70 transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-blue-500/20 group hover:scale-105 hover:-translate-y-2 transform-gpu">
@@ -49,7 +84,6 @@
                                 <form method="POST" action="/stash/delete" class="block" id="deleteForm-<%= $page_name %>">
                                     <input type="hidden" name="page_key" value="<%= $page_name %>">
                                     <button type="button" onclick="event.stopPropagation(); event.preventDefault(); return confirmDeleteStash('<%= $page_name %>');" class="block w-full text-left px-3 py-2 text-sm text-red-300 hover:bg-red-600/20 hover:text-red-200 transition-all duration-200 hover:translate-x-1">Delete</button>
-
                                 </form>
                             </div>
                         </div>

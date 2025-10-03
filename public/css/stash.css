@@ -580,3 +580,76 @@ body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
     transform: rotate(-90deg);
 }
 
+/**
+ * ============================================================================
+ * Global Cross-Stash Search Functionality
+ * ============================================================================
+ * 
+ * Styles for the global bookmark search feature on the index page
+ * Allows searching across all stashes from the stash list view
+ */
+
+/* Search container slide-in animation */
+#global-search-container {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Search result item styling */
+.global-search-result-item {
+    padding: 1rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.global-search-result-item:hover {
+    background-color: rgba(55, 65, 81, 0.8);
+}
+
+/* Bookmark icon in search results */
+.global-search-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+/* Stash badge in search results */
+.global-search-stash-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background-color: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Highlight matched text in search results */
+.global-search-highlight {
+    background-color: rgba(59, 130, 246, 0.4);
+    color: #60a5fa;
+    padding: 0 3px;
+    border-radius: 2px;
+    font-weight: 600;
+}
+
+/* Loading spinner */
+.global-search-loading {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #60a5fa;
+    border-radius: 50%;
+    animation: spin 0
