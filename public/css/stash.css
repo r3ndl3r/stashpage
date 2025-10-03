@@ -104,6 +104,13 @@ body.dashboard-canvas {
     min-width: 280px;                         /* Minimum width ensures readability on all screen sizes */
 }
 
+/* Remove action buttons from layout flow in view mode while keeping drag-handle flex intact */
+body.dashboard-canvas .drag-handle > div:last-child:not(.collapse-icon) {
+    position: absolute;
+    right: 40px; /* Position to the left of collapse icon */
+}
+
+
 /**
  * Individual Stash Tile Styling
  * 
@@ -490,5 +497,44 @@ body.dashboard-canvas {
     }
 }
 
+/**
+ * View/Edit Mode Width Consistency Fix
+ * 
+ * Problem: Category cards have different widths in view mode vs edit mode
+ * when category names are very long. This occurs because elements with
+ * `visibility: hidden` still reserve layout space in flexbox containers,
+ * causing inconsistent width calculations between the two modes.
+ * 
+ * Solution: Override `visibility: hidden` with `display: none !important`
+ * to completely remove hidden elements from the layout flow, ensuring
+ * both modes calculate identical card widths based solely on content.
+ */
+
+/* 
+ * Hide action button container completely in view mode
+ * Targets: Add/Edit/Delete button groups with inline visibility:hidden
+ * Effect: Removes ~100px+ of reserved space from flex layout calculation
+ */
+body.dashboard-canvas .drag-handle > div.flex.items-center.space-x-2[style*="visibility: hidden"] {
+    display: none !important;
+}
+
+/* 
+ * Hide drag indicators completely in view mode  
+ * Targets: Drag handle icons with inline visibility:hidden
+ * Effect: Removes ~32px (20px icon + 12px margin) of reserved space
+ */
+body.dashboard-canvas .drag-indicator[style*="visibility: hidden"] {
+    display: none !important;
+}
+
+/* 
+ * Hide stash item drag handles completely in view mode
+ * Targets: Individual stash tile drag handles with inline visibility:hidden  
+ * Effect: Removes drag handle spacing from stash item layout calculation
+ */
+body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
+    display: none !important;
+}
 
 

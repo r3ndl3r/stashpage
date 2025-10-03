@@ -93,10 +93,42 @@ body {
   backdrop-filter: blur(var(--backdrop-blur)); /* Glass morphism blur effect (16px default) */
   border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle light border for card definition */
   min-width: var(--card-min-width);        /* Minimum width ensures readability (280px default) */
-  max-width: var(--card-max-width);        /* Maximum width prevents unwieldy cards (400px default) */
+  max-width: none !important;       /* Maximum width prevents unwieldy cards (400px default) */
   transition: all calc(var(--animation-duration) * 1.5) ease; /* Smooth property transitions (300ms) */
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2); /* Layered shadows for depth */
   border-radius: var(--border-radius);     /* Consistent corner rounding (0.5rem default) */
+}
+
+/* 
+ * Position visible action buttons absolutely in edit mode
+ * Targets: Button containers without inline visibility:hidden (edit mode only) 
+ * Effect: Removes buttons from flex layout flow, overlays them in top-right corner
+ * Result: Buttons no longer contribute ~100px to card width calculation
+ */
+.drag-handle > div.flex.items-center.space-x-2:not([style*="visibility"]) {
+    position: absolute;
+    right: 0;                             /* Align to right edge of drag-handle */
+    top: 0;                               /* Align to top edge for header alignment */
+}
+
+/* 
+ * Establish positioning context for absolutely positioned child elements
+ * Targets: All drag-handle containers (both view and edit modes)
+ * Effect: Creates containing block for absolute positioning of action buttons
+ * Note: Required for absolute positioning to work relative to drag-handle
+ */
+.drag-handle {
+    position: relative;
+}
+
+/* 
+ * Increase maximum card width to accommodate very long category names
+ * Targets: All category cards in both view and edit modes
+ * Effect: Raises width limit from 400px to 600px for better long name display
+ * Override: Uses !important to supersede default canvas.css max-width constraint
+ */
+.card-window {
+    max-width: 600px !important;
 }
 
 /**
