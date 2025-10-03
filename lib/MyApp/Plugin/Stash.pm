@@ -130,6 +130,10 @@ sub register ($self, $app, $config = {}) {
             };
         }
         
+        # Sort categories by X coordinate (left-to-right), then Y (top-to-bottom)
+        # Ensures mobile view displays in column-by-column reading order
+        @categories = sort { $a->{x} <=> $b->{x} || $a->{y} <=> $b->{y} } @categories;
+
         return \@categories;                                   # Template-ready data
     });
 
@@ -305,6 +309,5 @@ sub register ($self, $app, $config = {}) {
         $app->log->info("Stash plugin initialized with default content and validation");
     });
 }
-
 
 1;
