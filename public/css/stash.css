@@ -618,10 +618,15 @@ body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
 
 /* Bookmark icon in search results */
 .global-search-icon {
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    max-width: 32px;
+    max-height: 32px;
+    border-radius: 6px;
     object-fit: cover;
+    flex-shrink: 0;
 }
 
 /* Stash badge in search results */
@@ -652,5 +657,5 @@ body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-top-color: #60a5fa;
     border-radius: 50%;
-    animation: spin 0
+    animation: spin 0.6s linear infinite;
 }
