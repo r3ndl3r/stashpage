@@ -537,4 +537,46 @@ body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
     display: none !important;
 }
 
+/**
+ * Smooth Category Collapse Animation System
+ * 
+ * Provides smooth expand/collapse animations for category bookmark lists
+ * Uses max-height transitions with overflow management for clean animations
+ * that work regardless of content size
+ */
+
+/* Category list container with animation setup */
+.stash-list {
+    overflow: hidden; /* Hide content during height transition */
+    transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
+                opacity 0.6s ease-in-out,
+                padding 0.6s ease-in-out;
+    max-height: 2000px; /* Large enough for most content */
+    opacity: 1;
+}
+
+/* Collapsed state */
+.stash-list.collapsed {
+    max-height: 0 !important;
+    opacity: 0;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* Expand state (explicit for clarity) */
+.stash-list.expanded {
+    max-height: 2000px;
+    opacity: 1;
+}
+
+/* Collapse icon smooth rotation */
+.collapse-icon {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-block;
+}
+
+/* Rotate icon when collapsed */
+.collapse-icon.collapsed {
+    transform: rotate(-90deg);
+}
 

@@ -266,10 +266,11 @@ function updateCollapseIcon(header, isCollapsed) {
 }
 
 /**
- * Category Collapse/Expand Toggle Handler
+ * Category Collapse/Expand Toggle Handler with Animation Support
  * 
- * Handles category collapse/expand interactions with server-side persistence
+ * Handles category collapse/expand interactions with smooth CSS transitions
  * Updates both the visual state and saves the preference to the database
+ * Uses class-based animations for better performance and reliability
  * 
  * @param {string} pageName - Name of the page containing the category
  * @param {string} categoryTitle - Title of the category to toggle
@@ -277,17 +278,36 @@ function updateCollapseIcon(header, isCollapsed) {
 function toggleCategory(pageName, categoryTitle) {
     // Find the category elements in the DOM
     const header = document.querySelector(`.card-window[data-category-title="${categoryTitle}"] h2`);
+    if (!header) {
+        console.error('Category header not found:', categoryTitle);
+        return;
+    }
+    
     const card = header.closest('.card-window');
     const list = card.querySelector('.stash-list');
     
-    // Determine current state and calculate new state
-    const isCollapsed = list.style.display === 'none';
-    const newState = isCollapsed ? 'open' : 'collapsed';
+    // Determine current state by checking classes
+    const isCurrentlyCollapsed = list.classList.contains('collapsed');
+    const newState = isCurrentlyCollapsed ? 'open' : 'collapsed';
     
-    // Apply visual changes immediately for responsive UI
-    list.style.display = isCollapsed ? 'flex' : 'none';
-    updateCollapseIcon(header, !isCollapsed);
-
+    // Apply smooth animated transition using classes
+    if (isCurrentlyCollapsed) {
+        // Expanding: remove collapsed class
+        list.classList.remove('collapsed');
+        list.classList.add('expanded');
+        // Remove inline display style if it exists
+        list.style.display = '';
+    } else {
+        // Collapsing: add collapsed class
+        list.classList.add('collapsed');
+        list.classList.remove('expanded');
+        // Remove inline display style if it exists
+        list.style.display = '';
+    }
+    
+    // Update collapse icon
+    updateCollapseIcon(header, !isCurrentlyCollapsed);
+    
     // Persist state change to server for future page loads
     fetch('/api/v1/stash/category/toggle', {
         method: 'POST',
@@ -304,26 +324,37 @@ function toggleCategory(pageName, categoryTitle) {
 }
 
 /**
- * Category Collapse State Application
+ * Category Collapse State Application with Animation Classes
  * 
  * Applies saved collapse states from server data to all categories on page load
- * Reads data attributes set by server rendering and applies visual states
+ * Reads data attributes set by server rendering and applies visual states with classes
+ * instead of inline styles for proper CSS animation support
  */
 function applyCollapseStates() {
     document.querySelectorAll('.card-window').forEach(card => {
         const header = card.querySelector('h2');
-        const isCollapsed = card.dataset.collapsed === '1';  // Server sets this attribute
+        const isCollapsed = card.dataset.collapsed === '1'; // Server sets this attribute
         const list = card.querySelector('.stash-list');
         
-        // Apply visual state based on server data
+        if (!list) return; // Safety check
+        
+        // Remove any inline display styles
+        list.style.display = '';
+        
+        // Apply visual state based on server data using classes
         if (isCollapsed) {
-            list.style.display = 'none';
+            list.classList.add('collapsed');
+            list.classList.remove('expanded');
         } else {
-            list.style.display = 'flex';
+            list.classList.add('expanded');
+            list.classList.remove('collapsed');
         }
+        
+        // Update collapse icon to match state
         updateCollapseIcon(header, isCollapsed);
     });
 }
+
 
 /**
  * Settings Dropdown Management
