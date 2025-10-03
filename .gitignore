@@ -18,5 +18,5 @@ secret_key
 exclude.txt
 sync-check
 sync-real
-.gitignore
 data/
+docker-cleanup

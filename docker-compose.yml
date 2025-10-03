@@ -11,7 +11,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD:-stashpage}
     volumes:
       - db_data:/var/lib/mysql
-      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
     networks:
       - stashpage-network
     healthcheck:
@@ -28,7 +28,8 @@ services:
     ports:
       - "${APP_PORT:-3300}:3000"
     environment:
-      # Database Configuration
+      # Database Configuration - MariaDB
+      DB_TYPE: mariadb
       DB_HOST: db
       DB_PORT: 3306
       DB_NAME: ${DB_NAME:-stashpage}
@@ -57,3 +58,4 @@ volumes:
 networks:
   stashpage-network:
     driver: bridge
+

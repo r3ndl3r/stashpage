@@ -1,0 +1,30 @@
+services:
+  # Stashpage Application with SQLite
+  app:
+    build: .
+    container_name: stashpage-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3300}:3000"
+    environment:
+      # Database Configuration - SQLite
+      DB_TYPE: sqlite
+      DB_FILE: /app/data/stashpage.db
+      
+      # Application Configuration
+      MOJO_MODE: ${MOJO_MODE:-production}
+    
+    volumes:
+      - ./log:/app/log
+      - sqlite_data:/app/data
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  sqlite_data:
+    driver: local
+

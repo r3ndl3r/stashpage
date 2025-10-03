@@ -6,6 +6,9 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     perl \
     libdbd-mariadb-perl \
+    libdbd-sqlite3-perl \
+    sqlite3 \
+    libdbi-perl \
     libdbi-perl \
     libmojolicious-perl \
     libcrypt-eksblowfish-perl \
