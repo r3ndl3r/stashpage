@@ -13,6 +13,7 @@ Perfect for homelab enthusiasts and teams who want to centrally manage and acces
 * **⚡ High Performance**: Built with Perl/Mojolicious for fast server-side processing
 * **🎯 Category Organization**: Hierarchical bookmark organization with icons and custom categories
 * **🔒 Secure**: Password hashing, session management, and security best practices built-in
+* **🗄️ Dual Database Support**: Choose between MariaDB (production) or SQLite (development/small deployments)
 
 ## 🎮 Live Demo
 Try Stashpage without installation:
@@ -40,6 +41,23 @@ Try Stashpage without installation:
 ![Admin Panel](screenshots/admin-panel.png)
 *Administrative interface for user management and system configuration*
 
+## Features in Detail
+
+### Dashboard
+- **Drag & Drop**: Rearrange categories and bookmarks with smooth animations
+- **Category Management**: Create, edit, delete, and organize bookmark categories
+- **Link Management**: Add, edit, and organize bookmarks with custom icons
+- **Auto-centering**: Smart viewport centering for optimal viewing
+
+### User Management
+- **Registration/Login**: Secure user authentication with email validation
+- **Password Reset**: Email-based password recovery system
+- **Admin Controls**: User approval, role management, and system oversight
+
+### Data Management
+- **Import/Export**: JSON-based backup and restore functionality
+- **Page Cloning**: Duplicate bookmark pages for easy organization
+
 ## Quick Start
 
 ### 🐳 Docker Deployment
@@ -56,16 +74,15 @@ nano .env
 ```
 
 3. Start with Docker Compose:
-
 ```
-docker-compose up -d
+docker compose up -d (mariadb) or docker compose -f docker-compose-sqlite.yml up -d (sqlite)
 ```
 
 4. Access at http://localhost:3300
 
-
-
 ### Manual Installation
+
+#### Option 1: MariaDB
 1. **Prerequisites**:
    - Perl 5.24+
    - MariaDB/MySQL
@@ -75,6 +92,10 @@ docker-compose up -d
    ```
    cpanm --installdeps .
    ```
+   or
+   ```
+   apt-get install libdbd-mariadb-perl libdbi-perl libmojolicious-perl libcrypt-eksblowfish-perl libemail-sender-perl libemail-mime-perl libwww-perl
+   ```
 
 3. **Database setup**:
    ```
@@ -83,6 +104,7 @@ docker-compose up -d
 
 4. **Configure environment**:
    ```
+   export DB_TYPE=mariadb
    export DB_USER=your_db_user
    export DB_PASS=your_db_password
    export DB_HOST=localhost
@@ -91,20 +113,70 @@ docker-compose up -d
 
 5. **Start the application**:
    ```
-   hypnotoad script/stashpage
+   ./start
    ```
+
+#### Option 2: SQLite
+1. **Prerequisites**:
+   - Perl 5.24+
+   - SQLite3
+   - cpanm (for installing Perl modules)
+
+2. **Install dependencies**:
+   ```
+   cpanm --installdeps .
+   ```
+   or
+   ```
+   apt-get install libdbd-sqlite3-perl sqlite3 libdbi-perl libmojolicious-perl libcrypt-eksblowfish-perl libemail-sender-perl libemail-mime-perl libwww-perl
+   ```
+
+3. **Start the application** (database auto-created):
+   ```
+   export DB_TYPE=sqlite
+   ./start
+   ```
+
+*That's it! SQLite database is automatically initialized on first run.*
 
 ## Configuration
 
 ### Environment Variables
+
+#### Common Variables
 ```
-DB_HOST=localhost          # Database host
+MOJO_MODE=production      # Application mode (development/production)
+MOJO_LISTEN=http://*:3000 # Server listen address
+```
+
+#### MariaDB Configuration
+```
+DB_TYPE=mariadb           # Database type (default)
+DB_HOST=localhost         # Database host
 DB_NAME=stashpage         # Database name
 DB_USER=stashpage         # Database username
 DB_PASS=your_password     # Database password
 DB_PORT=3306              # Database port
-MOJO_MODE=production      # Application mode (development/production)
-MOJO_LISTEN=http://*:3000 # Server listen address
+```
+
+#### SQLite Configuration
+```
+DB_TYPE=sqlite            # Database type
+DB_FILE=data/stashpage.db # Database file path (optional, auto-created)
+```
+
+### Database Selection
+
+Switch between databases using the `DB_TYPE` environment variable:
+
+```
+# Use MariaDB
+export DB_TYPE=mariadb
+./start
+
+# Use SQLite
+export DB_TYPE=sqlite
+./start
 ```
 
 ### Admin Account
@@ -113,7 +185,7 @@ The first user registered automatically becomes an admin. Subsequent users requi
 ## Tech Stack
 - **Backend**: Perl with Mojolicious framework
 - **Frontend**: Vanilla JavaScript (ES6+), HTML5, CSS3
-- **Database**: MariaDB/MySQL with DBI
+- **Database**: MariaDB/MySQL or SQLite with DBI
 - **Styling**: Custom CSS with Tailwind-inspired utilities
 - **Authentication**: Secure session-based auth with bcrypt
 - **Drag & Drop**: Native HTML5 Drag API with Sortable.js
@@ -131,56 +203,8 @@ stashpage/
 └── docs/                # Documentation
 ```
 
-## Features in Detail
-
-### Dashboard
-- **Drag & Drop**: Rearrange categories and bookmarks with smooth animations
-- **Category Management**: Create, edit, delete, and organize bookmark categories
-- **Link Management**: Add, edit, and organize bookmarks with custom icons
-- **Search & Filter**: Quick search across all bookmarks and categories
-- **Auto-centering**: Smart viewport centering for optimal viewing
-
-### User Management
-- **Registration/Login**: Secure user authentication with email validation
-- **Password Reset**: Email-based password recovery system
-- **User Profiles**: Customizable user profiles and preferences
-- **Admin Controls**: User approval, role management, and system oversight
-
-### Data Management
-- **Import/Export**: JSON-based backup and restore functionality
-- **Page Cloning**: Duplicate bookmark pages for easy organization
-- **Data Validation**: Comprehensive input validation and sanitization
-- **URL Resolution**: Smart URL handling with relative path support
-
-## Contributing
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Development Setup
-```
-# Clone and install dependencies
-git clone https://github.com/r3ndl3r/stashpage.git
-cd stashpage
-cpanm --installdeps .
-
-# Start in development mode
-morbo script/stashpage
-```
-
 ## License
 This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-- 📖 [Documentation](https://github.com/r3ndl3r/stashpage/wiki)
-- 🐛 [Bug Reports](https://github.com/r3ndl3r/stashpage/issues)
-- 💬 [Discussions](https://github.com/r3ndl3r/stashpage/discussions)
-
-## Roadmap
-- [ ] Themes and customization
-- [ ] Advanced search and filtering
 
 ---
 
