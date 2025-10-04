@@ -320,6 +320,32 @@ function init() {
 }
 
 /**
+ * Keyboard Shortcut Handler for Edit Mode
+ * 
+ * Processes keyboard shortcuts in edit mode:
+ * - Ctrl/Cmd + E: Return to view mode
+ * 
+ * @param {KeyboardEvent} e - Keyboard event object
+ */
+function handleEditModeKeyboard(e) {
+    // Return to view mode with Ctrl/Cmd + E
+    if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+        e.preventDefault();
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const stashName = urlParams.get('n');
+        
+        if (stashName) {
+            window.location.href = `/stash?n=${encodeURIComponent(stashName)}`;
+        }
+    }
+}
+
+// Initialize in edit mode
+document.addEventListener('keydown', handleEditModeKeyboard);
+
+
+/**
  * Application Entry Point
  * 
  * Initializes the dashboard once the DOM is fully loaded

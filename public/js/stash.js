@@ -606,6 +606,62 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+/**
+ * Keyboard Shortcut Handler for Dashboard
+ * 
+ * Processes keyboard shortcuts for quick actions in view mode:
+ * - Ctrl/Cmd + E: Switch to edit mode for current stash
+ * 
+ * @param {KeyboardEvent} e - Keyboard event object
+ */
+function handleDashboardKeyboard(e) {
+    // Enter edit mode with Ctrl/Cmd + E
+    if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+        e.preventDefault();
+        
+        // Only trigger if not typing in an input field
+        if (isInputFocused()) {
+            return;
+        }
+        
+        // Get current stash name from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const stashName = urlParams.get('n');
+        
+        if (stashName) {
+            // Navigate to edit mode
+            window.location.href = `/edit?n=${encodeURIComponent(stashName)}`;
+        }
+    }
+}
+
+/**
+ * Check if an input element is currently focused
+ * 
+ * Prevents keyboard shortcuts from triggering when user is typing in a text field.
+ * 
+ * @returns {boolean} True if an input/textarea is focused
+ */
+function isInputFocused() {
+    const activeElement = document.activeElement;
+    return activeElement && (
+        activeElement.tagName === 'INPUT' ||
+        activeElement.tagName === 'TEXTAREA' ||
+        activeElement.isContentEditable
+    );
+}
+
+// Initialize keyboard shortcuts when page loads
+document.addEventListener('keydown', handleDashboardKeyboard);
+
+// Initialize dashboard keyboard shortcuts
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('keydown', handleDashboardKeyboard);
+    });
+} else {
+    document.addEventListener('keydown', handleDashboardKeyboard);
+}
 
 /**
  * Global Function Exposure
