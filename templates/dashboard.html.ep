@@ -130,6 +130,7 @@
                 class="group relative flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-800/90 backdrop-blur-md border border-gray-700/50 hover:border-gray-600 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
                 data-page-key="<%= $page_key %>"
                 data-is-public="<%= $is_public ? '1' : '0' %>"
+                data-username="<%= $c->session('user') %>"
                 title="Toggle Public/Private">
             
             <!-- Lock/Unlock Icon Container -->

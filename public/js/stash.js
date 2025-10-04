@@ -665,6 +665,85 @@ if (document.readyState === 'loading') {
 }
 
 /**
+ * Clipboard Copy with Browser Compatibility
+ * 
+ * Attempts to copy text to the user's clipboard using the modern Clipboard API
+ * with automatic fallback to document.execCommand for older browsers or non-secure
+ * contexts (HTTP). The modern API requires HTTPS or localhost for security.
+ * 
+ * @param {string} text - The text content to copy to clipboard
+ * @returns {Promise<boolean>} Resolves to true if copy succeeded, false otherwise
+ */
+async function copyToClipboard(text) {
+    // Try modern Clipboard API first (requires HTTPS or localhost)
+    if (navigator.clipboard && window.isSecureContext) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch (err) {
+            console.error('Clipboard API failed:', err);
+        }
+    }
+    
+    // Fallback for older browsers or non-secure contexts
+    try {
+        // Create temporary textarea for copy operation
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        // Execute legacy copy command
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        return successful;
+    } catch (err) {
+        console.error('Fallback copy failed:', err);
+        return false;
+    }
+}
+
+/**
+ * Toast Notification Display System
+ * 
+ * Creates and displays a temporary notification toast with smooth animations
+ * Automatically removes previous notifications to prevent stacking and cleans
+ * up after 3 seconds with fade-out animation
+ * 
+ * @param {string} message - The notification message to display to the user
+ * @param {string} type - Notification type: 'success' (green) or 'error' (red)
+ */
+function showNotification(message, type = 'success') {
+    // Remove any existing notifications to prevent stacking
+    const existing = document.getElementById('clipboard-notification');
+    if (existing) {
+        existing.remove();
+    }
+    
+    // Create notification element with appropriate styling classes
+    const notification = document.createElement('div');
+    notification.id = 'clipboard-notification';
+    notification.className = `clipboard-notification clipboard-notification-${type}`;
+    notification.textContent = message;
+    
+    // Add to DOM for rendering
+    document.body.appendChild(notification);
+    
+    // Trigger animation after brief delay for CSS transition
+    setTimeout(() => notification.classList.add('show'), 10);
+    
+    // Auto-dismiss after 3 seconds with fade-out animation
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+/**
  * Public/Private Toggle Button Functionality
  * 
  * Handles the interactive behavior of the public/private toggle button that allows
@@ -696,11 +775,12 @@ function initializePublicToggle() {
 }
 
 /**
- * Public State Toggle Handler
+ * Public State Toggle Handler with Clipboard Integration
  * 
  * Handles button clicks by sending API request to server and updating button
- * state on success. Provides user feedback for both success and error cases
- * to ensure users understand the result of their action.
+ * state on success. When toggling to public state, automatically copies the
+ * public URL to clipboard and shows success notification. Provides user feedback
+ * for both success and error cases to ensure users understand their action.
  * 
  * @param {string} pageKey - The unique identifier of the stash page
  * @param {HTMLElement} toggleBtn - The toggle button element to update
@@ -728,17 +808,37 @@ function togglePublicState(pageKey, toggleBtn) {
         }
         return response.json();
     })
-    .then(data => {
+    .then(async data => {
         // Update button state on successful API response
         toggleBtn.dataset.isPublic = newState ? '1' : '0';
         updateToggleButtonState(toggleBtn, newState);
         
-        // Show success feedback
+        // Handle clipboard copy when toggling to public
+        if (newState) {
+            // Get username from data attribute (set by server)
+            const username = toggleBtn.dataset.username;
+            
+            // Build public URL with correct format: /stash?n=pageName&u=username
+            const publicUrl = `${window.location.origin}/stash?n=${encodeURIComponent(pageKey)}&u=${encodeURIComponent(username)}`;
+            
+            // Attempt to copy URL to clipboard
+            const copied = await copyToClipboard(publicUrl);
+            
+            if (copied) {
+                showNotification('✓ Public URL copied to clipboard!', 'success');
+            } else {
+                showNotification('⚠ Stash is now public, but clipboard copy failed', 'error');
+            }
+        } else {
+            // Toggled to private
+            showNotification('✓ Stash is now private', 'success');
+        }
+        
         console.log('Public state toggled:', newState ? 'Public' : 'Private');
     })
     .catch(error => {
         console.error('Error toggling public state:', error);
-        alert('Failed to update stash visibility. Please try again.');
+        showNotification('Network error - please try again', 'error');
     })
     .finally(() => {
         // Re-enable button after API call completes
