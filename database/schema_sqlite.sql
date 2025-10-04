@@ -75,14 +75,3 @@ CREATE TABLE IF NOT EXISTS stashes (
 );
 
 CREATE INDEX IF NOT EXISTS idx_user_id_stash ON stashes(user_id);
-
--- Demo user account for testing and demonstration purposes
--- Username: demo, Password: demo (bcrypt hashed)
-INSERT INTO users (username, password, email, is_admin, status)
-VALUES ('demo', '$2a$10$hElZoevAJmXW40AWLeKqZOKuHU.9O03oaPjaIcPmdoYixYcutFmVW', 'demo@demo', 0, 'approved')
-ON CONFLICT(username)
-DO UPDATE SET
-  password = excluded.password,
-  email = excluded.email,
-  is_admin = excluded.is_admin,
-  status = excluded.status;

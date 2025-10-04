@@ -176,6 +176,46 @@ sub create_user {
     return 1;
 }
 
+# Create demo user with deterministic non-admin pending status to prevent race conditions.
+# Parameters:
+#   $self     : StashDBI instance.
+#   $username : Demo username for account.
+#   $password : Plain text password for hashing.
+#   $email    : Email address for demo account.
+# Returns:
+#   Boolean: 1 on successful creation.
+sub create_demo_user {
+    my ($self, $username, $password, $email) = @_;
+    $self->ensure_connection;
+    
+    # Hardcode demo user attributes to avoid race condition during database initialization
+    my $is_admin = 0;       # Demo user is never an administrator
+    my $status = 'pending'; # Demo user always requires manual approval
+    
+    # Generate secure password hash using bcrypt with random salt
+    my $hashed_password;
+    eval {
+        my $salt = en_base64(join('', map chr(int(rand(256))), 1..16));  # Generate random salt
+        $hashed_password = bcrypt($password, '$2a$10$'.$salt);           # Hash with bcrypt
+    };
+    if ($@) {
+        die "Failed to hash password: $@";
+    }
+    
+    # Insert demo user with explicit non-admin pending status
+    eval {
+        my $sth = $self->{dbh}->prepare(
+            "INSERT INTO users (username, password, email, is_admin, status) VALUES (?, ?, ?, ?, ?)"
+        );
+        $sth->execute($username, $hashed_password, $email, $is_admin, $status);
+    };
+    if ($@) {
+        die "Failed to insert demo user into database: $@";
+    }
+    
+    return 1;
+}
+
 # Authenticate user credentials against database.
 # Parameters:
 #   $self     : StashDBI instance.

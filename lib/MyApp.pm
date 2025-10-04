@@ -30,9 +30,9 @@ sub startup {
     $self->_setup_database();
     $self->_setup_sessions();
     $self->_load_plugins();
+    $self->_seed_demo_user_if_needed();
     $self->_setup_routes();
 }
-
 
 sub _setup_config {
     my $self        = shift;
@@ -52,7 +52,6 @@ sub _setup_config {
         ? $self->plugin('Config' => { file => $config_file })
         : $self->plugin('Config' => { default => {} });
 }
-
 
 sub _setup_database {
     my $self = shift;
@@ -158,6 +157,54 @@ sub _initialize_sqlite_database {
     print "SQLite database initialized successfully at: $db_file\n";
 }
 
+# Seed demo user account if database is empty for new installations.
+# Parameters:
+#   $self : Mojolicious application instance.
+# Returns:
+#   None. Creates demo user if user count is zero.
+sub _seed_demo_user_if_needed {
+    my $self = shift;
+    
+    # Check if database is completely empty (no users at all)
+    my $user_count = $self->db->get_user_count;
+    
+    if ($user_count == 0) {
+        $self->app->log->info("No users found in database. Creating demo user...");
+        
+        # Attempt to create demo user with secure credentials
+        eval {
+            # Create demo user with standard credentials
+            # Demo user is NOT admin and starts in pending status (requires approval)
+            # Password: 'demo' (should be changed in production)
+            my $success = $self->db->create_demo_user(
+                'demo',                 # Username for demo account
+                'demo',                 # Password (plaintext, will be hashed)
+                'demo@example.com'      # Email address for demo account
+            );
+            
+            if ($success) {
+                $self->app->log->info("Demo user created successfully");
+                
+                # Initialize default stash data for demo user
+                eval {
+                    my $demo_user_id = $self->db->get_user_id('demo');
+                    if ($demo_user_id) {
+                        # Use plugin helper to initialize default dashboard
+                        $self->initialize_default_stash_for_user($demo_user_id);
+                        $self->app->log->info("Default stash initialized for demo user");
+                    }
+                };
+                if ($@) {
+                    $self->app->log->warn("Failed to initialize demo user stash: $@");
+                }
+            }
+        };
+        if ($@) {
+            $self->app->log->error("Failed to create demo user: $@");
+        }
+    }
+}
+
 sub _setup_sessions {
     my $self = shift;
 
@@ -171,7 +218,6 @@ sub _setup_sessions {
     $self->sessions->cookie_name('stash_session');
     $self->sessions->default_expiration(3600 * 24 * 30);  # 30 days
 }
-
 
 sub _load_plugins {
     my $self = shift;
@@ -210,7 +256,6 @@ sub _load_plugins {
         notifications_enabled  => 1
     });
 }
-
 
 sub _setup_routes {
     my $self = shift;

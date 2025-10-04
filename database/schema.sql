@@ -225,12 +225,3 @@ ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value);
 INSERT INTO app_logs (level, category, message) 
 VALUES ('info', 'system', 'StashPage database schema created successfully');
 
--- Demo user account for testing and demonstration purposes
--- Username: demo, Password: demo (bcrypt hashed)
-INSERT INTO users (username, password, email, is_admin, status) 
-VALUES ('demo', '$2a$10$hElZoevAJmXW40AWLeKqZOKuHU.9O03oaPjaIcPmdoYixYcutFmVW', 'demo@demo', 0, 'approved')
-ON DUPLICATE KEY UPDATE 
-  password = VALUES(password),
-  email = VALUES(email),
-  is_admin = VALUES(is_admin),
-  status = VALUES(status);
