@@ -20,3 +20,4 @@ sync-check
 sync-real
 data/
 docker-cleanup
+upload*
