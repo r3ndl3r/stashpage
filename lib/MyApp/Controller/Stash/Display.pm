@@ -95,12 +95,44 @@ sub index {
     
     # If no page selected, render the index hub
     if (!$page_key) {
+        # Calculate stats for each page
+        my $unified = $c->get_unified_stash_data();
+        my %page_stats;
+        my $total_categories = 0;
+        my $total_links = 0;
+
+        for my $page_name (@$page_names) {
+            my $stash_data = $unified->{stashes}{$page_name};
+            my $categories = $stash_data->{categories} || [];
+            my $link_count = 0;
+            
+            for my $cat (@$categories) {
+                $link_count += scalar @{$cat->{links} || []};
+            }
+            
+            $page_stats{$page_name} = {
+                categories => scalar @$categories,
+                links => $link_count
+            };
+            
+            # Add to totals as we go
+            $total_categories += scalar @$categories;
+            $total_links += $link_count;
+        }
+
+        my $total_stashes = scalar @$page_names;
+
         $c->stash(
             page_names => $page_names,
+            page_stats => \%page_stats,
+            total_stashes => $total_stashes,
+            total_categories => $total_categories,
+            total_links => $total_links,
             show_index_page => 1,
             categories => [],
             page_key => ''
         );
+        
         return $c->render('stash'); # Index hub view
     }
     

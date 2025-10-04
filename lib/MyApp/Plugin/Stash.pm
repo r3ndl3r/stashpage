@@ -335,6 +335,212 @@ sub register ($self, $app, $config = {}) {
         # Integration: DB helper for data persistence
         return $c->db->save_unified_stashes($user_id, $unified);
     });
+
+    # Helper: get_stash_emoji
+    # Returns an emoji icon based on stash name with fuzzy matching.
+    # Parameters:
+    #   $c : Mojolicious controller (calling context).
+    #   $page_name : Name of the stash page.
+    # Returns:
+    #   String: emoji character matching the stash name or default folder emoji.
+    $app->helper(get_stash_emoji => sub ($c, $page_name) {
+        # Emoji mapping based on keywords
+        my %emoji_map = (
+            # Media & Entertainment
+            'media' => '🎬',
+            'music' => '🎵',
+            'videos' => '📹',
+            'movies' => '🎥',
+            'tv' => '📺',
+            'shows' => '📺',
+            'podcasts' => '🎙️',
+            'podcast' => '🎙️',
+            'streaming' => '📡',
+            'youtube' => '▶️',
+            
+            # Reading & Learning
+            'books' => '📚',
+            'reading' => '📖',
+            'articles' => '📰',
+            'blog' => '✍️',
+            'blogs' => '✍️',
+            'wiki' => '📖',
+            'documentation' => '📚',
+            'tutorial' => '🎓',
+            'tutorials' => '🎓',
+            'education' => '🎓',
+            'learning' => '📝',
+            'study' => '📖',
+            'courses' => '🎓',
+            'course' => '🎓',
+            'swin' => '🎓',
+            
+            # Work & Productivity
+            'work' => '💼',
+            'business' => '💼',
+            'office' => '🏢',
+            'job' => '💼',
+            'career' => '📈',
+            'meeting' => '🤝',
+            'meetings' => '🤝',
+            'calendar' => '📅',
+            'schedule' => '🗓️',
+            'tasks' => '✅',
+            'todo' => '📋',
+            'planning' => '📋',
+            
+            # Development & Tech
+            'dev' => '💻',
+            'code' => '⌨️',
+            'development' => '👨‍💻',
+            'programming' => '💻',
+            'github' => '🐙',
+            'git' => '🔀',
+            'api' => '🔌',
+            'database' => '🗄️',
+            'server' => '🖥️',
+            'cloud' => '☁️',
+            'docker' => '🐳',
+            'devops' => '⚙️',
+            'linux' => '🐧',
+            'terminal' => '⌨️',
+            'shell' => '🐚',
+            'lab' => '🐧',
+            
+            # Design & Creative
+            'design' => '🎨',
+            'art' => '🎨',
+            'creative' => '🎨',
+            'graphics' => '🖼️',
+            'photos' => '📷',
+            'photography' => '📸',
+            'images' => '🖼️',
+            'icons' => '🎯',
+            'colors' => '🌈',
+            'fonts' => '🔤',
+            
+            # Social & Communication
+            'social' => '👥',
+            'chat' => '💬',
+            'messaging' => '💬',
+            'email' => '📧',
+            'mail' => '📮',
+            'contacts' => '📇',
+            'friends' => '👫',
+            'community' => '🌐',
+            
+            # Shopping & Finance
+            'shopping' => '🛒',
+            'shop' => '🛍️',
+            'store' => '🏪',
+            'cart' => '🛒',
+            'wishlist' => '⭐',
+            'deals' => '💰',
+            'finance' => '💰',
+            'money' => '💵',
+            'banking' => '🏦',
+            'crypto' => '₿',
+            'stocks' => '📈',
+            'investing' => '💹',
+            
+            # Food & Lifestyle
+            'food' => '🍔',
+            'recipes' => '🍳',
+            'cooking' => '👨‍🍳',
+            'restaurant' => '🍽️',
+            'restaurants' => '🍽️',
+            'coffee' => '☕',
+            'drinks' => '🍹',
+            
+            # Travel & Places
+            'travel' => '✈️',
+            'trips' => '🧳',
+            'vacation' => '🏖️',
+            'hotel' => '🏨',
+            'hotels' => '🏨',
+            'flights' => '✈️',
+            'maps' => '🗺️',
+            
+            # Sports & Fitness
+            'sports' => '⚽',
+            'fitness' => '💪',
+            'gym' => '🏋️',
+            'workout' => '🏃',
+            'health' => '🏥',
+            'running' => '🏃',
+            'cycling' => '🚴',
+            'swimming' => '🏊',
+            
+            # Gaming
+            'gaming' => '🎮',
+            'games' => '🎯',
+            'game' => '🕹️',
+            'steam' => '🎮',
+            'xbox' => '🎮',
+            'playstation' => '🎮',
+            'nintendo' => '🎮',
+            
+            # Tools & Resources
+            'tools' => '🔧',
+            'resources' => '📦',
+            'utilities' => '🛠️',
+            'apps' => '📱',
+            'software' => '💿',
+            'downloads' => '⬇️',
+            
+            # Projects & Ideas
+            'projects' => '🚀',
+            'project' => '🚀',
+            'ideas' => '💡',
+            'inspiration' => '✨',
+            'brainstorm' => '🧠',
+            
+            # Organization
+            'notes' => '📋',
+            'docs' => '📄',
+            'documents' => '📄',
+            'files' => '📁',
+            'archive' => '📦',
+            'backup' => '💾',
+            
+            # General
+            'links' => '🔗',
+            'favorites' => '⭐',
+            'bookmarks' => '🔖',
+            'starred' => '⭐',
+            'important' => '❗',
+            'urgent' => '🚨',
+            'personal' => '👤',
+            'private' => '🔒',
+            'public' => '🌍',
+            
+            # Science & Research
+            'research' => '🔬',
+            'science' => '🔬',
+            'experiment' => '⚗️',
+            'data' => '📊',
+            'analytics' => '📈',
+            
+            # News & Information
+            'news' => '📡',
+            'tech' => '💻',
+            'technology' => '🔌',
+            'weather' => '🌤️',
+        );
+        
+        my $lower = lc($page_name);
+        
+        # Exact match first
+        return $emoji_map{$lower} if exists $emoji_map{$lower};
+        
+        # Fuzzy matching - check if name contains any keyword
+        for my $keyword (keys %emoji_map) {
+            return $emoji_map{$keyword} if $lower =~ /\b$keyword\b/;
+        }
+        
+        return '📁';  # Default folder emoji
+    });
+
 }
 
 1;
