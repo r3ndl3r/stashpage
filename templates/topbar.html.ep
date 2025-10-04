@@ -25,3 +25,62 @@
         <% } %>
     </div>
 </div>
+
+<!-- 
+    Settings Dropdown Script
+    
+    This script provides the toggleDropdown functionality required by the settings cog icon.
+    It's included here in the topbar partial since the settings dropdown appears on every page.
+    
+    Functionality:
+    - Toggles dropdown visibility on button click
+    - Implements click-outside-to-close behavior
+    - Prevents event bubbling to avoid conflicts
+    - Manages event listener cleanup to prevent memory leaks
+-->
+<script>
+    /**
+     * Settings Dropdown Toggle Handler
+     * 
+     * Manages the visibility state of the settings dropdown menu in the top navigation.
+     * Prevents event bubbling and sets up click-outside-to-close behavior when opened.
+     * 
+     * @param {Event} event - The click event that triggered the dropdown toggle
+     */
+    function toggleDropdown(event) {
+        // Prevent event from bubbling to document click handler
+        event.stopPropagation();
+        
+        const dropdown = document.getElementById('settings-dropdown');
+        dropdown.classList.toggle('hidden');
+        
+        // Set up click-outside detection when dropdown opens
+        if (!dropdown.classList.contains('hidden')) {
+            // Use capture phase to handle clicks before other elements
+            document.addEventListener('click', closeDropdownHandler, true);
+        } else {
+            // Clean up listener when dropdown closes to prevent memory leaks
+            document.removeEventListener('click', closeDropdownHandler, true);
+        }
+    }
+    
+    /**
+     * Settings Dropdown Close Handler
+     * 
+     * Automatically closes the settings dropdown when clicking outside of it.
+     * Checks both the button and dropdown to prevent premature closing during interaction.
+     * 
+     * @param {Event} event - The click event to check if it's outside the dropdown
+     */
+    function closeDropdownHandler(event) {
+        const dropdown = document.getElementById('settings-dropdown');
+        const button = document.getElementById('settings-button');
+        
+        // Close dropdown only if click is outside both button and dropdown areas
+        if (!button.contains(event.target) && !dropdown.contains(event.target)) {
+            dropdown.classList.add('hidden');
+            // Remove listener to prevent memory leaks
+            document.removeEventListener('click', closeDropdownHandler, true);
+        }
+    }
+</script>

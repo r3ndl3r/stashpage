@@ -208,8 +208,5 @@
             </a>
         </div>
     </div>
-
-    <!-- External JavaScript Module -->
-    <script src="/js/user/account.js"></script>
 </body>
 </html>

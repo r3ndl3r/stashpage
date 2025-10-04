@@ -22,6 +22,5 @@
     <%= include '/edit/modal' %>
 
     <script type="module" src="/js/edit/main.js"></script>
-    <script type="module" src="/js/stash.js"></script>
 </body>
 </html>

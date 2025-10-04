@@ -92,6 +92,5 @@
             <a href="/admin" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">← Back to Admin</a>
         </div>
     </div>
-    <script src="/js/stash.js"></script>
 </body>
 </html>
