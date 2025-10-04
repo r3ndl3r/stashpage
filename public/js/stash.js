@@ -530,6 +530,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (pageName) {
         // Dashboard view mode: initialize advanced dashboard features
         initializeDashboard();
+        initializePublicToggle();
     } else {
         // Index page mode: set up page creation and management features
         const pageNameInput = document.getElementById('page-name-input');
@@ -664,6 +665,124 @@ if (document.readyState === 'loading') {
 }
 
 /**
+ * Public/Private Toggle Button Functionality
+ * 
+ * Handles the interactive behavior of the public/private toggle button that allows
+ * stash owners to control visibility of their stash pages. Manages button state,
+ * icon changes, and API communication with the server to persist visibility settings.
+ */
+
+/**
+ * Toggle Button Initialization System
+ * 
+ * Sets up the public toggle button with current state from server data and
+ * attaches click event handler for state changes. Reads initial visibility
+ * state from data attributes set during server rendering.
+ */
+function initializePublicToggle() {
+    const toggleBtn = document.getElementById('toggle-public-btn');
+    if (!toggleBtn) return;                  // Exit if button doesn't exist on page
+    
+    const pageKey = toggleBtn.dataset.pageKey;
+    const isPublic = toggleBtn.dataset.isPublic;
+    
+    // Set initial button state based on server data
+    updateToggleButtonState(toggleBtn, isPublic === '1');
+    
+    // Attach click handler for toggle functionality
+    toggleBtn.addEventListener('click', function() {
+        togglePublicState(pageKey, toggleBtn);
+    });
+}
+
+/**
+ * Public State Toggle Handler
+ * 
+ * Handles button clicks by sending API request to server and updating button
+ * state on success. Provides user feedback for both success and error cases
+ * to ensure users understand the result of their action.
+ * 
+ * @param {string} pageKey - The unique identifier of the stash page
+ * @param {HTMLElement} toggleBtn - The toggle button element to update
+ */
+function togglePublicState(pageKey, toggleBtn) {
+    const currentState = toggleBtn.dataset.isPublic === '1';
+    const newState = !currentState;          // Flip the current state
+    
+    // Disable button during API call to prevent double-clicks
+    toggleBtn.disabled = true;
+    toggleBtn.style.opacity = '0.6';
+    
+    // Send toggle request to server
+    fetch('/api/v1/stash/toggle-public', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            page_key: pageKey,
+            is_public: newState ? 1 : 0
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to toggle public state');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Update button state on successful API response
+        toggleBtn.dataset.isPublic = newState ? '1' : '0';
+        updateToggleButtonState(toggleBtn, newState);
+        
+        // Show success feedback
+        console.log('Public state toggled:', newState ? 'Public' : 'Private');
+    })
+    .catch(error => {
+        console.error('Error toggling public state:', error);
+        alert('Failed to update stash visibility. Please try again.');
+    })
+    .finally(() => {
+        // Re-enable button after API call completes
+        toggleBtn.disabled = false;
+        toggleBtn.style.opacity = '1';
+    });
+}
+
+/**
+ * Toggle Button Visual State Manager
+ * 
+ * Updates all visual aspects of the toggle button to match the current state
+ * including icon, text label, and CSS classes for color scheme. Ensures
+ * consistent visual feedback across all button elements.
+ * 
+ * @param {HTMLElement} toggleBtn - The toggle button element to update
+ * @param {boolean} isPublic - Whether the stash is currently public
+ */
+function updateToggleButtonState(toggleBtn, isPublic) {
+    const text = toggleBtn.querySelector('.toggle-text');
+    const privateIcon = toggleBtn.querySelector('.icon-private');
+    const publicIcon = toggleBtn.querySelector('.icon-public');
+    
+    if (!text || !privateIcon || !publicIcon) {
+        console.error('Toggle button elements not found');
+        return;
+    }
+    
+    if (isPublic) {
+        // Public state: show unlock icon, hide lock icon
+        publicIcon.style.display = 'block';
+        privateIcon.style.display = 'none';
+        text.textContent = 'Public';
+        toggleBtn.dataset.isPublic = '1';
+    } else {
+        // Private state: show lock icon, hide unlock icon
+        privateIcon.style.display = 'block';
+        publicIcon.style.display = 'none';
+        text.textContent = 'Private';
+        toggleBtn.dataset.isPublic = '0';
+    }
+}
+
+/**
  * Global Function Exposure
  * 
  * Makes functions available on the global window object for use by inline event
@@ -684,3 +803,5 @@ window.closeDeleteModal = closeDeleteModal;
 window.confirmDelete = confirmDelete;
 window.confirmDeleteStash = confirmDeleteStash;
 window.toggleCategory = toggleCategory;
+window.initializePublicToggle = initializePublicToggle;
+window.togglePublicState = togglePublicState;

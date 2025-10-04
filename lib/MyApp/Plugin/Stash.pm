@@ -308,6 +308,33 @@ sub register ($self, $app, $config = {}) {
     $app->hook(after_startup => sub ($app) {
         $app->log->info("Stash plugin initialized with default content and validation");
     });
+
+    # Helper: toggle_stash_public
+    # Toggles the public/private visibility state of a stash page.
+    # Parameters:
+    #   $c : Mojolicious controller (calling context).
+    #   $page_key : Page identifier to toggle visibility for.
+    #   $is_public : New public state (1 for public, 0 for private).
+    # Returns:
+    #   Boolean: success status of visibility update.
+    $app->helper(toggle_stash_public => sub ($c, $page_key, $is_public) {
+        # Verify user authentication for visibility modification
+        my $user_id = $c->current_user_id;
+        return 0 unless $user_id;
+        
+        # Block demo user from changing visibility
+        return 0 if $c->is_demo;
+        
+        # Load current unified stash data
+        my $unified = $c->get_unified_stash_data();
+        return 0 unless exists $unified->{stashes}{$page_key};
+        
+        # Update the is_public flag in JSON structure
+        $unified->{stashes}{$page_key}{is_public} = $is_public ? 1 : 0;
+        
+        # Integration: DB helper for data persistence
+        return $c->db->save_unified_stashes($user_id, $unified);
+    });
 }
 
 1;

@@ -659,3 +659,120 @@ body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
     border-radius: 50%;
     animation: spin 0.6s linear infinite;
 }
+
+/**
+ * ============================================================================
+ * Modern Public/Private Toggle Button System
+ * ============================================================================
+ * 
+ * Redesigned glassmorphism toggle for controlling stash page visibility with
+ * modern animated state transitions and color-coded visual feedback. Features
+ * smooth icon crossfades, pulsing state indicators, and responsive mobile layout.
+ * 
+ * States:
+ * - Private (red): Only owner can view, closed lock icon with red pulse
+ * - Public (green): Anyone with link can view, open lock with green pulse
+ * 
+ * Position: Fixed bottom-left corner with responsive behavior for mobile
+ * ============================================================================ */
+
+/**
+ * Base Button Styling with Glassmorphism
+ * 
+ * Creates modern semi-transparent button with backdrop blur, elevated shadows,
+ * and smooth hover interactions. Flexbox layout manages icon/text arrangement
+ * with consistent spacing and alignment.
+ */
+#toggle-public-btn {
+    cursor: pointer;                          /* Indicates interactivity */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth hover lift */
+}
+
+/**
+ * Hover Lift Effect
+ * 
+ * Provides tactile feedback through subtle upward movement that creates
+ * sense of elevation and confirms button responsiveness to user interaction.
+ */
+#toggle-public-btn:hover {
+    transform: translateY(-2px);             /* Subtle lift on hover */
+}
+
+/**
+ * ============================================================================
+ * PRIVATE STATE STYLING (data-is-public="0")
+ * ============================================================================
+ * Red color scheme indicates restricted/locked access state
+ * ============================================================================ */
+
+/**
+ * Private State Icon Visibility
+ * Shows closed lock icon while hiding open lock for clear visual state
+ */
+#toggle-public-btn[data-is-public="0"] .icon-private {
+    opacity: 1;                               /* Fully visible closed lock */
+    transform: scale(1);                      /* Normal size */
+}
+
+#toggle-public-btn[data-is-public="0"] .icon-public {
+    opacity: 0;                               /* Hidden open lock */
+    transform: scale(0.8);                    /* Slightly scaled down */
+}
+
+/**
+ * Private State Pulse Indicator
+ * Red pulsing dot provides persistent visual feedback for private status
+ */
+#toggle-public-btn[data-is-public="0"] .toggle-pulse {
+    background-color: rgb(248, 113, 113);    /* Tailwind red-400 for private state */
+}
+
+/**
+ * ============================================================================
+ * PUBLIC STATE STYLING (data-is-public="1")
+ * ============================================================================
+ * Green color scheme indicates open/shared access state
+ * ============================================================================ */
+
+/**
+ * Public State Icon Visibility
+ * Shows open lock icon while hiding closed lock for clear visual state
+ */
+#toggle-public-btn[data-is-public="1"] .icon-private {
+    opacity: 0;                               /* Hidden closed lock */
+    transform: scale(0.8);                    /* Slightly scaled down */
+}
+
+#toggle-public-btn[data-is-public="1"] .icon-public {
+    opacity: 1;                               /* Fully visible open lock */
+    transform: scale(1);                      /* Normal size */
+}
+
+/**
+ * Public State Text Color
+ * Changes primary text to green indicating public/shared status
+ */
+#toggle-public-btn[data-is-public="1"] .toggle-text {
+    color: rgb(134, 239, 172);               /* Tailwind green-300 for visibility */
+}
+
+/**
+ * Public State Pulse Indicator
+ * Green pulsing dot provides persistent visual feedback for public status
+ */
+#toggle-public-btn[data-is-public="1"] .toggle-pulse {
+    background-color: rgb(74, 222, 128);     /* Tailwind green-400 for public state */
+}
+
+/**
+ * ============================================================================
+ * ICON TRANSITION ANIMATIONS
+ * ============================================================================
+ * Smooth crossfade between lock/unlock icons with scale effects for
+ * professional state transitions that feel responsive and polished.
+ * ============================================================================ */
+
+.toggle-icon {
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Eased transitions */
+}

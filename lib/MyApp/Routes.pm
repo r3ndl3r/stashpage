@@ -93,18 +93,12 @@ sub setup_routes {
     # =============================================================================
     
     # Data persistence and manipulation routes
-    $r->post('/edit')->to('stash-data#save');                          # Save stash page edits to database
+    $r->post('/edit')->to('stash-data#save');                                          # Save stash page edits to database
     $r->post('/api/v1/stash/category/toggle')->to('stash-data#toggle_category_state'); # AJAX: toggle category collapse
-    $r->get('/stash/export')->to('stash-data#export');                 # Export stash data as JSON
-    $r->post('/stash/import')->to('stash-data#import');                # Import stash data from JSON
-
-    # =============================================================================
-    # LEGACY COMPATIBILITY ROUTES
-    # =============================================================================
+    $r->post('/api/v1/stash/toggle-public')->to('stash-data#toggle_public');           # API: toggle public/private visibility
+    $r->get('/stash/export')->to('stash-data#export');                                 # Export stash data as JSON
+    $r->post('/stash/import')->to('stash-data#import');                                # Import stash data from JSON
     
-    # Backward compatibility routes for existing integrations
-    $r->get('/stash/export')->to('stash#export');                      # Legacy export route mapping
-    $r->post('/stash/import')->to('stash#import');                     # Legacy import route mapping
 
     # ============================================================================
     # User Account Management Routes

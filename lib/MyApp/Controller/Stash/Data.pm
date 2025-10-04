@@ -48,30 +48,90 @@ sub save {
 
 # Toggles collapsed/expanded state of a category via AJAX.
 # Route: POST /stash/data/toggle_category_state
-# Parameters:
-#   page_key       : Page key for stash collection
+# Parameters (JSON):
+#   page_key       : Page key for stash collection (must match /^[\w_\-.]+$/)
 #   category_title : Category to modify
 #   state          : New collapsed (0) or expanded (1) state
 # Returns:
-#   JSON response: { success: 1 } on success, error otherwise
+#   JSON response: { success: 1 } on success
+#   JSON error: { error: '...' } with status code on failure
 sub toggle_category_state { 
     my $c = shift;
-    return $c->render(json => { error => 'Unauthorized' }, status => 401) unless $c->is_logged_in;
+    
+    # Verify user authentication
+    return $c->render(json => { error => 'Unauthorized' }, status => 401)
+        unless $c->is_logged_in;
 
+    # Get JSON request body
     my $data = $c->req->json;
-
     my $page_key = $data->{page_key};
     my $category_title = $data->{category_title};
     my $state = $data->{state};
 
-    # Validate required parameters
-    return $c->alert('Missing parameters', 400) unless $page_key && $category_title && $state;
+    # Validate required parameters (state can be 0, so use 'defined')
+    unless (defined $page_key && defined $category_title && defined $state) {
+        return $c->render(json => { error => 'Missing required parameters' }, status => 400);
+    }
+    
+    # Validate page key format for security
+    return $c->render(json => { error => 'Invalid page name' }, status => 400)
+        unless $page_key =~ /^[\w_\-.]+$/;
 
     # Save category state and respond with JSON
     if ($c->save_category_state($page_key, $category_title, $state)) {
-        $c->render(json => { success => 1 });
+        return $c->render(json => { success => 1 });
     } else {
-        $c->render(json => { error => 'Failed to save state' }, status => 500);
+        return $c->render(json => { error => 'Failed to save state' }, status => 500);
+    }
+}
+
+# Toggles public/private visibility state of a stash page via AJAX.
+# Route: POST /api/v1/stash/toggle-public
+# Parameters (JSON):
+#   page_key : Page key for stash (must match /^[\w_\-.]+$/)
+#   is_public : New public state (1 for public, 0 for private)
+# Returns:
+#   JSON response: { success: 1, page_key: '...', is_public: 1 } on success
+#   JSON error: { error: '...' } with status code on failure
+# Behavior:
+#   - Validates authentication and demo user status
+#   - Validates page key format and required parameters
+#   - Calls helper to toggle visibility flag in database
+#   - Returns success confirmation with updated state or error message
+sub toggle_public {
+    my $c = shift;
+    
+    # Verify user authentication
+    return $c->render(json => { error => 'Unauthorized' }, status => 401)
+        unless $c->is_logged_in;
+    
+    # Block demo users from modifying public status
+    return $c->render(json => { error => 'Demo account cannot modify public status' }, status => 403)
+        if $c->is_demo;
+    
+    # Get JSON request body
+    my $data = $c->req->json;
+    my $page_key = $data->{page_key};
+    my $is_public = $data->{is_public};
+    
+    # Validate required parameters
+    unless (defined $page_key && defined $is_public) {
+        return $c->render(json => { error => 'Missing required parameters' }, status => 400);
+    }
+    
+    # Validate page key format for security
+    return $c->render(json => { error => 'Invalid page name' }, status => 400)
+        unless $page_key =~ /^[\w_\-.]+$/;
+    
+    # Call helper to toggle visibility in database
+    if ($c->toggle_stash_public($page_key, $is_public)) {
+        return $c->render(json => {
+            success => 1,
+            page_key => $page_key,
+            is_public => $is_public ? 1 : 0
+        });
+    } else {
+        return $c->render(json => { error => 'Failed to update visibility' }, status => 500);
     }
 }
 
