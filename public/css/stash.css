@@ -848,15 +848,15 @@ body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
 /**
  * Mobile Responsive Behavior
  * 
- * On mobile devices, notification expands to full width (with margins) for
- * better visibility and touch-friendly sizing. Text centers for balanced
- * appearance in wider notification format.
+ * On mobile devices, notification stays right-aligned with constrained width
+ * for better visibility without stretching across entire screen.
  */
 @media (max-width: 768px) {
     .clipboard-notification {
         bottom: 10px;                         /* Reduced margin conserves screen space */
-        right: 10px;                          /* Reduced right margin */
-        left: 10px;                           /* Extends to left edge with margin */
+        right: 10px;                          /* Keep right-aligned positioning */
+        max-width: calc(100vw - 20px);       /* Prevent overflow beyond viewport */
+        width: auto;                          /* Auto width based on content */
         text-align: center;                   /* Centered text for balanced mobile layout */
     }
 }
