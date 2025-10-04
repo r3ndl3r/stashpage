@@ -30,7 +30,7 @@
         <div class="mb-8">
         <div class="flex items-center gap-3 mb-6">
             <h2 class="text-2xl font-semibold text-white">Your Stashes</h2>
-            <button id="global-search-toggle" class="text-gray-400 hover:text-white hover:bg-gray-700/50 p-2 rounded-lg transition-all duration-200 hover:scale-110" title="Search all bookmarks (Ctrl+K)">
+            <button id="global-search-toggle" class="text-gray-400 hover:text-white hover:bg-gray-700/50 p-2 rounded-lg transition-all duration-200 hover:scale-110" title="Search all bookmarks (/)">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>

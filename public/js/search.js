@@ -119,24 +119,43 @@ function closeGlobalSearch() {
  * Keyboard Shortcut Handler
  * 
  * Processes keyboard events for search shortcuts:
- * - Ctrl/Cmd + K: Open search bar
+ * - / (forward slash): Open search bar (common pattern like GitHub, Slack)
  * - Escape: Close search bar
  * 
  * @param {KeyboardEvent} e - Keyboard event object
  */
 function handleSearchKeyboard(e) {
-    // Open search with Ctrl/Cmd + K
-    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    // Open search with forward slash (/) - like GitHub, Slack, etc.
+    if (e.key === '/' && !isInputFocused()) {
         e.preventDefault();
         if (elements.container.classList.contains('hidden')) {
             openGlobalSearch();
         }
+        return;
     }
-
+    
     // Close search with Escape key
     if (e.key === 'Escape' && !elements.container.classList.contains('hidden')) {
         closeGlobalSearch();
     }
+}
+
+/**
+ * Check if an input element is currently focused
+ * 
+ * Prevents '/' shortcut from triggering when user is typing in a text field.
+ * This ensures the shortcut only works when the user intends to start a search,
+ * not when they're typing a URL or entering other text data.
+ * 
+ * @returns {boolean} True if an input/textarea is focused
+ */
+function isInputFocused() {
+    const activeElement = document.activeElement;
+    return activeElement && (
+        activeElement.tagName === 'INPUT' ||
+        activeElement.tagName === 'TEXTAREA' ||
+        activeElement.isContentEditable
+    );
 }
 
 /**
