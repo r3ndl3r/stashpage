@@ -1,11 +1,14 @@
 services:
-  # Stashpage Application with SQLite
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: stashpage-app
     restart: unless-stopped
+    
     ports:
       - "${APP_PORT:-3300}:3000"
+    
     environment:
       # Database Configuration - SQLite
       DB_TYPE: sqlite
@@ -13,6 +16,7 @@ services:
       
       # Application Configuration
       MOJO_MODE: ${MOJO_MODE:-production}
+      MOJO_LOG_LEVEL: ${MOJO_LOG_LEVEL:-info}
     
     volumes:
       - ./log:/app/log
@@ -23,6 +27,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s  # Added start_period
 
 volumes:
   sqlite_data:

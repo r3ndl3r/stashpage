@@ -4,29 +4,52 @@ services:
     image: mariadb:11.2
     container_name: stashpage-db
     restart: unless-stopped
+    
+    # UTF8MB4 for international characters and emoji
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
       MYSQL_DATABASE: ${DB_NAME:-stashpage}
       MYSQL_USER: ${DB_USER:-stashpage}
       MYSQL_PASSWORD: ${DB_PASSWORD:-stashpage}
+      MARIADB_AUTO_UPGRADE: 1
+    
     volumes:
       - db_data:/var/lib/mysql
       - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    
     networks:
       - stashpage-network
+    
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s  # Added start_period
+    
+    # Resource limits to prevent resource starvation
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
 
   # Stashpage Application
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: stashpage-app
     restart: unless-stopped
+    
     ports:
       - "${APP_PORT:-3300}:3000"
+    
     environment:
       # Database Configuration - MariaDB
       DB_TYPE: mariadb
@@ -38,19 +61,25 @@ services:
       
       # Application Configuration
       MOJO_MODE: ${MOJO_MODE:-production}
+      MOJO_LOG_LEVEL: ${MOJO_LOG_LEVEL:-info}
+    
     depends_on:
       db:
         condition: service_healthy
+    
     networks:
       - stashpage-network
+    
     volumes:
       - ./log:/app/log
+    
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-
+      start_period: 40s  # Added start_period
+    
 volumes:
   db_data:
     driver: local
