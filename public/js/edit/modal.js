@@ -130,6 +130,16 @@ export function showEditCategoryModal(cardElement, onSaveCallback) {
                 <input type="url" id="edit-category-base-url" value="${baseUrl}"
                     class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm p-2 text-white focus:ring-blue-500 focus:border-blue-500">
             </div>
+            <!-- Category Color Selection -->
+            <div>
+                <label class="block text-sm font-medium text-gray-400 mb-2">Category Color (Optional) <span class="text-gray-500 text-xs">- Accent color for visual distinction</span></label>
+                <div class="flex items-center space-x-3">
+                    <input type="color" id="edit-category-color" value="#3b82f6" class="h-10 w-16 rounded cursor-pointer border border-gray-600 bg-gray-700" title="Choose category color">
+                    <input type="text" id="edit-category-color-hex" value="#3b82f6" maxlength="7" pattern="^#[0-9A-Fa-f]{6}$" placeholder="#3b82f6" class="flex-1 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm">
+                    <button type="button" onclick="resetCategoryColor('edit')" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-colors text-sm whitespace-nowrap" title="Reset to default blue">Reset</button>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">Choose a color to visually distinguish this category and its links</p>
+            </div>
             <div class="flex justify-end space-x-2 pt-4">
                 <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" onclick="closeModal()">Cancel</button>
                 <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Save Changes</button>
@@ -137,6 +147,10 @@ export function showEditCategoryModal(cardElement, onSaveCallback) {
         </form>
     </div>`;
     document.getElementById('modal').classList.remove('hidden');
+
+    // Populate color picker with current category color
+    const currentColor = cardElement.dataset.categoryColor || '#3b82f6';
+    setCategoryColor('edit', currentColor);
 }
 
 
@@ -147,6 +161,7 @@ export function showEditCategoryModal(cardElement, onSaveCallback) {
  * - Title input with validation requirements
  * - Optional icon URL for visual category identification  
  * - Optional base URL for relative link functionality
+ * - Optional custom color for category and link visual distinction
  */
 export function showAddCategoryModal(onSaveCallback) {
     currentEditElement = null;
@@ -174,6 +189,18 @@ export function showAddCategoryModal(onSaveCallback) {
                 <input type="url" id="add-category-base-url"
                     class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm p-2 text-white focus:ring-blue-500 focus:border-blue-500">
             </div>
+            
+            <!-- Category Color Selection -->
+            <div>
+                <label class="block text-sm font-medium text-gray-400 mb-2">Category Color (Optional) <span class="text-gray-500 text-xs">- Accent color for visual distinction</span></label>
+                <div class="flex items-center space-x-3">
+                    <input type="color" id="add-category-color" value="#3b82f6" class="h-10 w-16 rounded cursor-pointer border border-gray-600 bg-gray-700" title="Choose category color">
+                    <input type="text" id="add-category-color-hex" value="#3b82f6" maxlength="7" pattern="^#[0-9A-Fa-f]{6}$" placeholder="#3b82f6" class="flex-1 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm">
+                    <button type="button" onclick="resetCategoryColor('add')" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg transition-colors text-sm whitespace-nowrap" title="Reset to default blue">Reset</button>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">Choose a color to visually distinguish this category and its links</p>
+            </div>
+            
             <div class="flex justify-end space-x-2 pt-4">
                 <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" onclick="closeModal()">Cancel</button>
                 <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Add Category</button>
@@ -182,6 +209,7 @@ export function showAddCategoryModal(onSaveCallback) {
     </div>`;
     document.getElementById('modal').classList.remove('hidden');
 }
+
 
 
 /**
@@ -373,3 +401,112 @@ export function handleConfirm(confirmed) {
     if (confirmCallback) confirmCallback(confirmed);
     closeModal();
 }
+
+
+/**
+ * Category Color Management System
+ * Synchronizes color picker with hex input and provides reset functionality
+ */
+
+/**
+ * Initialize color picker synchronization
+ * Sets up bidirectional sync between color picker and hex input
+ */
+function initColorSync(mode) {
+    const colorPicker = document.getElementById(`${mode}-category-color`);
+    const hexInput = document.getElementById(`${mode}-category-color-hex`);
+    
+    if (!colorPicker || !hexInput) return;
+    
+    // Sync color picker → hex input
+    colorPicker.addEventListener('input', function() {
+        hexInput.value = this.value.toUpperCase();
+    });
+    
+    // Sync hex input → color picker (with validation)
+    hexInput.addEventListener('input', function() {
+        const hex = this.value.trim();
+        if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+            colorPicker.value = hex;
+            this.setCustomValidity('');
+        } else if (hex.length === 7) {
+            this.setCustomValidity('Invalid hex color. Use #RRGGBB format');
+        }
+    });
+    
+    // Normalize on blur
+    hexInput.addEventListener('blur', function() {
+        const hex = this.value.trim().toUpperCase();
+        if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+            this.value = hex;
+            colorPicker.value = hex;
+            this.setCustomValidity('');
+        }
+    });
+}
+
+
+/**
+ * Reset category color to default blue
+ */
+window.resetCategoryColor = function(mode) {
+    const colorPicker = document.getElementById(`${mode}-category-color`);
+    const hexInput = document.getElementById(`${mode}-category-color-hex`);
+    const defaultColor = '#3b82f6';
+    
+    if (colorPicker && hexInput) {
+        colorPicker.value = defaultColor;
+        hexInput.value = defaultColor;
+        hexInput.setCustomValidity('');
+    }
+};
+
+
+/**
+ * Get current category color value
+ */
+export function getCategoryColor(mode) {
+    const hexInput = document.getElementById(`${mode}-category-color-hex`);
+    if (!hexInput) return '#3b82f6';
+    
+    let value = hexInput.value.trim();
+    // Ensure # prefix
+    if (!value.startsWith('#')) {
+        value = '#' + value;
+    }
+    return value;
+}
+
+
+/**
+ * Set category color value (for editing existing categories)
+ */
+export function setCategoryColor(mode, color) {
+    const colorPicker = document.getElementById(`${mode}-category-color`);
+    const hexInput = document.getElementById(`${mode}-category-color-hex`);
+    const validColor = /^#[0-9A-Fa-f]{6}$/.test(color) ? color : '#3b82f6';
+    
+    if (colorPicker && hexInput) {
+        colorPicker.value = validColor;
+        hexInput.value = validColor.toUpperCase();
+        hexInput.setCustomValidity('');
+    }
+}
+
+
+// Auto-initialize color sync when modals open
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('modal');
+    const observer = new MutationObserver(function() {
+        // Check if add or edit category modal is open
+        if (document.getElementById('add-category-color')) {
+            initColorSync('add');
+        }
+        if (document.getElementById('edit-category-color')) {
+            initColorSync('edit');
+        }
+    });
+    if (modal) {
+        observer.observe(modal, { childList: true, subtree: true });
+    }
+});

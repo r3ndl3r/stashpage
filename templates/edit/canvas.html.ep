@@ -12,6 +12,7 @@
                  data-category-title="<%= $category->{title} %>"
                  data-category-icon="<%= $category->{icon} %>"
                  data-category-base-url="<%= $category->{baseUrl} %>"
+                 data-category-color="<%= $category->{color} || '#3b82f6' %>"
                  style="left: <%= $category->{x} || 0 %>px; top: <%= $category->{y} || 0 %>px;">
                 
                 <div class="drag-handle flex justify-between items-center mb-2 pb-2 border-b border-gray-600/50 cursor-move hover:border-gray-500 transition-colors">

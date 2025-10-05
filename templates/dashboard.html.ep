@@ -3,13 +3,21 @@
     <div id="dashboard-main-area" class="relative" style="width: 4000px; height: 2500px; min-width: 100%;">
         <div id="dashboard-canvas" class="relative w-full h-full">
             <div id="center-marker" class="center-marker"></div>
+            <% 
+                # Normalize color with # prefix
+                for my $category (@$categories) {
+                    my $color = $category->{color} || '#3b82f6';
+                    $color = '#' . $color unless $color =~ /^#/;
+                    $category->{color} = $color;
+                }
+            %>
             <% for my $category (@$categories) { %>
-                <div class="card-window rounded-lg p-4 shadow-lg flex flex-col border border-gray-600/50 hover:border-gray-500/70 transition-all duration-200 backdrop-blur-md"
-                     data-category-title="<%= $category->{title} %>"
-                     data-category-icon="<%= $category->{icon} %>"
-                     data-category-base-url="<%= $category->{baseUrl} %>"
-                     data-collapsed="<%= $category->{collapsed} || 0 %>"
-                     style="left: <%= $category->{x} || 0 %>px; top: <%= $category->{y} || 0 %>px;">
+            <div class="card-window rounded-lg p-4 shadow-lg flex flex-col border border-gray-600/50 hover:border-gray-500/70 transition-all duration-200 backdrop-blur-md"
+                data-category-title="<%= $category->{title} %>"
+                data-category-icon="<%= $category->{icon} %>"
+                data-category-base-url="<%= $category->{baseUrl} %>"
+                data-category-color="<%= $category->{color} && $category->{color} =~ /^#/ ? $category->{color} : '#' . ($category->{color} || '3b82f6') %>"
+                style="left: <%= $category->{x} || 0 %>px; top: <%= $category->{y} || 0 %>px;">
                 
                 <!-- Exact match of edit mode drag-handle structure -->
                 <div class="drag-handle flex justify-between items-center mb-2 pb-2 border-b border-gray-600/50 cursor-pointer hover:border-gray-500 transition-colors"

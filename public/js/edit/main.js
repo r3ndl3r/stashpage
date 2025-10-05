@@ -157,6 +157,7 @@ function syncDataForSubmission() {
         category.y = parseInt(card.style.top, 10) || 0;
         category.icon = card.dataset.categoryIcon || '';
         category.baseUrl = card.dataset.categoryBaseUrl || '';
+        category.color = card.dataset.categoryColor || '#3b82f6';
 
         // Rebuild items array from current DOM order (reflects user sorting)
         category.items = [];
@@ -252,6 +253,7 @@ function init() {
             title: card.dataset.categoryTitle,
             icon: card.dataset.categoryIcon || '',
             baseUrl: card.dataset.categoryBaseUrl || '',
+            color: card.dataset.categoryColor || '#3b82f6',
             x: parseInt(card.style.left, 10) || 0,
             y: parseInt(card.style.top, 10) || 0,
             items: []
@@ -341,9 +343,83 @@ function handleEditModeKeyboard(e) {
     }
 }
 
+/**
+ * Apply Category Custom Colors in Edit Mode
+ * 
+ * Applies the same color styling in edit mode as view mode for consistency.
+ */
+function applyCategoryColors() {
+    document.querySelectorAll('.card-window[data-category-color]').forEach(card => {
+        const color = card.dataset.categoryColor;
+        
+        // Skip if no color or default blue
+        if (!color || color === '#3b82f6' || color === '3b82f6') {
+            // Reset to default styling if color was removed
+            card.style.background = '';
+            card.style.backdropFilter = '';
+            card.style.borderColor = '';
+            card.style.borderWidth = '';
+            
+            const header = card.querySelector('.drag-handle');
+            if (header) {
+                header.style.borderBottomColor = '';
+                header.style.borderBottomWidth = '';
+            }
+            
+            card.querySelectorAll('.stash-tile').forEach(tile => {
+                tile.style.borderLeft = '';
+                tile.style.background = '';
+            });
+            return;
+        }
+        
+        // Add # prefix if missing
+        const hexColor = color.startsWith('#') ? color : '#' + color;
+        
+        // Convert hex to RGB for transparency effects
+        const r = parseInt(hexColor.slice(1, 3), 16);
+        const g = parseInt(hexColor.slice(3, 5), 16);
+        const b = parseInt(hexColor.slice(5, 7), 16);
+        
+        // Apply colored background gradient with tint
+        card.style.background = `linear-gradient(135deg, 
+            rgba(${r}, ${g}, ${b}, 0.35) 0%, 
+            rgba(${r}, ${g}, ${b}, 0.20) 50%, 
+            rgba(0, 0, 0, 0.7) 100%)`;
+        
+        // Keep the backdrop blur
+        card.style.backdropFilter = 'blur(10px)';
+        
+        // Apply colored border to card (standard 1px width)
+        card.style.borderColor = hexColor;
+        card.style.borderWidth = '1px';
+        
+        // Apply colored border to header (standard 1px width)
+        const header = card.querySelector('.drag-handle');
+        if (header) {
+            header.style.borderBottomColor = hexColor;
+            header.style.borderBottomWidth = '1px';
+        }
+        
+        // Apply very subtle colored gradient with quick transition to solid
+        card.querySelectorAll('.stash-tile').forEach(tile => {
+            tile.style.borderLeft = `2px solid ${hexColor}`;
+            tile.style.background = `linear-gradient(90deg, 
+                rgba(${r}, ${g}, ${b}, 0.03) 0%, 
+                rgba(${r}, ${g}, ${b}, 0.015) 50%, 
+                rgba(30, 41, 59, 0.9) 100%)`;
+        });
+    });
+}
+
+// Expose applyCategoryColors globally for use in actions.js
+window.applyCategoryColors = applyCategoryColors;
+
+// Apply colors when page loads and after category operations
+document.addEventListener('DOMContentLoaded', applyCategoryColors);
+
 // Initialize in edit mode
 document.addEventListener('keydown', handleEditModeKeyboard);
-
 
 /**
  * Application Entry Point

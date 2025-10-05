@@ -122,11 +122,12 @@ sub register ($self, $app, $config = {}) {
             push @categories, {
                 title => $cat->{title},
                 icon => $cat->{icon},
-                items => $cat->{links},                        # Bookmark array
-                x => $geometry->{x},                           # X position
-                y => $geometry->{y},                           # Y position  
+                items => $cat->{links},                         # Bookmark array
+                x => $geometry->{x},                            # X position
+                y => $geometry->{y},                            # Y position  
                 collapsed => $cat->{positions}{collapsed} || 0, # Collapse state
-                baseUrl => $cat->{baseUrl} || ''               # URL prefix
+                baseUrl => $cat->{baseUrl} || '',               # URL prefix
+                color => $cat->{color} // '#3b82f6'
             };
         }
         
@@ -186,8 +187,9 @@ sub register ($self, $app, $config = {}) {
             # Build complete category record
             push @new_categories, {
                 title => $new_cat->{title},
-                icon => $new_cat->{icon} || '',
-                baseUrl => $new_cat->{baseUrl} || '',
+                icon => $new_cat->{icon} // '',
+                baseUrl => $new_cat->{baseUrl} // '',
+                color => $new_cat->{color} // '#3b82f6',
                 links => $new_cat->{items},
                 positions => $positions
             };

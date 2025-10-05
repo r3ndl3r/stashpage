@@ -418,11 +418,9 @@ export function makeSortable(list) {
     }
 
     try {
-        // Clean up any existing Sortable instance to prevent conflicts
-        const existingInstance = DragState.sortableInstances.get(list);
-        if (existingInstance) {
-            existingInstance.destroy();
-        }
+        // Destroy all Sortable instances
+        // Note: WeakMap doesn't have forEach - instances will be garbage collected
+        DragState.sortableInstances = new WeakMap();
 
         // Configure Sortable.js options for optimal user experience
         const sortableOptions = {

@@ -15,8 +15,9 @@
  * - draggable.js: For making new elements draggable and sortable
  */
 
-import { showAlert, closeModal } from './modal.js';
+import { showAlert, closeModal, getCategoryColor } from './modal.js';
 import { makeDraggable, makeSortable } from './draggable.js';
+
 
 /**
  * Configuration Constants
@@ -37,6 +38,7 @@ const CONFIG = {
     // Security policy: only these URL protocols are permitted
     ALLOWED_PROTOCOLS: ['http:', 'https:', 'ftp:', 'ftps:']
 };
+
 
 /**
  * URL Resolution and Validation
@@ -79,6 +81,7 @@ function resolveUrl(url, baseUrl) {
     return validateUrl(url);
 }
 
+
 /**
  * URL Security Validation
  * 
@@ -104,6 +107,7 @@ function validateUrl(url) {
         throw new Error(`Invalid URL: ${error.message}`);
     }
 }
+
 
 /**
  * Text Input Validation
@@ -135,6 +139,7 @@ function validateText(text, fieldName, maxLength, required = true) {
     
     return text;
 }
+
 
 /**
  * Stash Tile DOM Element Factory
@@ -198,6 +203,7 @@ function createStashTile({ name, url, icon }) {
     return tile;
 }
 
+
 /**
  * Category Card DOM Element Factory
  * 
@@ -208,11 +214,12 @@ function createStashTile({ name, url, icon }) {
  * @param {string} options.title - Category display name
  * @param {string} options.icon - Category icon URL (optional)
  * @param {string} options.baseUrl - Base URL for relative links in this category
+ * @param {string} options.color - Custom accent color for category and links
  * @param {number} options.x - Horizontal position on canvas
  * @param {number} options.y - Vertical position on canvas
  * @returns {HTMLElement} Complete category card element ready for insertion
  */
-function createCategoryCard({ title, icon, baseUrl, x = CONFIG.CANVAS.CENTER_X + CONFIG.CANVAS.DEFAULT_OFFSET, y = CONFIG.CANVAS.CENTER_Y + CONFIG.CANVAS.DEFAULT_OFFSET }) {
+function createCategoryCard({ title, icon, baseUrl, color, x = CONFIG.CANVAS.CENTER_X + CONFIG.CANVAS.DEFAULT_OFFSET, y = CONFIG.CANVAS.CENTER_Y + CONFIG.CANVAS.DEFAULT_OFFSET }) {
     const card = document.createElement('div');
     card.className = 'card-window rounded-lg p-4 shadow-lg flex flex-col border border-gray-600/50 hover:border-gray-500/70 transition-all duration-200 backdrop-blur-md';
     
@@ -220,9 +227,20 @@ function createCategoryCard({ title, icon, baseUrl, x = CONFIG.CANVAS.CENTER_X +
     card.dataset.categoryTitle = title || '';
     card.dataset.categoryIcon = icon || '';
     card.dataset.categoryBaseUrl = baseUrl || '';
+    card.dataset.categoryColor = color || '#3b82f6';
+    
     // Position the card on the canvas with bounds checking
     card.style.left = `${Math.max(0, x)}px`;
     card.style.top = `${Math.max(0, y)}px`;
+
+    // Apply custom color CSS variables if color is set
+    if (color && color !== '#3b82f6') {
+        const r = parseInt(color.slice(1, 3), 16);
+        const g = parseInt(color.slice(3, 5), 16);
+        const b = parseInt(color.slice(5, 7), 16);
+        card.style.setProperty('--category-color', color);
+        card.style.setProperty('--category-color-rgb', `${r}, ${g}, ${b}`);
+    }
 
     // Generate icon HTML with error handling for broken images
     const iconHtml = icon ? `<img src="${escapeHtml(icon)}" alt="" class="h-6 w-6 mr-2" onerror="this.style.display='none'">` : '';
@@ -281,6 +299,7 @@ function createCategoryCard({ title, icon, baseUrl, x = CONFIG.CANVAS.CENTER_X +
     return card;
 }
 
+
 /**
  * HTML Sanitization Function
  * 
@@ -297,8 +316,9 @@ function escapeHtml(unsafe) {
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(/'/g, "'");
 }
+
 
 /**
  * Safe DOM Element Retrieval
@@ -318,6 +338,7 @@ function safeGetElementById(id) {
     }
 }
 
+
 /**
  * Category Edit Handler
  * 
@@ -335,10 +356,12 @@ export function editCategory(cardElement, dashboardData) {
 
     try {
         const oldTitle = cardElement.dataset.categoryTitle;
+        
         // Retrieve form input elements
         const titleInput = safeGetElementById('edit-category-title');
         const iconInput = safeGetElementById('edit-category-icon');
         const baseUrlInput = safeGetElementById('edit-category-base-url');
+        const colorInput = safeGetElementById('edit-category-color-hex');
 
         if (!titleInput) {
             showAlert('Title input field not found.');
@@ -358,6 +381,13 @@ export function editCategory(cardElement, dashboardData) {
             validateUrl(newBaseUrl);
         }
         
+        // Get and validate color
+        const newColor = colorInput ? colorInput.value : '#3b82f6';
+        if (newColor && !/^#[0-9A-Fa-f]{6}$/.test(newColor)) {
+            showAlert('Invalid color format. Please use #RRGGBB format.');
+            return;
+        }
+        
         // Check for title conflicts with other categories
         const titleConflict = dashboardData.some(c => c.title !== oldTitle && c.title === newTitle);
         if (titleConflict) {
@@ -369,7 +399,24 @@ export function editCategory(cardElement, dashboardData) {
         cardElement.dataset.categoryTitle = newTitle;
         cardElement.dataset.categoryIcon = newIcon;
         cardElement.dataset.categoryBaseUrl = newBaseUrl;
-        
+        cardElement.dataset.categoryColor = newColor;
+
+        // Apply updated color CSS variables
+        if (newColor && newColor !== '#3b82f6') {
+            const r = parseInt(newColor.slice(1, 3), 16);
+            const g = parseInt(newColor.slice(3, 5), 16);
+            const b = parseInt(newColor.slice(5, 7), 16);
+            cardElement.style.setProperty('--category-color', newColor);
+            cardElement.style.setProperty('--category-color-rgb', `${r}, ${g}, ${b}`);
+        } else {
+            cardElement.style.removeProperty('--category-color');
+            cardElement.style.removeProperty('--category-color-rgb');
+        }
+
+        if (window.applyCategoryColors) {
+            window.applyCategoryColors();
+        }
+
         // Update the visible title text in the DOM
         const titleElement = cardElement.querySelector('h2 > span');
         const iconContainer = cardElement.querySelector('h2'); 
@@ -382,11 +429,9 @@ export function editCategory(cardElement, dashboardData) {
         // Handle icon updates: add, update, or remove
         if (newIcon) {
             if (oldIcon) {
-                // Update existing icon
                 oldIcon.src = newIcon;
                 oldIcon.style.display = '';
             } else {
-                // Add new icon
                 const newIconImg = document.createElement('img');
                 newIconImg.src = newIcon;
                 newIconImg.alt = "";
@@ -395,7 +440,6 @@ export function editCategory(cardElement, dashboardData) {
                 iconContainer.insertBefore(newIconImg, titleElement);
             }
         } else if (oldIcon) {
-            // Remove icon if no URL provided
             oldIcon.remove();
         }
         
@@ -405,6 +449,7 @@ export function editCategory(cardElement, dashboardData) {
         showAlert(`Error updating category: ${error.message}`);
     }
 }
+
 
 /**
  * Category Deletion Handler
@@ -425,6 +470,7 @@ export function deleteCategory(btn) {
         showAlert('Error deleting category. Please try again.');
     }
 }
+
 
 /**
  * Category Creation Handler
@@ -453,11 +499,15 @@ export function addCategory() {
         if (icon) validateUrl(icon);
         if (baseUrl) validateUrl(baseUrl);
 
+        // Get category color from color picker
+        const color = getCategoryColor('add');
+
         // Create category data object with default positioning
         const newCategory = { 
             title, 
             icon, 
-            baseUrl, 
+            baseUrl,
+            color,
             x: CONFIG.CANVAS.CENTER_X + CONFIG.CANVAS.DEFAULT_OFFSET, 
             y: CONFIG.CANVAS.CENTER_Y + CONFIG.CANVAS.DEFAULT_OFFSET 
         };
@@ -485,12 +535,17 @@ export function addCategory() {
             }
         }
 
+        if (window.applyCategoryColors) {
+            window.applyCategoryColors();
+        }
+
         closeModal();
     } catch (error) {
         console.error('Error adding category:', error);
         showAlert(`Error adding category: ${error.message}`);
     }
 }
+
 
 /**
  * Stash Item Creation Handler
@@ -545,6 +600,7 @@ export function addStash(categoryElement) {
         showAlert(`Error adding link: ${error.message}`);
     }
 }
+
 
 /**
  * Stash Item Edit Handler
@@ -604,11 +660,9 @@ export function editStash(stashElement) {
 
         if (icon) {
             if (iconImg) {
-                // Update existing icon
                 iconImg.src = icon;
                 iconImg.style.display = '';
             } else {
-                // Add new icon
                 const newIconImg = document.createElement('img');
                 newIconImg.src = icon;
                 newIconImg.className = "stash-icon mr-3 rounded";
@@ -619,7 +673,6 @@ export function editStash(stashElement) {
                 }
             }
         } else if (iconImg) {
-            // Remove icon if no URL provided
             iconImg.remove();
         }
         
@@ -629,6 +682,7 @@ export function editStash(stashElement) {
         showAlert(`Error updating link: ${error.message}`);
     }
 }
+
 
 /**
  * Stash Item Deletion Handler
@@ -649,6 +703,7 @@ export function deleteStash(btn) {
         showAlert('Error deleting link. Please try again.');
     }
 }
+
 
 /**
  * Position Reset Handler
