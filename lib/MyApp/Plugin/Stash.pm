@@ -167,29 +167,41 @@ sub register ($self, $app, $config = {}) {
             # Validate required category fields
             next unless defined $new_cat->{title} && length($new_cat->{title});
             next unless ref($new_cat->{items}) eq 'ARRAY';
-            
+
             # Extract and validate position coordinates
-            my $x_pos = $new_cat->{x} || $default_position_x;  # X coordinate with default
-            my $y_pos = $new_cat->{y} || $default_position_y;  # Y coordinate with default
-            
+            my $x_pos = $new_cat->{x} || $default_position_x;
+            my $y_pos = $new_cat->{y} || $default_position_y;
+
             # Apply position validation if enabled
             if ($enable_position_validation) {
-                $x_pos = $x_pos < 0 ? 0 : $x_pos;             # Prevent negative X
-                $y_pos = $y_pos < 0 ? 0 : $y_pos;             # Prevent negative Y
+                $x_pos = $x_pos < 0 ? 0 : $x_pos;
+                $y_pos = $y_pos < 0 ? 0 : $y_pos;
             }
-            
-            # Create nested position structure for database storage
+
+            # Validate and sanitize color format
+            my $color = $new_cat->{color} || '#3b82f6';
+            # Remove whitespace and convert to lowercase for validation
+            $color =~ s/\s+//g;
+            $color = lc($color);
+            # Add # prefix if missing
+            $color = '#' . $color unless $color =~ /^#/;
+            # Validate hex format (6 characters after #)
+            unless ($color =~ /^#[0-9a-f]{6}$/) {
+                # Invalid format - reset to default blue
+                $color = '#3b82f6';
+            }
+
             my $positions = {
                 collapsed => $new_cat->{collapsed} || 0,
                 geometry => { x => $x_pos, y => $y_pos }
             };
-            
+
             # Build complete category record
             push @new_categories, {
                 title => $new_cat->{title},
                 icon => $new_cat->{icon} // '',
                 baseUrl => $new_cat->{baseUrl} // '',
-                color => $new_cat->{color} // '#3b82f6',
+                color => $color,
                 links => $new_cat->{items},
                 positions => $positions
             };

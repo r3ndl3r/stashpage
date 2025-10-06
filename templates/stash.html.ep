@@ -24,7 +24,8 @@
     <% } else { %>
         <%= include 'dashboard' %>
     <% } %>
-    <script src="/js/stash.js"></script>
-    <script src="/js/search.js"></script>
+
+    <script type="module" src="/js/stash.js"></script>
+    <script type="module" src="/js/search.js"></script>
 </body>
 </html>
