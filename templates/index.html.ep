@@ -29,7 +29,7 @@
                     <span><%= $total_links %> total <%= $total_links == 1 ? 'link' : 'links' %></span>
                 </div>
 
-                <!-- Global Search Bar (hidden by default) -->
+                <!-- Global Search Bar -->
                 <div id="global-search-container" class="mb-6 hidden">
                     <div class="relative">
                         <input type="text" id="global-search-input" placeholder="Search bookmarks across all stashes..." class="w-full px-4 py-3 pl-12 pr-12 bg-gray-800/95 text-white rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all" autocomplete="off" />

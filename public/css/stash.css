@@ -1014,3 +1014,45 @@ body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
     border: 1px solid rgba(59, 130, 246, 0.4);          /* Blue border */
     z-index: 10;                                         /* Pop above siblings */
 }
+
+/**
+ * Quick Create Section Pulsing Glow Effect
+ * 
+ * Adds a subtle pulsing blue/purple glow to the create/edit stash input section
+ * to draw attention to the primary action on the stash index page.
+ */
+.bg-gradient-to-r.from-blue-600.to-purple-600 {
+    animation: createGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes createGlow {
+    0%, 100% {
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.7),
+                    0 0 12px rgba(147, 51, 234, 0.6);
+    }
+    50% {
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.9),
+                    0 0 20px rgba(147, 51, 234, 0.8);
+    }
+}
+
+/**
+ * Global Search Input Pulsing Glow Effect
+ * 
+ * Focused blue glow on the global search input to draw attention.
+ * Animation stops when user focuses the input to avoid distraction while typing.
+ */
+#global-search-input {
+    animation: searchGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes searchGlow {
+    0%, 100% {
+        box-shadow: 0 1px 6px rgba(59, 130, 246, 0.6),
+                    0 0 10px rgba(59, 130, 246, 0.5);
+    }
+    50% {
+        box-shadow: 0 2px 5px rgba(59, 130, 246, 0.8),
+                    0 0 18px rgba(59, 130, 246, 0.7);
+    }
+}
