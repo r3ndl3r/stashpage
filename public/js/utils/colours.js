@@ -80,7 +80,7 @@ function applyCategoryCustomColor(card, color) {
     const b = parseInt(hexColor.slice(5, 7), 16);
     
     // Apply colored background gradient
-    card.style.background = `linear-gradient(135deg,
+    card.style.background = `linear-gradient(315deg,
         rgba(${r}, ${g}, ${b}, 0.35) 0%,
         rgba(${r}, ${g}, ${b}, 0.20) 50%,
         rgba(0, 0, 0, 0.7) 100%)`;
