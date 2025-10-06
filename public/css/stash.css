@@ -906,7 +906,84 @@ body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
     animation: shimmer 4s linear infinite;
 }
 
+/**
+ * Shimmer Animation
+ * Creates a left-to-right shimmering light effect across stash tiles on hover
+ * Used for adding visual polish to interactive elements
+ */
 @keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+    0% { background-position: 200% 0; }    /* Start shimmer off-screen right */
+    100% { background-position: -200% 0; } /* End shimmer off-screen left */
+}
+
+/**
+ * Fade-In Animation
+ * Cards fly in from 100px below while fading from invisible to visible
+ * Creates smooth entry animation for category cards on page load
+ */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(100px);  /* Start 100px below final position */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);      /* End at natural position */
+    }
+}
+
+/**
+ * Fade-In Animation Class
+ * Apply to elements that should animate in on page load
+ * Duration: 1s | Easing: ease-out | Direction: backwards (maintains initial state before animation)
+ */
+.animate-fade-in {
+    animation: fade-in 0.8s ease-out backwards;
+}
+
+/**
+ * Stash Icon Hover Glow Effect
+ * 
+ * Adds a subtle white glow around bookmark icons when hovering over stash tiles
+ * Creates visual interest and draws attention to interactive elements without
+ * overwhelming the interface. Uses box-shadow for compatibility across browsers.
+ */
+.stash-tile:hover .stash-icon {
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);  /* Soft white glow with 40% opacity */
+    transition: box-shadow 0.3s ease;                /* Smooth 300ms fade-in animation */
+}
+
+/**
+ * Edit Button Glow + Pulse Animation
+ * 
+ * Subtle glow effect with tight spread radius for refined appearance.
+ * Combines scale pulsing with controlled blue glow that doesn't overwhelm.
+ */
+.edit-button {
+    animation: glowPulse 2.5s ease-in-out infinite;  /* Slow, continuous pulse */
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5),    /* Inner blue glow ring */
+                0 0 20px rgba(59, 130, 246, 0.3),    /* Outer blue aura */
+                0 4px 12px rgba(0, 0, 0, 0.3);       /* Elevation drop shadow */
+}
+
+.edit-button:hover {
+    animation: glowPulse 1s ease-in-out infinite;    /* Faster pulse on hover */
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.8),    /* Brighter inner glow */
+                0 0 30px rgba(59, 130, 246, 0.5),    /* Expanded outer glow */
+                0 8px 25px rgba(0, 0, 0, 0.4);       /* Enhanced drop shadow */
+}
+
+@keyframes glowPulse {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(59, 130, 246, 0.5),
+                    0 0 20px rgba(59, 130, 246, 0.3),
+                    0 4px 12px rgba(0, 0, 0, 0.3);
+        transform: scale(1);                         /* Base size */
+    }
+    50% {
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.8),
+                    0 0 30px rgba(59, 130, 246, 0.5),
+                    0 6px 20px rgba(0, 0, 0, 0.4);
+        transform: scale(1.05);                      /* Expanded size at pulse peak */
+    }
 }

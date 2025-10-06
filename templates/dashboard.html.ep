@@ -3,13 +3,25 @@
     <div id="dashboard-main-area" class="relative" style="width: 4000px; height: 2500px; min-width: 100%;">
         <div id="dashboard-canvas" class="relative w-full h-full">
             <div id="center-marker" class="center-marker"></div>
+            <% my $index = 0; %>
             <% for my $category (@$categories) { %>
-            <div class="card-window rounded-lg p-4 shadow-lg flex flex-col border border-gray-600/50 hover:border-gray-500/70 transition-all duration-200 backdrop-blur-md"
+            <div class="card-window 
+                        animate-fade-in 
+                        rounded-lg p-4 
+                        bg-slate-800/60 backdrop-blur-xl 
+                        shadow-lg hover:shadow-[0_0_30px_rgba(59,130,246,0.3),0_10px_40px_rgba(0,0,0,0.4)]
+                        flex flex-col 
+                        border border-gray-600/50 hover:border-blue-500/50
+                        transition-all duration-300 
+                        hover:scale-[1.02]"
                 data-category-title="<%= $category->{title} %>"
                 data-category-icon="<%= $category->{icon} %>"
                 data-category-base-url="<%= $category->{baseUrl} %>"
                 data-category-color="<%= $category->{color} && $category->{color} =~ /^#/ ? $category->{color} : '#' . ($category->{color} || '3b82f6') %>"
-                style="left: <%= $category->{x} || 0 %>px; top: <%= $category->{y} || 0 %>px;">
+                style="left: <%= $category->{x} || 0 %>px; 
+                        top: <%= $category->{y} || 0 %>px;
+                        animation-delay: <%= $index * 0.1 %>s;">
+                <% $index++; %>
                 
                 <!-- Exact match of edit mode drag-handle structure -->
                 <div class="drag-handle flex justify-between items-center mb-2 pb-2 border-b border-gray-600/50 cursor-pointer hover:border-gray-500 transition-colors"
@@ -116,7 +128,7 @@
 </div>
 
 <% if ($is_logged_in) { %>
-    <a href="/edit?n=<%= $page_key %>" class="edit-button bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-3 rounded-full shadow-lg transition-transform duration-200 hover:scale-110" title="Edit stash (Ctrl+E)">
+    <a href="/edit?n=<%= $page_key %>" class="edit-button bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-3 rounded-full transition-transform duration-200" title="Edit stash (Ctrl+E)"">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L16.732 3.732z" />
         </svg>
