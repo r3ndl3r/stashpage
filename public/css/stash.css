@@ -860,3 +860,23 @@ body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
         text-align: center;                   /* Centered text for balanced mobile layout */
     }
 }
+
+/* Simple shimmer effect on category titles */
+.card-window h2 {
+    background: linear-gradient(
+        110deg,
+        rgba(255, 255, 255, 0.6) 0%,
+        rgba(255, 255, 255, 1) 50%,
+        rgba(255, 255, 255, 0.6) 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
