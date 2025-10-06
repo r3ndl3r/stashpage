@@ -120,10 +120,12 @@ body.dashboard-canvas .drag-handle > div:last-child:not(.collapse-icon) {
  * behavior exactly with shimmer animation and lift effects.
  */
 .stash-tile {
-    background-color: rgba(30, 41, 59, 0.8);  /* Semi-transparent slate background matches edit mode */
-    transition: all 0.2s ease-in-out;         /* Quick transitions maintain responsiveness */
-    position: relative;                       /* Required for absolute positioning of shimmer pseudo-element */
-    overflow: hidden;                         /* Hide shimmer effect when off-screen */
+  background: rgba(30, 41, 59, 0.8);       /* Slate gray background darker than cards for hierarchy */
+  transition: all var(--animation-duration) ease; /* Smooth hover transitions (200ms default) */
+  position: relative;                       /* Enable absolute positioning of child elements */
+  overflow: hidden;                         /* Contain any overflowing content cleanly */
+  border-radius: calc(var(--border-radius) * 0.75); /* Slightly smaller radius than cards for visual hierarchy */
+  padding: 0.1rem 0.1rem;
 }
 
 /**
@@ -156,7 +158,6 @@ body.dashboard-canvas .drag-handle > div:last-child:not(.collapse-icon) {
 .stash-tile:hover::before {
     left: 100%;                               /* Move completely off-screen to right, creating sweep */
 }
-
 
 /**
  * Icon Standardization System
@@ -998,12 +999,6 @@ body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
 .stash-list {
     overflow: visible;        /* Allow tiles to expand beyond container */
     position: relative;
-}
-
-.stash-tile {
-    position: relative;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1;
 }
 
 .stash-tile:hover {

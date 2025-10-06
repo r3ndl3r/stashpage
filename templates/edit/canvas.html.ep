@@ -62,7 +62,7 @@
                 
                 <div class="stash-list flex flex-col space-y-2 flex-grow min-h-0">
                     <% for my $item (@{$category->{items}}) { %>
-                    <div class="stash-tile group relative flex items-center p-3 rounded-md shadow-sm bg-gray-700/60 hover:bg-gray-600/80 transition-all duration-200"
+                    <div class="stash-tile group relative flex items-center py-2 px-3 rounded-md shadow-sm bg-gray-700/60 hover:bg-gray-600/80 transition-all duration-200"
                          data-name="<%= $item->{name} %>" 
                          data-url="<%= $item->{url} %>" 
                          data-icon="<%= $item->{icon} %>">
