@@ -17,7 +17,9 @@
                 data-category-title="<%= $category->{title} %>"
                 data-category-icon="<%= $category->{icon} %>"
                 data-category-base-url="<%= $category->{baseUrl} %>"
+                 data-collapsed="<%= $category->{collapsed} // 0 %>"
                 data-category-color="<%= $category->{color} && $category->{color} =~ /^#/ ? $category->{color} : '#' . ($category->{color} || '3b82f6') %>"
+                
                 style="left: <%= $category->{x} || 0 %>px; 
                         top: <%= $category->{y} || 0 %>px;
                         animation-delay: <%= $index * 0.1 %>s;">
