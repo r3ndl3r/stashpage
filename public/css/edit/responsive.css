@@ -141,7 +141,7 @@
     }
     
     #stashForm .bg-gray-800\/95 {
-        padding: 1rem !important;             /* Compact inner spacing for toolbar content */
+        padding: 0.5rem !important;             /* Compact inner spacing for toolbar content */
     }
     
     /**
@@ -215,6 +215,43 @@
     #stashForm .flex.flex-col.sm\:flex-row {
         gap: 3rem !important;                 /* Increased spacing between major button groups */
         justify-content: center !important;   /* Centered alignment maintains visual balance */
+    }
+
+    /**
+    * Toolbar Width Constraint for Mobile
+    * 
+    * Reduces the maximum width of the toolbar container on mobile
+    * to prevent it from dominating the screen.
+    */
+    #stashForm .max-w-5xl {
+        max-width: 60% !important;
+    }
+
+    /**
+    * Stash Tile Action Buttons - Always Visible on Mobile
+    * 
+    * Makes the edit/delete buttons for individual links always visible
+    * on mobile since hover doesn't work on touch devices. Also increases
+    * button size for better touch targets.
+    */
+    .stash-tile .absolute.right-0 {
+        opacity: 1 !important;                /* Always show - override opacity-0 */
+    }
+
+    .stash-tile button {
+        padding: 0.5rem !important;
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+        min-height: unset !important;
+        min-width: unset !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .stash-tile button svg {
+        width: 1.25rem !important;
+        height: 1.25rem !important;
     }
 }
 

@@ -130,14 +130,9 @@
 
         </div>
 
-        <!-- Flex spacer for bottom -->
-        <div class="flex-1"></div>
-
-    </div>
-</div>
 
 <!-- Management Tools - Fixed Bottom Right -->
-<div class="fixed bottom-6 right-6 z-50">
+<div class="management-tools-container fixed bottom-6 right-6 z-50">
     <div class="bg-gray-800/90 backdrop-blur-sm rounded-lg p-4 border border-gray-700/50 hover:border-gray-600/70 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
         <div class="flex gap-3">
             <a href="/stash/export" class="flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 text-sm rounded-md transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-green-500/30 active:scale-95 group whitespace-nowrap">
@@ -153,6 +148,12 @@
                 <span class="group-hover:translate-x-1 transition-transform duration-300">Import</span>
             </button>
         </div>
+    </div>
+</div>
+
+        <!-- Flex spacer for bottom -->
+        <div class="flex-1"></div>
+
     </div>
 </div>
 

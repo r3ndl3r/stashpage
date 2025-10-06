@@ -407,6 +407,41 @@ body.dashboard-canvas .drag-handle > div:last-child:not(.collapse-icon) {
     .quick-create-input {
         width: 100%;                          /* Full width input maximizes touch target */
     }
+
+    /* Management Tools Responsive Positioning
+    * Mobile: Flow in document, centered below quick create
+    * Desktop: Fixed bottom-right corner as usual
+    */
+    .management-tools-container {
+        position: static !important;
+        display: flex;
+        justify-content: center;
+        margin-top: -1.5rem;
+        margin-bottom: 2rem;
+        bottom: auto !important;
+        right: auto !important;
+    }
+
+    /**
+    * Dashboard Action Buttons Mobile Repositioning
+    * 
+    * Moves the edit and private/public toggle buttons from fixed
+    * bottom corners to natural document flow on mobile to prevent
+    * overlap with category cards.
+    */
+    .edit-mode-toggle,
+    .privacy-toggle-container {
+        position: static !important;          /* Override fixed positioning */
+        margin: 3rem auto;                    /* Center with spacing */
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+    }
+
+    /* Add extra spacing after the last category card */
+    .card-window:last-child {
+        margin-bottom: 4rem !important;      /* Large bottom margin after last card */
+    }
 }
 
 /**
