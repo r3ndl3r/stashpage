@@ -112,21 +112,51 @@ body.dashboard-canvas .drag-handle > div:last-child:not(.collapse-icon) {
 
 
 /**
- * Individual Stash Tile Styling
+ * Individual Stash Tile Interactive System
  * 
  * Provides consistent styling for individual bookmark tiles within categories
  * with smooth hover effects that indicate interactivity and enhance the
- * overall user experience through subtle visual feedback.
+ * overall user experience through subtle visual feedback. Matches edit mode
+ * behavior exactly with shimmer animation and lift effects.
  */
 .stash-tile {
-    background-color: rgba(30, 41, 59, 0.7);  /* Darker background differentiates from container */
-    transition: all 0.2s ease-in-out;        /* Quick transitions maintain responsiveness */
+    background-color: rgba(30, 41, 59, 0.8);  /* Semi-transparent slate background matches edit mode */
+    transition: all 0.2s ease-in-out;         /* Quick transitions maintain responsiveness */
+    position: relative;                       /* Required for absolute positioning of shimmer pseudo-element */
+    overflow: hidden;                         /* Hide shimmer effect when off-screen */
 }
 
+/**
+ * Stash Tile Hover Enhancement
+ */
 .stash-tile:hover {
-    background-color: rgba(51, 65, 85, 0.9);  /* Lighter background provides hover feedback */
-    transform: translateY(-2px);             /* Consistent lift effect across interface */
+    background: rgba(51, 65, 85, 0.9);       /* Lighter slate background persists during hover */
+    transform: translateY(-2px);             /* Subtle upward lift effect (GPU accelerated) */
 }
+
+/**
+ * Stash Tile Shimmer Animation Pseudo-Element
+ */
+.stash-tile::before {
+    content: '';                              /* Empty pseudo-element for animation overlay */
+    position: absolute;                       /* Position independent of tile content flow */
+    top: 0;                                   /* Full height coverage from top */
+    left: -100%;                              /* Start completely off-screen to left */
+    width: 100%;                              /* Full width to cover entire tile */
+    height: 100%;                             /* Full height to cover entire tile */
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent); /* White shimmer gradient */
+    transition: left 1s ease;                 /* Smooth horizontal movement across tile (matches edit mode) */
+    pointer-events: none;                     /* Prevent interference with tile click events */
+    z-index: 1;                               /* Above background but below content */
+}
+
+/**
+ * Shimmer Animation Trigger
+ */
+.stash-tile:hover::before {
+    left: 100%;                               /* Move completely off-screen to right, creating sweep */
+}
+
 
 /**
  * Icon Standardization System
