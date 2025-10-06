@@ -987,3 +987,30 @@ body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
         transform: scale(1.05);                      /* Expanded size at pulse peak */
     }
 }
+
+/**
+ * Stash Tile Hover Zoom + Glow Effect
+ * 
+ * Subtle scale zoom with blue glow maintains position while emphasizing
+ * the hovered tile. Overflow visible prevents clipping, z-index ensures
+ * hovered tile appears above neighbors.
+ */
+.stash-list {
+    overflow: visible;        /* Allow tiles to expand beyond container */
+    position: relative;
+}
+
+.stash-tile {
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+}
+
+.stash-tile:hover {
+    transform: scale(1.03);                              /* Subtle 5% zoom */
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5),       /* Blue glow */
+                0 8px 25px rgba(0, 0, 0, 0.4);          /* Depth shadow */
+    background-color: rgba(51, 65, 85, 0.95);           /* Brighter bg */
+    border: 1px solid rgba(59, 130, 246, 0.4);          /* Blue border */
+    z-index: 10;                                         /* Pop above siblings */
+}
