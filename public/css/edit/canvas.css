@@ -88,15 +88,15 @@ body {
  * that provide excellent visual feedback while maintaining content readability.
  */
 .card-window {
-  position: absolute;                       /* Enable free positioning anywhere on canvas */
-  background: rgba(0, 0, 0, 0.6);          /* Semi-transparent dark background for content visibility */
-  backdrop-filter: blur(var(--backdrop-blur)); /* Glass morphism blur effect (16px default) */
-  border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle light border for card definition */
-  min-width: var(--card-min-width);        /* Minimum width ensures readability (280px default) */
-  max-width: none !important;       /* Maximum width prevents unwieldy cards (400px default) */
+  position: absolute;                                         /* Enable free positioning anywhere on canvas */
+  background: rgba(0, 0, 0, 0.6);                           /* Semi-transparent dark background for content visibility */
+  backdrop-filter: blur(8px);                                 /* Glass morphism blur effect */
+  border: 1px solid rgba(255, 255, 255, 0.1);                 /* Subtle light border for card definition */
+  min-width: var(--card-min-width);                           /* Minimum width ensures readability (280px default) */
+  max-width: none !important;                                 /* Maximum width prevents unwieldy cards (400px default) */
   transition: all calc(var(--animation-duration) * 1.5) ease; /* Smooth property transitions (300ms) */
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2); /* Layered shadows for depth */
-  border-radius: var(--border-radius);     /* Consistent corner rounding (0.5rem default) */
+  border-radius: var(--border-radius);                        /* Consistent corner rounding (0.5rem default) */
 }
 
 /* 
@@ -137,13 +137,19 @@ body {
  * Provides immediate visual feedback when users hover over category cards.
  * The enhanced border and shadow effects indicate interactivity while
  * maintaining the sophisticated glass morphism aesthetic. Animations are
- * GPU-accelerated for smooth 60fps performance.
  */
-.card-window:hover {
-  border-color: rgba(255, 255, 255, 0.2);  /* Brighter border indicates hover state */
-  box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.5), 0 15px 15px -5px rgba(0, 0, 0, 0.3); /* Enhanced shadows for lift effect */
+.card-window {
+  position: absolute;                                         /* Enable free positioning anywhere on canvas */
+  background: rgba(0, 0, 0, 0.6);                           /* Semi-transparent dark background for content visibility */
+  backdrop-filter: blur(8px);                                 /* Glass morphism blur effect (reduced from 16px for performance) */
+  border: 1px solid rgba(255, 255, 255, 0.1);               /* Subtle light border for card definition */
+  min-width: var(--card-min-width);                           /* Minimum width ensures readability (280px default) */
+  max-width: none !important;                                 /* Remove maximum width constraint for long category names */
+  transition: all calc(var(--animation-duration) * 1.5) ease; /* Smooth property transitions (300ms default) */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2); /* Layered shadows for depth */
+  border-radius: var(--border-radius);                        /* Consistent corner rounding (0.5rem default) */
+  will-change: transform, box-shadow;                         /* GPU acceleration hint for hover animations */
 }
-
 /**
  * Canvas Center Reference Marker
  * 

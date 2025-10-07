@@ -28,41 +28,6 @@
 }
 
 /**
- * Loading Spinner Animation
- * 
- * Provides continuous rotation for loading indicators and progress spinners.
- * Uses efficient transform-only animation for smooth performance across devices.
- * The rotation is linear and infinite to indicate ongoing processing.
- */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);            /* Complete full rotation every cycle */
-  }
-}
-
-/**
- * Save Button Pulse Animation
- * 
- * Draws attention to unsaved changes through rhythmic shadow pulsing effect.
- * The animation cycles between normal and highlighted states to create urgency
- * without being overly distracting. Uses green accent color to indicate positive
- * action availability while maintaining visual hierarchy.
- */
-@keyframes pulse {
-  0% {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
-  }
-  
-  50% {
-    box-shadow: 0 15px 35px rgba(34, 197, 94, 0.6), 0 0 0 3px rgba(34, 197, 94, 0.3);
-  }
-  
-  100% {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
-  }
-}
-
-/**
  * Modal Container Backdrop Styling
  * 
  * Creates the modal overlay background with blur effect for focus isolation.
@@ -70,7 +35,7 @@
  * content behind the modal is visually de-emphasized but still partially visible.
  */
 #modal {
-  backdrop-filter: blur(8px);             /* Modern glass morphism effect */
+  backdrop-filter: blur(6px);             /* Modern glass morphism effect */
   transition: all 0.3s ease;             /* Smooth appearance and disappearance */
 }
 

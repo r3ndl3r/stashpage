@@ -64,6 +64,7 @@
         max-width: none !important;            /* Remove desktop width constraints */
         min-width: auto !important;            /* Remove desktop minimum width requirements */
         margin-bottom: 1.5rem;                 /* Comfortable spacing between cards for thumb navigation */
+        will-change: transform;                /* GPU hint for responsive repositioning */
     }
     
     /**

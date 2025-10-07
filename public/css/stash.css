@@ -76,16 +76,17 @@ body.dashboard-canvas {
  * clear visual feedback for interactive elements.
  */
 .stash-card {
-    background-color: rgba(30, 41, 59, 0.7);  /* Semi-transparent slate background */
-    backdrop-filter: blur(10px);              /* Glass morphism blur effect */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle light border for definition */
-    transition: all 0.3s ease-in-out;        /* Smooth multi-property transitions */
+    background-color: rgba(30, 41, 59, 0.7);              /* Semi-transparent slate background */
+    backdrop-filter: blur(6px);                             /* Glass morphism blur effect */
+    border: 1px solid rgba(255, 255, 255, 0.1);           /* Subtle light border for definition */
+    will-change: transform;                                 /* GPU acceleration hint for smoother animations */
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease; /* Smooth property transitions on hover */
 }
 
 .stash-card:hover {
     background-color: rgba(51, 65, 85, 0.9);  /* Darker background on hover for feedback */
-    transform: translateY(-2px);             /* Subtle lift effect creates depth */
-    border-color: rgba(255, 255, 255, 0.2);  /* Enhanced border visibility on hover */
+    transform: scale(1.03) translateY(-2px);    /* Subtle lift effect creates depth */
+    border-color: rgba(255, 255, 255, 0.2);   /* Enhanced border visibility on hover */
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2); /* Layered shadows for elevation */
 }
 
@@ -97,11 +98,11 @@ body.dashboard-canvas {
  * to maintain visual consistency while enabling free-form arrangement.
  */
 .card-window {
-    position: absolute;                       /* Enable free positioning anywhere on canvas */
-    background-color: rgba(0, 0, 0, 0.4);    /* Dark semi-transparent background for content contrast */
-    backdrop-filter: blur(10px);              /* Blur effect maintains readability over background */
+    position: absolute;                           /* Enable free positioning anywhere on canvas */
+    background-color: rgba(0, 0, 0, 0.4);       /* Dark semi-transparent background for content contrast */
+    backdrop-filter: blur(6px);                   /* Blur effect maintains readability over background */
     border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border for card definition */
-    min-width: 280px;                         /* Minimum width ensures readability on all screen sizes */
+    min-width: 280px;                             /* Minimum width ensures readability on all screen sizes */
 }
 
 /* Remove action buttons from layout flow in view mode while keeping drag-handle flex intact */
@@ -184,6 +185,19 @@ body.dashboard-canvas .drag-handle > div:last-child:not(.collapse-icon) {
     bottom: 20px;                             /* Comfortable margin from viewport edge */
     right: 20px;                              /* Standard right-side placement for primary actions */
     z-index: 100;                             /* Above content but below modals */
+    box-shadow: 
+      0 0 10px rgba(59, 130, 246, 0.5),
+      0 0 20px rgba(59, 130, 246, 0.3),
+      0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.edit-button:hover {
+  box-shadow: 
+    0 0 15px rgba(59, 130, 246, 0.8),
+    0 0 30px rgba(59, 130, 246, 0.5),
+    0 8px 25px rgba(0, 0, 0, 0.4);
+  transform: scale(1.05);
 }
 
 /**
@@ -219,7 +233,7 @@ body.dashboard-canvas .drag-handle > div:last-child:not(.collapse-icon) {
  */
 .management-tools {
     background-color: rgba(30, 41, 59, 0.4);  /* Semi-transparent background matches card system */
-    backdrop-filter: blur(10px);              /* Consistent blur effect */
+    backdrop-filter: blur(6px);              /* Consistent blur effect */
     border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border maintains definition */
 }
 
@@ -253,7 +267,7 @@ body.dashboard-canvas .drag-handle > div:last-child:not(.collapse-icon) {
 
 .modal-content {
     background-color: rgba(30, 41, 59, 0.95); /* Near-opaque background ensures content readability */
-    backdrop-filter: blur(10px);              /* Glass morphism effect maintains modern aesthetic */
+    backdrop-filter: blur(6px);              /* Glass morphism effect maintains modern aesthetic */
     border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border defines modal boundaries */
 }
 
@@ -870,7 +884,7 @@ body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
     font-weight: 500;                         /* Medium weight for clear legibility */
     color: white;                             /* High contrast text for readability */
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); /* Elevated shadow creates depth */
-    backdrop-filter: blur(10px);              /* Glassmorphism blur effect */
+    backdrop-filter: blur(6px);              /* Glassmorphism blur effect */
     z-index: 10000;                           /* Above all content including modals */
     opacity: 0;                               /* Hidden by default */
     transform: translateY(20px);             /* Start position below final location */
@@ -990,41 +1004,6 @@ body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
 }
 
 /**
- * Edit Button Glow + Pulse Animation
- * 
- * Subtle glow effect with tight spread radius for refined appearance.
- * Combines scale pulsing with controlled blue glow that doesn't overwhelm.
- */
-.edit-button {
-    animation: glowPulse 2.5s ease-in-out infinite;  /* Slow, continuous pulse */
-    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5),    /* Inner blue glow ring */
-                0 0 20px rgba(59, 130, 246, 0.3),    /* Outer blue aura */
-                0 4px 12px rgba(0, 0, 0, 0.3);       /* Elevation drop shadow */
-}
-
-.edit-button:hover {
-    animation: glowPulse 1s ease-in-out infinite;    /* Faster pulse on hover */
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.8),    /* Brighter inner glow */
-                0 0 30px rgba(59, 130, 246, 0.5),    /* Expanded outer glow */
-                0 8px 25px rgba(0, 0, 0, 0.4);       /* Enhanced drop shadow */
-}
-
-@keyframes glowPulse {
-    0%, 100% {
-        box-shadow: 0 0 10px rgba(59, 130, 246, 0.5),
-                    0 0 20px rgba(59, 130, 246, 0.3),
-                    0 4px 12px rgba(0, 0, 0, 0.3);
-        transform: scale(1);                         /* Base size */
-    }
-    50% {
-        box-shadow: 0 0 15px rgba(59, 130, 246, 0.8),
-                    0 0 30px rgba(59, 130, 246, 0.5),
-                    0 6px 20px rgba(0, 0, 0, 0.4);
-        transform: scale(1.05);                      /* Expanded size at pulse peak */
-    }
-}
-
-/**
  * Stash Tile Hover Zoom + Glow Effect
  * 
  * Subtle scale zoom with blue glow maintains position while emphasizing
@@ -1037,54 +1016,28 @@ body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
 }
 
 .stash-tile:hover {
-    transform: scale(1.03);                              /* Subtle 5% zoom */
+    transform: scale(1.03);                               /* Subtle 5% zoom */
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.5),       /* Blue glow */
                 0 8px 25px rgba(0, 0, 0, 0.4);          /* Depth shadow */
     background-color: rgba(51, 65, 85, 0.95);           /* Brighter bg */
     border: 1px solid rgba(59, 130, 246, 0.4);          /* Blue border */
-    z-index: 10;                                         /* Pop above siblings */
+    z-index: 10;                                          /* Pop above siblings */
 }
 
 /**
  * Quick Create Section Pulsing Glow Effect
- * 
- * Adds a subtle pulsing blue/purple glow to the create/edit stash input section
- * to draw attention to the primary action on the stash index page.
  */
 .bg-gradient-to-r.from-blue-600.to-purple-600 {
-    animation: createGlow 2.5s ease-in-out infinite;
-}
-
-@keyframes createGlow {
-  0%, 100% {
-    box-shadow: 
-      0 1px 6px rgba(59, 130, 246, 0.6),
-      0 0 10px rgba(59, 130, 246, 0.5);
-  }
-  50% {
-    box-shadow: 
-      0 2px 5px rgba(59, 130, 246, 0.8),
-      0 0 18px rgba(59, 130, 246, 0.7);
-  }
+  box-shadow: 
+    0 1px 6px rgba(59, 130, 246, 0.6),
+    0 0 10px rgba(59, 130, 246, 0.5);
 }
 
 /**
  * Global Search Input Pulsing Glow Effect
- * 
- * Focused blue glow on the global search input to draw attention.
- * Animation stops when user focuses the input to avoid distraction while typing.
  */
 #global-search-input {
-    animation: searchGlow 2.5s ease-in-out infinite;
-}
-
-@keyframes searchGlow {
-    0%, 100% {
-        box-shadow: 0 1px 6px rgba(59, 130, 246, 0.6),
-                    0 0 10px rgba(59, 130, 246, 0.5);
-    }
-    50% {
-        box-shadow: 0 2px 5px rgba(59, 130, 246, 0.8),
-                    0 0 18px rgba(59, 130, 246, 0.7);
-    }
+  box-shadow: 
+    0 1px 6px rgba(59, 130, 246, 0.6),
+    0 0 10px rgba(59, 130, 246, 0.5);
 }

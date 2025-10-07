@@ -140,18 +140,8 @@
  * not interfering with dashboard content.
  * 
  */
-.save-button {
-  position: fixed;                          /* Always visible regardless of scroll position */
-  bottom: 24px;                             /* Comfortable margin from viewport edge */
-  right: 24px;                              /* Standard right-side positioning for primary actions */
-  z-index: 100;                             /* Above all dashboard content for guaranteed visibility */
-  backdrop-filter: blur(8px);              /* Glass morphism effect for modern appearance */
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1); /* Layered shadows for depth */
-  border-radius: 50%;                       /* Perfect circle creates strong visual distinction */
-}
-
-.save-button:hover {
-  box-shadow: 0 15px 35px rgba(34, 197, 94, 0.4), 0 5px 15px rgba(0, 0, 0, 0.3); /* Green accent indicates save action */
+#save-dashboard-btn {
+  box-shadow: 0 2px 5px rgba(59, 130, 246, 0.8), 0 0 18px rgba(59, 130, 246, 0.7) !important; /* Bright blue glow matching search box */
 }
 
 /**
@@ -186,9 +176,10 @@ textarea:focus {
  * 
  */
 .sortable-ghost {
-  opacity: 0.5;                             /* Semi-transparent placeholder shows drop location */
-  background: rgba(59, 130, 246, 0.2) !important; /* Blue tint indicates drop target area */
+  opacity: 0.5;                                            /* Semi-transparent placeholder shows drop location */
+  background: rgba(59, 130, 246, 0.2) !important;        /* Blue tint indicates drop target area */
   border: 2px dashed rgba(59, 130, 246, 0.5) !important; /* Dashed border reinforces placeholder nature */
+  backdrop-filter: none !important;                        /* Disable blur during drag for performance */
 }
 
 .sortable-drag {
