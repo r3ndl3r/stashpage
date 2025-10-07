@@ -808,6 +808,28 @@ body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
 }
 
 /**
+ * Private State Glowing Border
+ * Multi-layer red glow effect indicates restricted access
+ */
+#toggle-public-btn[data-is-public="0"] {
+  border: 2px solid rgba(239, 68, 68, 0.7) !important; /* Brighter red border */
+  box-shadow: 
+    0 2px 5px rgba(239, 68, 68, 0.8),          /* Tight inner red glow */
+    0 0 18px rgba(239, 68, 68, 0.7),           /* Focused outer red glow */
+    0 4px 12px rgba(0, 0, 0, 0.3) !important;  /* Depth shadow */
+}
+
+/**
+ * Private State Hover Enhancement
+ * Intensifies red glow on hover for better interactivity feedback
+ */
+#toggle-public-btn[data-is-public="0"]:hover {
+  box-shadow: 
+    0 2px 8px rgba(239, 68, 68, 0.9),
+    0 0 22px rgba(239, 68, 68, 0.8),
+    0 6px 16px rgba(0, 0, 0, 0.4) !important;
+}
+/**
  * ============================================================================
  * PUBLIC STATE STYLING (data-is-public="1")
  * ============================================================================
@@ -842,6 +864,29 @@ body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
  */
 #toggle-public-btn[data-is-public="1"] .toggle-pulse {
     background-color: rgb(74, 222, 128);     /* Tailwind green-400 for public state */
+}
+
+/**
+ * Public State Glowing Border
+ * Multi-layer green glow effect indicates open access
+ */
+#toggle-public-btn[data-is-public="1"] {
+  border: 2px solid rgba(34, 197, 94, 0.7) !important; /* Brighter green border */
+  box-shadow: 
+    0 2px 5px rgba(34, 197, 94, 0.8),          /* Tight inner green glow */
+    0 0 18px rgba(34, 197, 94, 0.7),           /* Focused outer green glow */
+    0 4px 12px rgba(0, 0, 0, 0.3) !important;  /* Depth shadow */
+}
+
+/**
+ * Public State Hover Enhancement
+ * Intensifies green glow on hover for better interactivity feedback
+ */
+#toggle-public-btn[data-is-public="1"]:hover {
+  box-shadow: 
+    0 2px 8px rgba(34, 197, 94, 0.9),          /* Stronger tight green glow */
+    0 0 22px rgba(34, 197, 94, 0.8),           /* Enhanced focused green glow */
+    0 6px 16px rgba(0, 0, 0, 0.4) !important;  /* Enhanced depth */
 }
 
 /**

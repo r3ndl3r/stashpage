@@ -834,7 +834,7 @@ function togglePublicState(pageKey, toggleBtn) {
             }
         } else {
             // Toggled to private
-            showNotification('✓ Stash is now private', 'success');
+            showNotification('✓ Stash is now private', 'error');
         }
         
         console.log('Public state toggled:', newState ? 'Public' : 'Private');
