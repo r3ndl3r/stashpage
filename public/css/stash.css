@@ -458,17 +458,15 @@ body.dashboard-canvas .drag-handle > div:last-child:not(.collapse-icon) {
     }
 
     /**
-    * Mobile Performance Optimization - Animation Control
+    * Mobile Performance Optimization - Fast Animation
     * 
-    * Disables category card fade-in animations on mobile devices (≤768px) to
-    * improve performance and reduce resource consumption on lower-powered devices.
-    * Animations remain active on desktop where hardware acceleration is more
-    * robust and performance impact is negligible.
+    * Uses a very fast fade-in animation on mobile to mask the color
+    * flash that occurs when JavaScript applies custom colors. The quick animation
+    * hides the default-to-custom color transition while still providing smooth
+    * entry. Desktop keeps longer animation for more polished experience.
     */
     body.dashboard-canvas .animate-fade-in {
-        animation: none !important;           /* Disable animation completely on mobile */
-        opacity: 1;                           /* Set to fully visible immediately */
-        transform: translateY(0);             /* Remove any translation offset */
+        animation: fade-in 0.5s ease-out backwards;  /* Very fast 150ms animation */
     }
 }
 
