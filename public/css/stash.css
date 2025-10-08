@@ -456,6 +456,20 @@ body.dashboard-canvas .drag-handle > div:last-child:not(.collapse-icon) {
     .card-window:last-child {
         margin-bottom: 4rem !important;      /* Large bottom margin after last card */
     }
+
+    /**
+    * Mobile Performance Optimization - Animation Control
+    * 
+    * Disables category card fade-in animations on mobile devices (≤768px) to
+    * improve performance and reduce resource consumption on lower-powered devices.
+    * Animations remain active on desktop where hardware acceleration is more
+    * robust and performance impact is negligible.
+    */
+    body.dashboard-canvas .animate-fade-in {
+        animation: none !important;           /* Disable animation completely on mobile */
+        opacity: 1;                           /* Set to fully visible immediately */
+        transform: translateY(0);             /* Remove any translation offset */
+    }
 }
 
 /**
