@@ -1,34 +1,60 @@
+# Docker Compose file using pre-built image from GitHub Container Registry
+#
+# Usage:
+#   MariaDB:  docker compose -f docker-compose-registry.yml --profile mariadb up -d
+#   SQLite:   docker compose -f docker-compose-registry.yml --profile sqlite up -d
+#
+# Set DOCKER_IMAGE in .env file or use default:
+#   DOCKER_IMAGE=ghcr.io/r3ndl3r/stashpage:latest
+
 services:
-  # MariaDB Database
+  # Schema setup service - extracts schema from app image (only runs with --profile mariadb)
+  db-init:
+    image: ${DOCKER_IMAGE:-ghcr.io/r3ndl3r/stashpage:latest}
+    container_name: stashpage-db-init
+    profiles: ["mariadb"]
+    user: root
+    command: sh -c "cp /app/database/schema.sql /init/schema.sql && echo 'Schema file copied successfully'"
+    volumes:
+      - db_init:/init
+    networks:
+      - stashpage-network
+
+  # MariaDB Database (only runs with --profile mariadb)
   db:
     image: mariadb:11.2
     container_name: stashpage-db
     restart: unless-stopped
-    
+    profiles: ["mariadb"]
+
     # UTF8MB4 for international characters and emoji
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    
+
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
       MYSQL_DATABASE: ${DB_NAME:-stashpage}
       MYSQL_USER: ${DB_USER:-stashpage}
       MYSQL_PASSWORD: ${DB_PASSWORD:-stashpage}
       MARIADB_AUTO_UPGRADE: 1
-    
+
     volumes:
       - db_data:/var/lib/mysql
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
-    
+      - db_init:/docker-entrypoint-initdb.d:ro
+
     networks:
       - stashpage-network
-    
+
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s  # Added start_period
-    
+      start_period: 30s
+
     # Resource limits to prevent resource starvation
     deploy:
       resources:
@@ -39,17 +65,16 @@ services:
           cpus: '0.25'
           memory: 256M
 
-  # Stashpage Application
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  # Stashpage Application with MariaDB (only runs with --profile mariadb)
+  app-mariadb:
+    image: ${DOCKER_IMAGE:-ghcr.io/r3ndl3r/stashpage:latest}
     container_name: stashpage-app
     restart: unless-stopped
-    
+    profiles: ["mariadb"]
+
     ports:
-      - "${APP_PORT:-3300}:3000"
-    
+      - "3300:3300"
+
     environment:
       # Database Configuration - MariaDB
       DB_TYPE: mariadb
@@ -58,30 +83,66 @@ services:
       DB_NAME: ${DB_NAME:-stashpage}
       DB_USER: ${DB_USER:-stashpage}
       DB_PASS: ${DB_PASSWORD:-stashpage}
-      
+
       # Application Configuration
       MOJO_MODE: ${MOJO_MODE:-production}
       MOJO_LOG_LEVEL: ${MOJO_LOG_LEVEL:-info}
-    
+
     depends_on:
       db:
         condition: service_healthy
-    
+
     networks:
       - stashpage-network
-    
+
     volumes:
-      - ./log:/app/log
-    
+      - app_logs:/app/log
+
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:3300/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s  # Added start_period
-    
+      start_period: 40s
+
+  # Stashpage Application with SQLite (only runs with --profile sqlite)
+  app-sqlite:
+    image: ${DOCKER_IMAGE:-ghcr.io/r3ndl3r/stashpage:latest}
+    container_name: stashpage-app
+    restart: unless-stopped
+    profiles: ["sqlite"]
+
+    ports:
+      - "3300:3300"
+
+    environment:
+      # Database Configuration - SQLite
+      DB_TYPE: sqlite
+      DB_FILE: /app/data/stashpage.db
+
+      # Application Configuration
+      MOJO_MODE: ${MOJO_MODE:-production}
+      MOJO_LOG_LEVEL: ${MOJO_LOG_LEVEL:-info}
+
+    volumes:
+      - app_logs:/app/log
+      - sqlite_data:/app/data
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3300/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
 volumes:
   db_data:
+    driver: local
+  db_init:
+    driver: local
+  sqlite_data:
+    driver: local
+  app_logs:
     driver: local
 
 networks:
