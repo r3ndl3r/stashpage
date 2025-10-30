@@ -62,23 +62,76 @@ Try Stashpage without installation:
 
 ### 🐳 Docker Deployment
 
-1. Clone the repository:
-```
-git clone https://github.com/r3ndl3r/stashpage.git
-cd stashpage
+Stashpage uses Docker profiles to support both MariaDB and SQLite backends. The application runs on port **3300** by default.
+
+#### Using Pre-built Images (Recommended)
+
+1. Download the docker-compose.yml file:
+```bash
+curl -O https://raw.githubusercontent.com/r3ndl3r/stashpage/main/docker-compose.yml
 ```
 
-2. Edit `.env` and modify if needed:
-```
-nano .env
+2. (Optional) Create a `.env` file to customize settings:
+```bash
+# Database credentials (MariaDB only)
+DB_ROOT_PASSWORD=rootpassword
+DB_NAME=stashpage
+DB_USER=stashpage
+DB_PASSWORD=stashpage
+
+# Application settings
+MOJO_MODE=production
+MOJO_LOG_LEVEL=info
 ```
 
-3. Start with Docker Compose:
-```
-docker compose up -d (mariadb) or docker compose -f docker-compose-sqlite.yml up -d (sqlite)
+3. Start with Docker Compose using profiles:
+
+**For SQLite** (simpler, no separate database container):
+```bash
+docker compose --profile sqlite up -d
 ```
 
-4. Access at http://localhost:3300
+**For MariaDB** (recommended for production):
+```bash
+docker compose --profile mariadb up -d
+```
+
+4. Access Stashpage at **http://localhost:3300**
+
+5. The first registered user automatically becomes the admin.
+
+#### Building from Source
+
+If you want to build the image locally instead of using the pre-built image:
+
+```bash
+# Build and optionally push to your own registry
+./build-and-push.sh YOUR_GITHUB_USERNAME
+
+# Or build locally without pushing
+docker build -t stashpage:local .
+
+# Update docker-compose.yml to use your image
+# Then start with profiles as above
+```
+
+#### Managing Containers
+
+```bash
+# View logs
+docker compose --profile sqlite logs -f
+# or
+docker compose --profile mariadb logs -f
+
+# Stop containers
+docker compose --profile sqlite down
+# or
+docker compose --profile mariadb down
+
+# Update to latest image
+docker compose --profile sqlite pull
+docker compose --profile sqlite up -d
+```
 
 ### Manual Installation
 
