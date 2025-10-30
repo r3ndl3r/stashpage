@@ -58,7 +58,7 @@ sub _setup_database {
 
     # Initializes the database integration and session signing secret.
     # Responsibilities:
-    #   - Load appropriate database driver based on DB_TYPE environment variable.
+    #   - Load unified database driver with backend selection via DB_TYPE environment variable.
     #   - Initialize SQLite database if it doesn't exist.
     #   - Fetch a secret from the database for cookie/session signing.
     #   - Register a reusable 'db' helper for controllers and plugins.
@@ -102,18 +102,17 @@ sub _setup_database {
             print "Creating new database and initializing schema...\n";
             $self->_initialize_sqlite_database($db_file);
         }
-        
-        # Load SQLite driver (can't use 'use' due to hyphen in filename)
-        require "$FindBin::Bin/lib/StashDBI-SQLite.pm";
     }
     
-    my $db = StashDBI->new();
+    # Initialize unified database driver with backend type
+    my $db = StashDBI->new(db_type => $db_type);
     my $secret = $db->get_app_secret();
     $self->secrets([$secret]);
 
     # Expose a persistent DB handle via helper for controllers/views/plugins.
+    # Uses 'state' to create a single persistent instance per worker process.
     $self->helper(db => sub {
-        state $db = StashDBI->new;
+        state $db = StashDBI->new(db_type => $db_type);
         return $db;
     });
 
