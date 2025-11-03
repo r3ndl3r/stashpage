@@ -1,8 +1,8 @@
 # Docker Compose file using pre-built image from GitHub Container Registry
 #
 # Usage:
-#   MariaDB:  docker compose -f docker-compose-registry.yml --profile mariadb up -d
-#   SQLite:   docker compose -f docker-compose-registry.yml --profile sqlite up -d
+#   MariaDB:  docker compose --profile mariadb up -d
+#   SQLite:   docker compose --profile sqlite up -d
 #
 # Set DOCKER_IMAGE in .env file or use default:
 #   DOCKER_IMAGE=ghcr.io/r3ndl3r/stashpage:latest
