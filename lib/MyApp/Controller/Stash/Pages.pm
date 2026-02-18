@@ -146,4 +146,58 @@ sub list {
 }
 
 
+# Controller for stash page management operations.
+# Responsibilities:
+# - Handles permanent deletion of stash pages with data cleanup
+# - Manages page renaming with conflict detection and validation
+# - Provides page cloning functionality with deep copy operations
+# - Provides interface and logic for custom page reordering
+# - Offers API endpoint for retrieving user's page listings
+
+# Display the interface for reordering stash pages.
+# Parameters:
+#   $c : Mojolicious controller (calling context).
+# Returns:
+#   Redirect to login if not authenticated, reorder template render on success.
+sub reorder_view {
+    my $c = shift;
+    # Enforce user authentication for reordering access
+    return $c->redirect_to('/login') unless $c->is_logged_in;
+    
+    # Retrieve current page sequence for the UI
+    $c->stash(page_names => $c->get_all_page_names());
+    $c->render(template => 'reorder');
+}
+
+
+# Persist a new custom sequence for stash pages.
+# Parameters:
+#   $c : Mojolicious controller (calling context).
+# Returns:
+#   JSON response with success or error status.
+sub save_reorder {
+    my $c = shift;
+    # Enforce authentication and block demo account modifications
+    return $c->render(json => { error => 'Unauthorized' }, status => 401) unless $c->is_logged_in;
+    return $c->render(json => { error => 'Demo account restriction' }, status => 403) if $c->is_demo;
+
+    # Extract ordered array of names from JSON payload
+    my $order_list = $c->req->json; # Expects: ["lab", "swin", "links", "Movies"]
+    my $user_id = $c->current_user_id;
+    my $unified = $c->get_unified_stash_data();
+
+    # Inject numeric 'order' weight into each stash object based on new position
+    my $weight = 0;
+    foreach my $name (@$order_list) {
+        if (exists $unified->{stashes}{$name}) {
+            $unified->{stashes}{$name}{order} = ++$weight;
+        }
+    }
+
+    # Integration: DB helper for updated configuration persistence
+    $c->db->save_unified_stashes($user_id, $unified);
+    return $c->render(json => { success => 1 });
+}
+
+
 1;

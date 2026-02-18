@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organize Stashes - Stash Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/stash.css">
+    <link rel="shortcut icon" href="/favicon.ico"/>
+</head>
+<body class="text-gray-200 font-sans dashboard-index">
+    
+    <%= include 'topbar' %>
+
+    <div class="min-h-screen py-8 md:py-16 px-4 flex flex-col items-center">
+        <div class="max-w-xl mx-auto w-full bg-gray-800/80 backdrop-blur-sm rounded-lg border border-gray-700/50 p-6 md:p-8 shadow-lg">
+            
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-3xl font-bold text-white">Organize Stashes</h2>
+                <a href="/stash" class="text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </a>
+            </div>
+            
+            <p class="text-gray-400 text-sm mb-8">Drag and drop stashes to change their display order on your dashboard.</p>
+
+            <div id="reorder-list" class="space-y-3">
+                % for my $name (@$page_names) {
+                    <div class="flex items-center justify-between p-4 bg-gray-700/60 rounded-md border border-gray-600/50 cursor-move hover:border-blue-500/50 transition-all group" data-name="<%= $name %>">
+                        <div class="flex items-center gap-4">
+                            <span class="text-2xl group-hover:scale-110 transition-transform duration-200">
+                                <%= $c->get_stash_emoji($name) %>
+                            </span>
+                            <span class="text-white font-semibold text-lg"><%= $name %></span>
+                        </div>
+                        <div class="text-gray-500 group-hover:text-blue-400">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+                            </svg>
+                        </div>
+                    </div>
+                % }
+            </div>
+
+            <div class="mt-10">
+                <button onclick="saveNewOrder()" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-4 rounded-md shadow-lg hover:shadow-blue-500/20 transition-all transform hover:scale-[1.01] active:scale-95 uppercase tracking-wider text-sm">
+                    Save Custom Order
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script type="module" src="/js/search.js"></script>
+    <script>
+        const el = document.getElementById('reorder-list');
+        Sortable.create(el, { 
+            animation: 150,
+            ghostClass: 'opacity-25',
+            chosenClass: 'border-blue-500'
+        });
+
+        async function saveNewOrder() {
+            const order = Array.from(el.children).map(child => child.dataset.name);
+            const res = await fetch('/api/v1/stash/reorder', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(order)
+            });
+            
+            if (res.ok) {
+                window.location.href = '/stash';
+            } else {
+                const data = await res.json();
+                alert('Error: ' + (data.error || 'Failed to save sequence'));
+            }
+        }
+    </script>
+</body>
+</html>

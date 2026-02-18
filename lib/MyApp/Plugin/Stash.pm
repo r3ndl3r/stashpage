@@ -256,16 +256,18 @@ sub register ($self, $app, $config = {}) {
     });
 
     # Helper: get_all_page_names
-    # Provides sorted list of user's dashboard pages.
+    # Provides list of user's dashboard pages sorted by custom weight or name.
     # Parameters:
     #   $c : Mojolicious controller (calling context).
     # Returns:
-    #   Arrayref: sorted page names for navigation.
+    #   Arrayref: page names sorted by 'order' weight, then alphabetically.
     $app->helper(get_all_page_names => sub ($c) {
+        # Retrieve user's complete stash configuration
         my $unified = $c->get_unified_stash_data();
         my $stashes = $unified->{stashes} || {};
         
-        # Numeric sort by 'order' (defaults to high number), then alpha
+        # Sort by 'order' property first (default to 999), then alphabetically
+        # Ensures consistent navigation while supporting manual overrides
         return [ sort { 
             ($stashes->{$a}{order} // 999) <=> ($stashes->{$b}{order} // 999) 
             || lc($a) cmp lc($b) 
