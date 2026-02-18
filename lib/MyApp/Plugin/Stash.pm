@@ -262,11 +262,14 @@ sub register ($self, $app, $config = {}) {
     # Returns:
     #   Arrayref: sorted page names for navigation.
     $app->helper(get_all_page_names => sub ($c) {
-        # Retrieve user's complete stash configuration
         my $unified = $c->get_unified_stash_data();
+        my $stashes = $unified->{stashes} || {};
         
-        # Return sorted page names for consistent navigation
-        return [ sort keys %{$unified->{stashes}} ];          # Alphabetically sorted names
+        # Numeric sort by 'order' (defaults to high number), then alpha
+        return [ sort { 
+            ($stashes->{$a}{order} // 999) <=> ($stashes->{$b}{order} // 999) 
+            || lc($a) cmp lc($b) 
+        } keys %$stashes ];
     });
 
     # Helper: get_default_stash
