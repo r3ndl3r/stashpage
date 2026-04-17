@@ -207,10 +207,10 @@ sub register ($self, $app, $config = {}) {
             };
         }
 
-        # Update unified structure with new data
-        $unified->{stashes}{$page_key} = {
-            categories => \@new_categories
-        };
+        # Persistence of category data within the unified structure while
+        # maintaining existing stash-level metadata (order, visibility).
+        $unified->{stashes}{$page_key} ||= {};
+        $unified->{stashes}{$page_key}{categories} = \@new_categories;
 
         # Integration: DB helper for data persistence
         return $c->db->save_unified_stashes($user_id, $unified); # DB: save updated configuration
