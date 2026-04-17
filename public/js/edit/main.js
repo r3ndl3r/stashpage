@@ -153,11 +153,12 @@ function syncDataForSubmission() {
             };
         }
 
-        // Update category position from current DOM element position
+        // Update category state from current DOM element
         category.x = parseInt(card.style.left, 10) || 0;
         category.y = parseInt(card.style.top, 10) || 0;
         category.icon = card.dataset.categoryIcon || '';
         category.baseUrl = card.dataset.categoryBaseUrl || '';
+        category.collapsed = parseInt(card.dataset.collapsed, 10) || 0;
         
         // Normalize color format before submission
         category.color = normalizeColor(card.dataset.categoryColor);
@@ -257,6 +258,7 @@ function init() {
             icon: card.dataset.categoryIcon || '',
             baseUrl: card.dataset.categoryBaseUrl || '',
             color: card.dataset.categoryColor || '#3b82f6',
+            collapsed: parseInt(card.dataset.collapsed, 10) || 0,
             x: parseInt(card.style.left, 10) || 0,
             y: parseInt(card.style.top, 10) || 0,
             items: []
