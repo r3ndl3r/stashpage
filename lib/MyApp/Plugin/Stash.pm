@@ -274,6 +274,92 @@ sub register ($self, $app, $config = {}) {
         } keys %$stashes ];
     });
 
+    # Helper: get_dashboard_structure
+    # Returns a hierarchical structure of stashes grouped by categories.
+    # Parameters:
+    #   $c : Mojolicious controller (calling context).
+    # Returns:
+    #   Arrayref: Categorized dashboard structure with stash metadata.
+    $app->helper(get_dashboard_structure => sub ($c) {
+        my $unified = $c->get_unified_stash_data();
+        my $stashes = $unified->{stashes} || {};
+        my $categories_config = $unified->{dashboard_categories} || [];
+        
+        my %assigned_stashes;
+        my @structure;
+
+        # Process specifically defined categories
+        foreach my $cat (@$categories_config) {
+            my @cat_stashes;
+            foreach my $page_name (@{$cat->{stashes} || []}) {
+                if (exists $stashes->{$page_name}) {
+                    push @cat_stashes, $page_name;
+                    $assigned_stashes{$page_name} = 1;
+                }
+            }
+            
+            push @structure, {
+                id    => $cat->{id},
+                title => $cat->{title},
+                stashes => [ map { { name => $_, title => $stashes->{$_}{title} || $_ } } @cat_stashes ],
+                collapsed => $cat->{collapsed} || 0
+            };
+        }
+
+        # Handle stashes not assigned to any category (The "Global" group)
+        my @unassigned = sort { 
+            ($stashes->{$a}{order} // 999) <=> ($stashes->{$b}{order} // 999) 
+            || lc($a) cmp lc($b)
+        } grep { !$assigned_stashes{$_} } keys %$stashes;
+
+        if (@unassigned) {
+            # Add unassigned stashes to the front as "Global"
+            unshift @structure, {
+                id    => 'uncategorized',
+                title => 'Global',
+                stashes => [ map { { name => $_, title => $stashes->{$_}{title} || $_ } } @unassigned ],
+                collapsed => 0
+            };
+        }
+
+        return \@structure;
+    });
+
+    # Helper: save_dashboard_structure
+    # Persists the categorized dashboard configuration.
+    # Parameters:
+    #   $c : Mojolicious controller (calling context).
+    #   $structure : Arrayref of category objects.
+    $app->helper(save_dashboard_structure => sub ($c, $structure) {
+        my $user_id = $c->current_user_id;
+        return 0 unless $user_id && !$c->is_demo;
+
+        my $unified = $c->get_unified_stash_data();
+        
+        # Clean the input structure to ensure we only save what we need
+        my @to_save;
+        foreach my $cat (@$structure) {
+            next if $cat->{id} eq 'uncategorized'; # Uncategorized is implicit
+            
+            my $id = $cat->{id};
+            # If it's a new category from the frontend, give it a proper permanent ID
+            if ($id =~ /^new_/) {
+                require Mojo::Util;
+                $id = 'cat_' . Mojo::Util::hmac_sha1_sum(time() . rand(), 'stash');
+            }
+
+            push @to_save, {
+                id    => $id,
+                title => $cat->{title},
+                stashes => $cat->{stashes} || [],
+                collapsed => $cat->{collapsed} || 0
+            };
+        }
+
+        $unified->{dashboard_categories} = \@to_save;
+        return $c->db->save_unified_stashes($user_id, $unified);
+    });
+
     # Helper: get_default_stash
     # Provides deep copy of default categories for new user initialization.
     # Parameters:
@@ -353,211 +439,6 @@ sub register ($self, $app, $config = {}) {
         
         # Integration: DB helper for data persistence
         return $c->db->save_unified_stashes($user_id, $unified);
-    });
-
-    # Helper: get_stash_emoji
-    # Returns an emoji icon based on stash name with fuzzy matching.
-    # Parameters:
-    #   $c : Mojolicious controller (calling context).
-    #   $page_name : Name of the stash page.
-    # Returns:
-    #   String: emoji character matching the stash name or default folder emoji.
-    $app->helper(get_stash_emoji => sub ($c, $page_name) {
-        # Emoji mapping based on keywords
-        my %emoji_map = (
-            # Media & Entertainment
-            'media' => '🎬',
-            'music' => '🎵',
-            'videos' => '📹',
-            'movies' => '🎥',
-            'tv' => '📺',
-            'shows' => '📺',
-            'podcasts' => '🎙️',
-            'podcast' => '🎙️',
-            'streaming' => '📡',
-            'youtube' => '▶️',
-            
-            # Reading & Learning
-            'books' => '📚',
-            'reading' => '📖',
-            'articles' => '📰',
-            'blog' => '✍️',
-            'blogs' => '✍️',
-            'wiki' => '📖',
-            'documentation' => '📚',
-            'tutorial' => '🎓',
-            'tutorials' => '🎓',
-            'education' => '🎓',
-            'learning' => '📝',
-            'study' => '📖',
-            'courses' => '🎓',
-            'course' => '🎓',
-            'swin' => '🎓',
-            
-            # Work & Productivity
-            'work' => '💼',
-            'business' => '💼',
-            'office' => '🏢',
-            'job' => '💼',
-            'career' => '📈',
-            'meeting' => '🤝',
-            'meetings' => '🤝',
-            'calendar' => '📅',
-            'schedule' => '🗓️',
-            'tasks' => '✅',
-            'todo' => '📋',
-            'planning' => '📋',
-            
-            # Development & Tech
-            'dev' => '💻',
-            'code' => '⌨️',
-            'development' => '👨‍💻',
-            'programming' => '💻',
-            'github' => '🐙',
-            'git' => '🔀',
-            'api' => '🔌',
-            'database' => '🗄️',
-            'server' => '🖥️',
-            'cloud' => '☁️',
-            'docker' => '🐳',
-            'devops' => '⚙️',
-            'linux' => '🐧',
-            'terminal' => '⌨️',
-            'shell' => '🐚',
-            'lab' => '🐧',
-            
-            # Design & Creative
-            'design' => '🎨',
-            'art' => '🎨',
-            'creative' => '🎨',
-            'graphics' => '🖼️',
-            'photos' => '📷',
-            'photography' => '📸',
-            'images' => '🖼️',
-            'icons' => '🎯',
-            'colors' => '🌈',
-            'fonts' => '🔤',
-            
-            # Social & Communication
-            'social' => '👥',
-            'chat' => '💬',
-            'messaging' => '💬',
-            'email' => '📧',
-            'mail' => '📮',
-            'contacts' => '📇',
-            'friends' => '👫',
-            'community' => '🌐',
-            
-            # Shopping & Finance
-            'shopping' => '🛒',
-            'shop' => '🛍️',
-            'store' => '🏪',
-            'cart' => '🛒',
-            'wishlist' => '⭐',
-            'deals' => '💰',
-            'finance' => '💰',
-            'money' => '💵',
-            'banking' => '🏦',
-            'crypto' => '₿',
-            'stocks' => '📈',
-            'investing' => '💹',
-            
-            # Food & Lifestyle
-            'food' => '🍔',
-            'recipes' => '🍳',
-            'cooking' => '👨‍🍳',
-            'restaurant' => '🍽️',
-            'restaurants' => '🍽️',
-            'coffee' => '☕',
-            'drinks' => '🍹',
-            
-            # Travel & Places
-            'travel' => '✈️',
-            'trips' => '🧳',
-            'vacation' => '🏖️',
-            'hotel' => '🏨',
-            'hotels' => '🏨',
-            'flights' => '✈️',
-            'maps' => '🗺️',
-            
-            # Sports & Fitness
-            'sports' => '⚽',
-            'fitness' => '💪',
-            'gym' => '🏋️',
-            'workout' => '🏃',
-            'health' => '🏥',
-            'running' => '🏃',
-            'cycling' => '🚴',
-            'swimming' => '🏊',
-            
-            # Gaming
-            'gaming' => '🎮',
-            'games' => '🎯',
-            'game' => '🕹️',
-            'steam' => '🎮',
-            'xbox' => '🎮',
-            'playstation' => '🎮',
-            'nintendo' => '🎮',
-            
-            # Tools & Resources
-            'tools' => '🔧',
-            'resources' => '📦',
-            'utilities' => '🛠️',
-            'apps' => '📱',
-            'software' => '💿',
-            'downloads' => '⬇️',
-            
-            # Projects & Ideas
-            'projects' => '🚀',
-            'project' => '🚀',
-            'ideas' => '💡',
-            'inspiration' => '✨',
-            'brainstorm' => '🧠',
-            
-            # Organization
-            'notes' => '📋',
-            'docs' => '📄',
-            'documents' => '📄',
-            'files' => '📁',
-            'archive' => '📦',
-            'backup' => '💾',
-            
-            # General
-            'links' => '🔗',
-            'favorites' => '⭐',
-            'bookmarks' => '🔖',
-            'starred' => '⭐',
-            'important' => '❗',
-            'urgent' => '🚨',
-            'personal' => '👤',
-            'private' => '🔒',
-            'public' => '🌍',
-            
-            # Science & Research
-            'research' => '🔬',
-            'science' => '🔬',
-            'experiment' => '⚗️',
-            'data' => '📊',
-            'analytics' => '📈',
-            
-            # News & Information
-            'news' => '📡',
-            'tech' => '💻',
-            'technology' => '🔌',
-            'weather' => '🌤️',
-        );
-        
-        my $lower = lc($page_name);
-        
-        # Exact match first
-        return $emoji_map{$lower} if exists $emoji_map{$lower};
-        
-        # Fuzzy matching - check if name contains any keyword
-        for my $keyword (keys %emoji_map) {
-            return $emoji_map{$keyword} if $lower =~ /\b$keyword\b/;
-        }
-        
-        return '📁';  # Default folder emoji
     });
 
 }

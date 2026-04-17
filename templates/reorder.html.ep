@@ -1,81 +1,322 @@
+<%# /templates/reorder.html.ep %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Organize Stashes - Stash Dashboard</title>
+    <title>Organize Dashboard - Stash Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/css/stash.css">
     <link rel="shortcut icon" href="/favicon.ico"/>
+    <style>
+        .category-container.sortable-ghost { opacity: 0.3; }
+        .stash-item.sortable-ghost { opacity: 0.3; background: rgba(59, 130, 246, 0.2); }
+        .category-group { min-height: 80px; transition: background 0.3s ease; }
+        .category-group.empty { border: 2px dashed rgba(255, 255, 255, 0.1); }
+        .drag-handle-cat { cursor: grab; }
+        .drag-handle-cat:active { cursor: grabbing; }
+    </style>
 </head>
-<body class="text-gray-200 font-sans dashboard-index">
+<body class="text-gray-200 font-sans dashboard-index bg-[#050c1d]">
     
     <%= include 'topbar' %>
 
     <div class="min-h-screen py-8 md:py-16 px-4 flex flex-col items-center">
-        <div class="max-w-xl mx-auto w-full bg-gray-800/80 backdrop-blur-sm rounded-lg border border-gray-700/50 p-6 md:p-8 shadow-lg">
+        <div class="max-w-4xl mx-auto w-full">
             
-            <div class="flex items-center justify-between mb-8">
-                <h2 class="text-3xl font-bold text-white">Organize Stashes</h2>
-                <a href="/stash" class="text-gray-400 hover:text-white transition-colors">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </a>
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+                <div>
+                    <h2 class="text-4xl font-bold text-white mb-2">Organize Dashboard</h2>
+                    <p class="text-gray-400">Manage categories and arrange your stashes exactly how you want them.</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="addNewCategory()" class="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 font-semibold py-2 px-6 rounded-lg transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Add Category
+                    </button>
+                    <a href="/stash" class="bg-gray-700/50 hover:bg-gray-700/80 text-white font-semibold py-2 px-6 rounded-lg transition-all border border-gray-600/50 flex items-center gap-2">
+                         Done
+                    </a>
+                </div>
             </div>
-            
-            <p class="text-gray-400 text-sm mb-8">Drag and drop stashes to change their display order on your dashboard.</p>
 
-            <div id="reorder-list" class="space-y-3">
-                % for my $name (@$page_names) {
-                    <div class="flex items-center justify-between p-4 bg-gray-700/60 rounded-md border border-gray-600/50 cursor-move hover:border-blue-500/50 transition-all group" data-name="<%= $name %>">
-                        <div class="flex items-center gap-4">
-                            <span class="text-2xl group-hover:scale-110 transition-transform duration-200">
-                                <%= $c->get_stash_emoji($name) %>
-                            </span>
-                            <span class="text-white font-semibold text-lg"><%= $name %></span>
+            <div id="category-list" class="space-y-8">
+                <% foreach my $group (@$dashboard_structure) { %>
+                    <div class="category-container bg-gray-800/40 backdrop-blur-md rounded-xl border border-gray-700/50 overflow-hidden shadow-2xl transition-all duration-300" 
+                         data-id="<%= $group->{id} %>" 
+                         data-title="<%= $group->{title} %>">
+                        
+                        <!-- Category Header -->
+                        <div class="flex items-center justify-between p-4 bg-gray-700/30 border-b border-gray-700/50">
+                            <div class="flex items-center gap-4">
+                                <% if ($group->{id} ne 'uncategorized') { %>
+                                    <div class="drag-handle-cat text-gray-500 hover:text-blue-400 transition-colors">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+                                        </svg>
+                                    </div>
+                                <% } %>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-xl font-bold text-blue-400"><%= $group->{title} %></span>
+                                    <% if ($group->{id} ne 'uncategorized') { %>
+                                        <button onclick="renameCategory('<%= $group->{id} %>', '<%= $group->{title} %>')" class="text-gray-500 hover:text-white transition-colors">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                            </svg>
+                                        </button>
+                                    <% } %>
+                                </div>
+                            </div>
+                            
+                            <% if ($group->{id} ne 'uncategorized') { %>
+                                <button onclick="deleteCategory('<%= $group->{id} %>')" class="text-gray-500 hover:text-red-400 transition-colors p-2 hover:bg-red-500/10 rounded-lg">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            <% } %>
                         </div>
-                        <div class="text-gray-500 group-hover:text-blue-400">
-                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
-                            </svg>
+
+                        <!-- Stash items within this category -->
+                        <div class="stash-list category-group p-4 grid grid-cols-1 md:grid-cols-2 gap-3" data-id="<%= $group->{id} %>">
+                            <% for my $stash (@{$group->{stashes} || []}) { %>
+                                <div class="stash-item flex items-center justify-between p-4 bg-gray-900/40 rounded-xl border border-gray-700/50 hover:border-blue-500/50 cursor-move transition-all group group/item shadow-sm hover:shadow-blue-500/10" data-name="<%= $stash->{name} %>">
+                                    <div class="flex items-center gap-4">
+                                        <div class="p-2 bg-gray-800/60 rounded-lg text-gray-400 group-hover/item:text-blue-400 group-hover/item:bg-blue-500/10 transition-all duration-300">
+                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                                            </svg>
+                                        </div>
+                                        <span class="text-white font-semibold tracking-tight"><%= $stash->{title} %></span>
+                                    </div>
+                                    <div class="text-gray-600 group-hover/item:text-blue-500 transition-colors">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            <% } %>
                         </div>
                     </div>
-                % }
+                <% } %>
             </div>
 
-            <div class="mt-10">
-                <button onclick="saveNewOrder()" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-4 rounded-md shadow-lg hover:shadow-blue-500/20 transition-all transform hover:scale-[1.01] active:scale-95 uppercase tracking-wider text-sm">
-                    Save Custom Order
+            <div class="sticky bottom-8 mt-12 w-full flex justify-center">
+                <button onclick="saveEverything()" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-4 px-12 rounded-full shadow-2xl hover:shadow-blue-500/40 transition-all transform hover:scale-105 active:scale-95 uppercase tracking-widest text-sm border-2 border-white/10 flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                    </svg>
+                    Save
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- Modals -->
+    <div id="categoryModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-[100] animate-in fade-in duration-200">
+        <div class="bg-gray-800 border border-gray-700 p-8 rounded-2xl w-full max-w-md shadow-2xl scale-in-center">
+            <h3 id="modalTitle" class="text-2xl font-bold text-white mb-6">Add New Category</h3>
+            <input type="text" id="categoryTitleInput" placeholder="Category Name" class="w-full bg-gray-900 border border-gray-700 text-white p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all mb-8">
+            <div class="flex justify-end gap-4">
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white px-6 py-2 transition-colors">Cancel</button>
+                <button id="modalActionBtn" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-2 rounded-xl font-bold transition-all hover:shadow-lg hover:shadow-blue-500/30">Create</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <script type="module" src="/js/search.js"></script>
     <script>
-        const el = document.getElementById('reorder-list');
-        Sortable.create(el, { 
+        const categoryList = document.getElementById('category-list');
+        const stashesGroup = {
+            name: 'stashes',
+            pull: true,
+            put: true
+        };
+
+        // Initialize Sortable for Categories
+        Sortable.create(categoryList, {
             animation: 150,
-            ghostClass: 'opacity-25',
-            chosenClass: 'border-blue-500'
+            handle: '.drag-handle-cat',
+            ghostClass: 'sortable-ghost'
         });
 
-        async function saveNewOrder() {
-            const order = Array.from(el.children).map(child => child.dataset.name);
-            const res = await fetch('/api/v1/stash/reorder', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(order)
-            });
-            
-            if (res.ok) {
-                window.location.href = '/stash';
+        // Helper to check and style empty categories
+        function checkEmptyCategory(el) {
+            if (el.children.length === 0) {
+                el.classList.add('empty');
             } else {
-                const data = await res.json();
-                alert('Error: ' + (data.error || 'Failed to save sequence'));
+                el.classList.remove('empty');
             }
+        }
+
+        // Initialize Sortable for items within each category
+        function initStashSortable(el) {
+            if (el.sortable) el.sortable.destroy();
+            el.sortable = Sortable.create(el, {
+                group: stashesGroup,
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                onAdd: (evt) => checkEmptyCategory(evt.to),
+                onRemove: (evt) => checkEmptyCategory(evt.from)
+            });
+            checkEmptyCategory(el);
+        }
+
+        // Initialize all existing lists
+        document.querySelectorAll('.stash-list').forEach(initStashSortable);
+
+        // Helper to get an icon (re-implementing the icon logic in JS for client-side injection)
+        function getStashEmoji(name) {
+            // Simplified emoji map mirroring backend logic
+            const map = {
+                'links': '🔗', 'media': '🎬', 'lab': '🐧', 'dev': '💻', 'books': '📚',
+                'social': '👥', 'shopping': '🛒', 'gaming': '🎮', 'work': '💼'
+            };
+            const lower = name.toLowerCase();
+            for (let k in map) { if (lower.includes(k)) return map[k]; }
+            return '📁';
+        }
+
+        function createCategoryElement(id, title) {
+            const div = document.createElement('div');
+            div.className = 'category-container bg-gray-800/40 backdrop-blur-md rounded-xl border border-gray-700/50 overflow-hidden shadow-2xl transition-all duration-300';
+            div.dataset.id = id;
+            div.dataset.title = title;
+            
+            div.innerHTML = `
+                <div class="flex items-center justify-between p-4 bg-gray-700/30 border-b border-gray-700/50">
+                    <div class="flex items-center gap-4">
+                        <div class="drag-handle-cat text-gray-500 hover:text-blue-400 transition-colors">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+                            </svg>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl font-bold text-blue-400 font-title">${title}</span>
+                            <button onclick="renameCategory('${id}', this.closest('.category-container').dataset.title)" class="text-gray-500 hover:text-white transition-colors">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button onclick="deleteCategory('${id}')" class="text-gray-500 hover:text-red-400 transition-colors p-2 hover:bg-red-500/10 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="stash-list category-group p-4 grid grid-cols-1 md:grid-cols-2 gap-3" data-id="${id}"></div>
+            `;
+            return div;
+        }
+
+        async function saveEverything() {
+            const saveBtn = document.querySelector('button[onclick="saveEverything()"]');
+            const originalHTML = saveBtn.innerHTML;
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">...</svg> Saving...';
+
+            try {
+                const structure = [];
+                document.querySelectorAll('.category-container').forEach(container => {
+                    const id = container.dataset.id;
+                    const title = container.dataset.title;
+                    const stashes = Array.from(container.querySelectorAll('.stash-item')).map(item => item.dataset.name);
+                    
+                    structure.push({ id, title, stashes });
+                });
+
+                const res = await fetch('/api/v1/dashboard/structure', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(structure)
+                });
+
+                if (res.ok) {
+                    window.location.href = '/stash';
+                } else {
+                    const data = await res.json();
+                    alert('Failed to save dashboard organization: ' + (data.error || 'Unknown error'));
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = originalHTML;
+                }
+            } catch (e) {
+                alert('Connection error. Please try again.');
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = originalHTML;
+            }
+        }
+
+        let currentCatId = null;
+
+        function addNewCategory() {
+            currentCatId = null;
+            document.getElementById('modalTitle').textContent = 'Add New Category';
+            document.getElementById('modalActionBtn').textContent = 'Create';
+            document.getElementById('categoryTitleInput').value = '';
+            document.getElementById('modalActionBtn').onclick = processCategoryAction;
+            document.getElementById('categoryModal').classList.remove('hidden');
+            document.getElementById('categoryModal').classList.add('flex');
+            document.getElementById('categoryTitleInput').focus();
+        }
+
+        function renameCategory(id, currentTitle) {
+            currentCatId = id;
+            document.getElementById('modalTitle').textContent = 'Rename Category';
+            document.getElementById('modalActionBtn').textContent = 'Rename';
+            document.getElementById('categoryTitleInput').value = currentTitle;
+            document.getElementById('modalActionBtn').onclick = processCategoryAction;
+            document.getElementById('categoryModal').classList.remove('hidden');
+            document.getElementById('categoryModal').classList.add('flex');
+            document.getElementById('categoryTitleInput').focus();
+        }
+
+        function processCategoryAction() {
+            const title = document.getElementById('categoryTitleInput').value.trim();
+            if (!title) return;
+
+            if (!currentCatId) {
+                // Client-side add
+                const id = 'new_' + Math.random().toString(36).substr(2, 9);
+                const el = createCategoryElement(id, title);
+                categoryList.appendChild(el);
+                initStashSortable(el.querySelector('.stash-list'));
+            } else {
+                // Client-side rename
+                const container = document.querySelector(`.category-container[data-id="${currentCatId}"]`);
+                if (container) {
+                    container.dataset.title = title;
+                    container.querySelector('.font-title').textContent = title;
+                }
+            }
+            closeModal();
+        }
+
+        function deleteCategory(id) {
+            const container = document.querySelector(`.category-container[data-id="${id}"]`);
+            if (!container) return;
+
+            const stashes = container.querySelectorAll('.stash-item');
+            if (stashes.length > 0) {
+                const globalList = document.querySelector('.category-group[data-id="uncategorized"]');
+                if (globalList) {
+                    stashes.forEach(item => globalList.appendChild(item));
+                    initStashSortable(globalList); // Refresh
+                }
+            }
+            container.remove();
+        }
+
+        function closeModal() {
+            document.getElementById('categoryModal').classList.add('hidden');
+            document.getElementById('categoryModal').classList.remove('flex');
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('categoryModal')) closeModal();
         }
     </script>
 </body>

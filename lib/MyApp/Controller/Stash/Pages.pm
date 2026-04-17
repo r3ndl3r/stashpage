@@ -4,6 +4,7 @@ package MyApp::Controller::Stash::Pages;
 
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::JSON qw(decode_json encode_json);
+use Mojo::Util qw(hmac_sha1_sum);
 
 # Controller for stash page management operations.
 # Responsibilities:
@@ -58,30 +59,43 @@ sub rename {
     return $c->alert('Demo account cannot rename pages.', 403) if $c->is_demo;
 
     # Extract rename parameters from form submission
-    my $old_name = $c->param('old_page_name');     # Current page name
-    my $new_name = $c->param('new_page_name');     # Desired new page name
+    my $old_name  = $c->param('old_page_name');     # Current page name (alias)
+    my $new_name  = $c->param('new_page_name');     # Desired new alias (URL identifier)
+    my $new_title = $c->param('new_title');         # Desired new display title
     
     # Validate required parameters presence
-    return $c->alert('Missing parameters.', 400) unless $old_name && $new_name;
+    return $c->alert('Missing parameters.', 400) unless $old_name && ($new_name || defined $new_title);
     
-    # Validate new page name format for security and compatibility
-    return $c->alert('Invalid page name format.', 400) 
-        unless $new_name =~ /^[\w_\-.]+$/;
+    # Validate new page name format for security and compatibility (only if alias is changing)
+    if ($new_name && $new_name ne $old_name) {
+        return $c->alert('Invalid page name format.', 400) 
+            unless $new_name =~ /^[\w_\-.]+$/;
+    }
     
     # Load user's stash data for rename operation
     my $user_id = $c->current_user_id;             # Current user ID for ownership
     my $unified = $c->get_unified_stash_data();    # User's complete stash structure
 
-    # Check for naming conflicts before proceeding with rename
-    return $c->alert("Page '$new_name' already exists.", 409) 
-        if exists $unified->{stashes}{$new_name};
-    
     # Verify source page exists before attempting rename
     return $c->alert("Page '$old_name' not found.", 404) 
         unless exists $unified->{stashes}{$old_name};
-    
-    # Execute rename operation by moving data to new key
-    $unified->{stashes}{$new_name} = delete $unified->{stashes}{$old_name};  # Atomic rename
+
+    # If alias is changing, handle the key move
+    if ($new_name && $new_name ne $old_name) {
+        # Check for naming conflicts before proceeding with move
+        return $c->alert("Page '$new_name' already exists.", 409) 
+            if exists $unified->{stashes}{$new_name};
+            
+        # Atomic key move
+        $unified->{stashes}{$new_name} = delete $unified->{stashes}{$old_name};
+        $old_name = $new_name; # Continue with new alias for title update
+    }
+
+    # Update the title field if provided (supports spaces and emojis)
+    if (defined $new_title) {
+        $unified->{stashes}{$old_name}{title} = $new_title;
+    }
+
     $c->db->save_unified_stashes($user_id, $unified);  # DB: persist renamed page
     
     return $c->redirect_to('/stash');              # Redirect to updated stash view
@@ -164,8 +178,8 @@ sub reorder_view {
     # Enforce user authentication for reordering access
     return $c->redirect_to('/login') unless $c->is_logged_in;
     
-    # Retrieve current page sequence for the UI
-    $c->stash(page_names => $c->get_all_page_names());
+    # Retrieve hierarchical dashboard structure for the UI
+    $c->stash(dashboard_structure => $c->get_dashboard_structure());
     $c->render(template => 'reorder');
 }
 
@@ -197,6 +211,114 @@ sub save_reorder {
     # Integration: DB helper for updated configuration persistence
     $c->db->save_unified_stashes($user_id, $unified);
     return $c->render(json => { success => 1 });
+}
+
+
+# Persist a new hierarchical structure for the dashboard.
+# Parameters:
+#   $c : Mojolicious controller (calling context).
+# Returns:
+#   JSON response with success or error status.
+sub api_save_structure {
+    my $c = shift;
+    # Enforce authentication and block demo account modifications
+    return $c->render(json => { error => 'Unauthorized' }, status => 401) unless $c->is_logged_in;
+    return $c->render(json => { error => 'Demo account restriction' }, status => 403) if $c->is_demo;
+
+    # Extract structured data from JSON payload
+    my $structure = $c->req->json; # Expects: [{id: "...", title: "...", stashes: [...]}, ...]
+    
+    if ($c->save_dashboard_structure($structure)) {
+        return $c->render(json => { success => 1 });
+    }
+    
+    return $c->render(json => { error => 'Failed to save dashboard structure' }, status => 500);
+}
+
+
+# Add a new category to the user's dashboard.
+# Parameters:
+#   $c : Mojolicious controller (calling context).
+# Returns:
+#   JSON response with new category ID and title.
+sub add_category {
+    my $c = shift;
+    return $c->render(json => { error => 'Unauthorized' }, status => 401) unless $c->is_logged_in;
+    return $c->render(json => { error => 'Demo account restriction' }, status => 403) if $c->is_demo;
+
+    my $title = $c->param('title') || 'New Category';
+    my $id = 'cat_' . Mojo::Util::hmac_sha1_sum(time() . rand(), 'stash');
+    
+    my $structure = $c->get_dashboard_structure();
+    push @$structure, {
+        id => $id,
+        title => $title,
+        stashes => [],
+        collapsed => 0
+    };
+    
+    if ($c->save_dashboard_structure($structure)) {
+        return $c->render(json => { success => 1, id => $id, title => $title });
+    }
+    
+    return $c->render(json => { error => 'Failed to add category' }, status => 500);
+}
+
+
+# Rename an existing dashboard category.
+# Parameters:
+#   $c : Mojolicious controller (calling context).
+# Returns:
+#   JSON response with success status.
+sub rename_category {
+    my $c = shift;
+    return $c->render(json => { error => 'Unauthorized' }, status => 401) unless $c->is_logged_in;
+    return $c->render(json => { error => 'Demo account restriction' }, status => 403) if $c->is_demo;
+
+    my $id = $c->param('id');
+    my $new_title = $c->param('title');
+    
+    return $c->render(json => { error => 'Missing parameters' }, status => 400) unless $id && $new_title;
+    
+    my $structure = $c->get_dashboard_structure();
+    my $found = 0;
+    foreach my $cat (@$structure) {
+        if ($cat->{id} eq $id) {
+            $cat->{title} = $new_title;
+            $found = 1;
+            last;
+        }
+    }
+    
+    if ($found && $c->save_dashboard_structure($structure)) {
+        return $c->render(json => { success => 1 });
+    }
+    
+    return $c->render(json => { error => 'Category not found or save failed' }, status => 404);
+}
+
+
+# Delete a dashboard category.
+# Parameters:
+#   $c : Mojolicious controller (calling context).
+# Returns:
+#   JSON response with success status.
+sub delete_category {
+    my $c = shift;
+    return $c->render(json => { error => 'Unauthorized' }, status => 401) unless $c->is_logged_in;
+    return $c->render(json => { error => 'Demo account restriction' }, status => 403) if $c->is_demo;
+
+    my $id = $c->param('id');
+    return $c->render(json => { error => 'Missing category ID' }, status => 400) unless $id;
+    
+    my $structure = $c->get_dashboard_structure();
+    my @new_structure = grep { $_->{id} ne $id } @$structure;
+    
+    if ($c->save_dashboard_structure(\@new_structure)) {
+        return $c->render(json => { success => 1 });
+    }
+    
+    return $c->render(json => { error => 'Failed to delete category' }, status => 500);
 }
 
 

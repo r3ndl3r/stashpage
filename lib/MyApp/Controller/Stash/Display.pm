@@ -95,35 +95,41 @@ sub index {
     
     # If no page selected, render the index hub
     if (!$page_key) {
+        # Retrieve hierarchical dashboard structure
+        my $dashboard_structure = $c->get_dashboard_structure();
+        
         # Calculate stats for each page
         my $unified = $c->get_unified_stash_data();
         my %page_stats;
         my $total_categories = 0;
         my $total_links = 0;
+        my $total_stashes = 0;
 
-        for my $page_name (@$page_names) {
-            my $stash_data = $unified->{stashes}{$page_name};
-            my $categories = $stash_data->{categories} || [];
-            my $link_count = 0;
-            
-            for my $cat (@$categories) {
-                $link_count += scalar @{$cat->{links} || []};
+        foreach my $group (@$dashboard_structure) {
+            foreach my $stash (@{$group->{stashes} || []}) {
+                my $page_name = $stash->{name};
+                my $stash_data = $unified->{stashes}{$page_name};
+                my $categories = $stash_data->{categories} || [];
+                my $link_count = 0;
+                
+                for my $cat (@$categories) {
+                    $link_count += scalar @{$cat->{links} || []};
+                }
+                
+                $page_stats{$page_name} = {
+                    categories => scalar @$categories,
+                    links => $link_count
+                };
+                
+                # Add to totals
+                $total_categories += scalar @$categories;
+                $total_links += $link_count;
+                $total_stashes++;
             }
-            
-            $page_stats{$page_name} = {
-                categories => scalar @$categories,
-                links => $link_count
-            };
-            
-            # Add to totals as we go
-            $total_categories += scalar @$categories;
-            $total_links += $link_count;
         }
 
-        my $total_stashes = scalar @$page_names;
-
         $c->stash(
-            page_names => $page_names,
+            dashboard_structure => $dashboard_structure,
             page_stats => \%page_stats,
             total_stashes => $total_stashes,
             total_categories => $total_categories,
@@ -148,14 +154,16 @@ sub index {
         return $c->redirect_to('/stash'); # Fallback to index
     }
 
-    # Get the unified stash data to extract is_public flag
+    # Get the unified stash data to extract is_public flag and title
     my $unified = $c->get_unified_stash_data();
     my $is_public = $unified->{stashes}{$page_key}{is_public} || 0;
+    my $page_title = $unified->{stashes}{$page_key}{title} || $page_key;
 
     # Provide data to template and render selected page
     $c->stash(
         categories => $categories,
         page_key => $page_key,
+        page_title => $page_title,
         show_index_page => 0,
         is_public => $is_public,
         is_public_view => 0

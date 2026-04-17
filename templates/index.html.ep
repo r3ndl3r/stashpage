@@ -8,9 +8,9 @@
         <!-- Main Content -->
         <div class="w-full">
             
-            <!-- Existing Stashes Grid -->
-            <% if (@$page_names) { %>
-            <div class="mb-8">
+            <!-- Categorized Stashes Grid -->
+            <% if (@$dashboard_structure) { %>
+            <div class="mb-8 space-y-12">
                 <div class="flex items-center gap-3 mb-6 mt-16 md:mt-0">
                     <h2 class="text-4xl font-semibold text-white">Your Stashes</h2>
                     <button id="global-search-toggle" class="text-gray-400 hover:text-white hover:bg-gray-700/50 p-2 rounded-lg transition-all duration-200 hover:scale-110" title="Search all bookmarks (/)">
@@ -20,7 +20,6 @@
                     </button>
                 </div>
                 
-                <!-- ADD THIS SUMMARY BAR -->
                 <div class="text-gray-400 text-sm mb-6 flex items-center gap-3">
                     <span><%= $total_stashes %> <%= $total_stashes == 1 ? 'stash' : 'stashes' %></span>
                     <span class="text-gray-600">•</span>
@@ -52,60 +51,64 @@
                     </div>
                 </div>
 
-                <!-- Stash Cards Grid with staggered animation -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <% my $index = 0; %>
-                    <% for my $page_name (@$page_names) { %>
-                   <a href="/stash?n=<%= $page_name %>" class="block bg-gray-800/80 backdrop-blur-sm hover:bg-gray-750/90 rounded-lg p-6 border border-gray-700/50 hover:border-gray-600/70 transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-blue-500/20 group hover:scale-105 hover:-translate-y-2 transform-gpu">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="text-3xl font-bold text-white group-hover:text-blue-300 transition-colors duration-300"><%= $c->get_stash_emoji($page_name) %> <%= $page_name %></h3>
-                            <% if ($is_logged_in) { %>
-                            <div class="relative" onclick="event.stopPropagation(); event.preventDefault();">
-                                <button onclick="toggleStashMenu('<%= $page_name %>')" class="text-gray-400 hover:text-white hover:bg-gray-600/50 p-2 rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 hover:scale-110 hover:rotate-90 backdrop-blur-sm">
-                                    <svg class="w-5 h-5 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
-                                    </svg>
-                                </button>
-                                <div id="menu-<%= $page_name %>" class="absolute right-0 mt-2 w-36 bg-gray-700/95 backdrop-blur-md rounded-md shadow-xl py-1 z-10 hidden border border-gray-600/50 animate-in slide-in-from-top-2 duration-200">
-                                    <button onclick="openCloneModal('<%= $page_name %>')" class="block w-full text-left px-3 py-2 text-sm text-green-300 hover:bg-gray-600/70 hover:text-green-200 transition-all duration-200 hover:translate-x-1">Clone</button>
-                                    <button onclick="openRenameModal('<%= $page_name %>')" class="block w-full text-left px-3 py-2 text-sm text-yellow-300 hover:bg-gray-600/70 hover:text-yellow-200 transition-all duration-200 hover:translate-x-1">Rename</button>
-                                    <form method="POST" action="/stash/delete" class="block" id="deleteForm-<%= $page_name %>">
-                                        <input type="hidden" name="page_key" value="<%= $page_name %>">
-                                        <button type="button" onclick="event.stopPropagation(); event.preventDefault(); return confirmDeleteStash('<%= $page_name %>');" class="block w-full text-left px-3 py-2 text-sm text-red-300 hover:bg-red-600/20 hover:text-red-200 transition-all duration-200 hover:translate-x-1">Delete</button>
-                                    </form>
-                                </div>
-                            </div>
-                            <% } %>
-                        </div>
-                        
-                        <!-- Stats Section -->
-                        <div class="flex items-center gap-4 text-gray-400 text-sm mb-4">
-                            <div class="flex items-center gap-1.5">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-                                </svg>
-                                <span><%= $page_stats->{$page_name}{categories} %> <%= $page_stats->{$page_name}{categories} == 1 ? 'category' : 'categories' %></span>
-                            </div>
-                            <div class="flex items-center gap-1.5">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
-                                </svg>
-                                <span><%= $page_stats->{$page_name}{links} %> <%= $page_stats->{$page_name}{links} == 1 ? 'link' : 'links' %></span>
-                            </div>
+                <% foreach my $group (@$dashboard_structure) { %>
+                    <div class="category-section animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div class="flex items-center gap-4 mb-6">
+                            <h3 class="text-2xl font-bold text-blue-400/90 tracking-tight"><%= $group->{title} %></h3>
+                            <div class="flex-1 h-px bg-gradient-to-r from-blue-500/30 to-transparent"></div>
                         </div>
 
-                        <div class="border-t border-gray-700/50 my-4"></div>
-                        
-                        <div class="flex items-center text-blue-400 group-hover:text-blue-300 font-medium transition-all duration-300 group-hover:translate-x-2">
-                            Open Stash
-                            <svg class="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <% for my $stash (@{$group->{stashes} || []}) { %>
+                                <a href="/stash?n=<%= $stash->{name} %>" class="block bg-gray-800/80 backdrop-blur-sm hover:bg-gray-750/90 rounded-lg p-6 border border-gray-700/50 hover:border-gray-600/70 transition-all duration-300 shadow-lg hover:shadow-2xl hover:shadow-blue-500/20 group hover:scale-105 hover:-translate-y-2 transform-gpu">
+                                    <div class="flex items-center justify-between mb-6">
+                                        <h4 class="text-3xl font-bold text-white group-hover:text-blue-300 transition-colors duration-300"><%= $stash->{title} %></h4>
+                                        <% if ($is_logged_in) { %>
+                                        <div class="relative" onclick="event.stopPropagation(); event.preventDefault();">
+                                            <button onclick="toggleStashMenu('<%= $stash->{name} %>')" class="text-gray-400 hover:text-white hover:bg-gray-600/50 p-2 rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 hover:scale-110 hover:rotate-90 backdrop-blur-sm">
+                                                <svg class="w-5 h-5 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                                                </svg>
+                                            </button>
+                                            <div id="menu-<%= $stash->{name} %>" class="absolute right-0 mt-2 w-36 bg-gray-700/95 backdrop-blur-md rounded-md shadow-xl py-1 z-10 hidden border border-gray-600/50 animate-in slide-in-from-top-2 duration-200">
+                                                <button onclick="openCloneModal('<%= $stash->{name} %>')" class="block w-full text-left px-3 py-2 text-sm text-green-300 hover:bg-gray-600/70 hover:text-green-200 transition-all duration-200 hover:translate-x-1">Clone</button>
+                                                <button onclick="openRenameModal('<%= $stash->{name} %>', '<%= $stash->{title} %>')" class="block w-full text-left px-3 py-2 text-sm text-yellow-300 hover:bg-gray-600/70 hover:text-yellow-200 transition-all duration-200 hover:translate-x-1">Rename</button>
+                                                <form method="POST" action="/stash/delete" class="block" id="deleteForm-<%= $stash->{name} %>">
+                                                    <input type="hidden" name="page_key" value="<%= $stash->{name} %>">
+                                                    <button type="button" onclick="event.stopPropagation(); event.preventDefault(); return confirmDeleteStash('<%= $stash->{name} %>');" class="block w-full text-left px-3 py-2 text-sm text-red-300 hover:bg-red-600/20 hover:text-red-200 transition-all duration-200 hover:translate-x-1">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                                    </div>
+                                    
+                                    <!-- Stats Section -->
+                                    <div class="flex items-center gap-4 text-gray-400 text-sm mb-4">
+                                        <div class="flex items-center gap-1.5">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                                            </svg>
+                                            <span><%= $page_stats->{$stash->{name}}{categories} %> <%= $page_stats->{$stash->{name}}{categories} == 1 ? 'category' : 'categories' %></span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                            </svg>
+                                            <span><%= $page_stats->{$stash->{name}}{links} %> <%= $page_stats->{$stash->{name}}{links} == 1 ? 'link' : 'links' %></span>
+                                        </div>
+                                    </div>
+                                    <div class="border-t border-gray-700/50 my-4"></div>
+                                    <div class="flex items-center text-blue-400 group-hover:text-blue-300 font-medium transition-all duration-300 group-hover:translate-x-2">
+                                        Open Stash
+                                        <svg class="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                        </svg>
+                                    </div>
+                                </a>
+                            <% } %>
                         </div>
-                    </a>
-                    <% $index++; %>
-                    <% } %>
-                </div>
+                    </div>
+                <% } %>
             </div>
             <% } else { %>
             <!-- Empty State -->
@@ -139,7 +142,7 @@
                 <svg class="w-4 h-4 mr-2 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
-                <span class="group-hover:translate-x-1 transition-transform duration-300">Reorder</span>
+                <span class="group-hover:translate-x-1 transition-transform duration-300">Categories</span>
             </a>
             <a href="/stash/export" class="flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 text-sm rounded-md transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-green-500/30 active:scale-95 group whitespace-nowrap">
                 <svg class="w-4 h-4 mr-2 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -169,7 +172,16 @@
         <h3 class="text-xl text-white mb-4">Rename Stash</h3>
         <form id="renameForm" method="post" action="/stash/rename">
             <input type="hidden" id="old_page_name" name="old_page_name">
-            <input type="text" id="new_page_name" name="new_page_name" class="w-full p-3 rounded-md text-gray-900 border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:scale-105 transition-all duration-200" placeholder="New stash name" required>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">Display Title</label>
+                    <input type="text" id="new_title" name="new_title" class="w-full p-3 rounded-md text-gray-900 border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:scale-105 transition-all duration-200" placeholder="e.g. 🎮 Gaming Zone" required>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">URL Alias (Key)</label>
+                    <input type="text" id="new_page_name" name="new_page_name" class="w-full p-3 rounded-md text-gray-900 border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:scale-105 transition-all duration-200" placeholder="e.g. gaming" required>
+                </div>
+            </div>
             <div class="flex justify-end mt-6 space-x-3">
                 <button type="button" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded transition-all duration-200 hover:scale-105 active:scale-95" onclick="closeRenameModal()">Cancel</button>
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/30 active:scale-95">Rename</button>

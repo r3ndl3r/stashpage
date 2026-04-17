@@ -103,12 +103,14 @@ function toggleStashMenu(stashName) {
  * Opens the rename dialog with the current page name pre-filled for editing
  * Provides immediate focus and text selection for optimal user experience
  * 
- * @param {string} pageName - Current name of the page to rename
+ * @param {string} pageName - Current alias/key of the page to rename
+ * @param {string} pageTitle - Current display title of the page to rename
  */
-function openRenameModal(pageName) {
+function openRenameModal(pageName, pageTitle) {
     // Pre-populate form fields with current values for easy editing
     document.getElementById('old_page_name').value = pageName;
     document.getElementById('new_page_name').value = pageName;
+    document.getElementById('new_title').value = pageTitle || pageName;
     
     const modal = document.getElementById('renameModal');
     modal.style.display = 'flex';  // Direct style manipulation instead of classes
