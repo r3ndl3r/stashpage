@@ -143,7 +143,7 @@ function syncDataForSubmission() {
         // Find existing category data or create new structure
         let category = dashboardData.find(c => c.title === title);
         if (!category) {
-            // Create new category structure for newly added cards
+            // Initialize dynamic category structures for new elements
             category = {
                 title: card.dataset.categoryTitle,
                 icon: card.dataset.categoryIcon || '',
@@ -191,7 +191,7 @@ function syncDataForSubmission() {
  * 
  * Uses event delegation to handle all button clicks within the dashboard canvas
  * This approach is more efficient than individual event listeners and automatically
- * handles dynamically added elements without requiring re-binding
+ * Logic: Event delegation handles dynamic elements without re-binding requirements
  * 
  * @param {Event} event - The click event from the dashboard canvas
  */
