@@ -54,7 +54,7 @@ const DRAG_CONFIG = {
  * Event Listener Cleanup System
  * 
  * Safely removes all event listeners associated with a draggable card
- * This prevents memory leaks when cards are removed or when cleanup is needed
+ * Memory leak prevention during card destruction and cleanup phases
  * 
  * @param {HTMLElement} element - The card element (not used directly, but kept for API consistency)
  * @param {string} cardId - Unique identifier for the card to clean up
@@ -63,7 +63,7 @@ function cleanupListeners(element, cardId) {
     try {
         const listeners = DragState.dragListeners.get(cardId);
         if (listeners) {
-            // Remove each event listener that was registered for this card
+            // Remove each event listener registered for this card
             listeners.forEach(({ event, handler }) => {
                 document.removeEventListener(event, handler);
             });
@@ -181,7 +181,7 @@ export function makeDraggable(card) {
     let dragData = {
         startX: 0,                      // Initial mouse X position
         startY: 0,                      // Initial mouse Y position
-        startTime: 0,                   // When the mouse was pressed
+        startTime: 0,                   // Pointer interaction start timestamp
         initialLeft: 0,                 // Card's initial left position
         initialTop: 0,                  // Card's initial top position
         hasMoved: false                 // Whether the card actually moved during drag
@@ -419,7 +419,7 @@ export function makeSortable(list) {
 
     try {
         // Destroy all Sortable instances
-        // Note: WeakMap doesn't have forEach - instances will be garbage collected
+        // WeakMap lack of iteration ensures GC efficiency for orphaned instances
         DragState.sortableInstances = new WeakMap();
 
         // Configure Sortable.js options for optimal user experience
@@ -542,7 +542,7 @@ export function cleanupAllDragInstances() {
  * Individual Element Cleanup
  * 
  * Cleans up drag/sortable functionality for a specific element
- * Used when individual cards or lists are removed from the DOM
+ * Triggered during card or list DOM destruction phases
  * 
  * @param {HTMLElement} element - Element to clean up
  */
