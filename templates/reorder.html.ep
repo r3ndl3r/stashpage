@@ -51,17 +51,15 @@
                         <!-- Category Header -->
                         <div class="flex items-center justify-between p-4 bg-gray-700/30 border-b border-gray-700/50">
                             <div class="flex items-center gap-4">
-                                <% if ($group->{id} ne 'uncategorized') { %>
-                                    <div class="drag-handle-cat text-gray-500 hover:text-blue-400 transition-colors">
-                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
-                                        </svg>
-                                    </div>
-                                <% } %>
+                                <div class="drag-handle-cat text-gray-500 hover:text-blue-400 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+                                    </svg>
+                                </div>
                                 <div class="flex items-center gap-3">
-                                    <span class="text-xl font-bold text-blue-400"><%= $group->{title} %></span>
+                                    <span class="text-xl font-bold text-blue-400 font-title"><%= $group->{title} %></span>
                                     <% if ($group->{id} ne 'uncategorized') { %>
-                                        <button onclick="renameCategory('<%= $group->{id} %>', '<%= $group->{title} %>')" class="text-gray-500 hover:text-white transition-colors">
+                                        <button onclick="renameCategory('<%= $group->{id} %>', this.closest('.category-container').dataset.title)" class="text-gray-500 hover:text-white transition-colors">
                                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                             </svg>
@@ -301,11 +299,27 @@
 
             const stashes = container.querySelectorAll('.stash-item');
             if (stashes.length > 0) {
-                const globalList = document.querySelector('.category-group[data-id="uncategorized"]');
-                if (globalList) {
-                    stashes.forEach(item => globalList.appendChild(item));
-                    initStashSortable(globalList); // Refresh
+                let globalList = document.querySelector('.category-group[data-id="uncategorized"]');
+                if (!globalList) {
+                    const globalContainer = document.createElement('div');
+                    globalContainer.className = 'category-container bg-gray-800/40 backdrop-blur-md rounded-xl border border-gray-700/50 overflow-hidden shadow-2xl transition-all duration-300';
+                    globalContainer.dataset.id = 'uncategorized';
+                    globalContainer.dataset.title = 'Global';
+                    globalContainer.innerHTML = `
+                        <div class="flex items-center p-4 bg-gray-700/30 border-b border-gray-700/50">
+                            <div class="drag-handle-cat text-gray-500 hover:text-blue-400 transition-colors mr-4">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
+                            </div>
+                            <span class="text-xl font-bold text-blue-400 font-title">Global</span>
+                        </div>
+                        <div class="stash-list category-group p-4 grid grid-cols-1 md:grid-cols-2 gap-3" data-id="uncategorized"></div>
+                    `;
+                    categoryList.prepend(globalContainer);
+                    globalList = globalContainer.querySelector('.category-group');
+                    initStashSortable(globalList);
                 }
+                stashes.forEach(item => globalList.appendChild(item));
+                checkEmptyCategory(globalList);
             }
             container.remove();
         }
