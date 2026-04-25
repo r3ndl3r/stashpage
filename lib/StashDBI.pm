@@ -192,7 +192,7 @@ sub user_exists {
 # Generate cryptographically secure random bytes for password salting.
 # Uses /dev/urandom which provides a cryptographically secure pseudorandom
 # number generator suitable for all cryptographic purposes including password
-# hashing. This replaces the insecure rand() function previously used.
+# hashing. Provides a cryptographically secure entropy source.
 # Parameters:
 #   $num_bytes : Number of random bytes to generate.
 # Returns:
