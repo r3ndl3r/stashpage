@@ -323,7 +323,7 @@ function toggleCategory(pageName, categoryTitle) {
         })
     }).catch(error => {
         console.error('Failed to save collapse state to DB:', error);
-        // Note: Visual change remains even if server update fails for better UX
+        // Visual state is not rolled back on failure
     });
 }
 
@@ -836,7 +836,7 @@ function togglePublicState(pageKey, toggleBtn) {
             }
         } else {
             // Toggled to private
-            showNotification('✓ Stash is now private', 'error');
+            showNotification('✓ Stash is now private', 'success');
         }
         
         console.log('Public state toggled:', newState ? 'Public' : 'Private');
