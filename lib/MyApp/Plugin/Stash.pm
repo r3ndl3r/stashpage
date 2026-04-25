@@ -288,8 +288,15 @@ sub register ($self, $app, $config = {}) {
         my %assigned_stashes;
         my @structure;
 
-        # Process specifically defined categories
+        my $global_placed = 0;
+
         foreach my $cat (@$categories_config) {
+            if ($cat->{id} eq 'uncategorized') {
+                $global_placed = 1;
+                push @structure, { id => 'uncategorized', _placeholder => 1 };
+                next;
+            }
+
             my @cat_stashes;
             foreach my $page_name (@{$cat->{stashes} || []}) {
                 if (exists $stashes->{$page_name}) {
@@ -297,7 +304,7 @@ sub register ($self, $app, $config = {}) {
                     $assigned_stashes{$page_name} = 1;
                 }
             }
-            
+
             push @structure, {
                 id    => $cat->{id},
                 title => $cat->{title},
@@ -306,20 +313,27 @@ sub register ($self, $app, $config = {}) {
             };
         }
 
-        # Handle stashes not assigned to any category (The "Global" group)
-        my @unassigned = sort { 
-            ($stashes->{$a}{order} // 999) <=> ($stashes->{$b}{order} // 999) 
+        my @unassigned = sort {
+            ($stashes->{$a}{order} // 999) <=> ($stashes->{$b}{order} // 999)
             || lc($a) cmp lc($b)
         } grep { !$assigned_stashes{$_} } keys %$stashes;
 
-        if (@unassigned) {
-            # Add unassigned stashes to the front as "Global"
-            unshift @structure, {
-                id    => 'uncategorized',
-                title => 'Global',
-                stashes => [ map { { name => $_, title => $stashes->{$_}{title} || $_ } } @unassigned ],
-                collapsed => 0
-            };
+        my $global_entry = {
+            id       => 'uncategorized',
+            title    => 'Global',
+            stashes  => [ map { { name => $_, title => $stashes->{$_}{title} || $_ } } @unassigned ],
+            collapsed => 0
+        };
+
+        if ($global_placed) {
+            for my $i (0 .. $#structure) {
+                if (ref $structure[$i] eq 'HASH' && $structure[$i]{_placeholder}) {
+                    $structure[$i] = $global_entry;
+                    last;
+                }
+            }
+        } elsif (@unassigned) {
+            unshift @structure, $global_entry;
         }
 
         return \@structure;
@@ -339,9 +353,13 @@ sub register ($self, $app, $config = {}) {
         # Clean the input structure to ensure we only save what we need
         my @to_save;
         foreach my $cat (@$structure) {
-            next if $cat->{id} eq 'uncategorized'; # Uncategorized is implicit
-            
             my $id = $cat->{id};
+
+            if ($id eq 'uncategorized') {
+                push @to_save, { id => 'uncategorized', title => 'Global', stashes => [], collapsed => 0 };
+                next;
+            }
+
             # If it's a new category from the frontend, give it a proper permanent ID
             if ($id =~ /^new_/) {
                 require Mojo::Util;
@@ -349,9 +367,9 @@ sub register ($self, $app, $config = {}) {
             }
 
             push @to_save, {
-                id    => $id,
-                title => $cat->{title},
-                stashes => $cat->{stashes} || [],
+                id       => $id,
+                title    => $cat->{title},
+                stashes  => $cat->{stashes} || [],
                 collapsed => $cat->{collapsed} || 0
             };
         }
