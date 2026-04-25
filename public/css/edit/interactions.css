@@ -206,7 +206,7 @@ textarea:focus {
  * 
  * Disables expensive visual effects during drag operations to maintain smooth
  * 60fps performance even on slower devices. These optimizations are automatically
- * applied by JavaScript during drag operations and removed when dragging ends.
+ * Class lifecycle managed by JavaScript during drag operations.
  * 
  */
 body.dragging-active {
