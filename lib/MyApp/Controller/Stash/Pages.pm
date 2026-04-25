@@ -27,8 +27,7 @@ sub delete {
     # Enforce user authentication for page deletion
     return $c->redirect_to('/login') unless $c->is_logged_in;
 
-    # Don't allow deletion from demo account.
-    return if $c->is_demo;  # Just redirect, no alert
+    return $c->redirect_to('/stash') if $c->is_demo;
 
     
     # Extract page identifier from request parameters
@@ -39,9 +38,11 @@ sub delete {
     my $user_id = $c->current_user_id;             # Current user ID for ownership
     my $unified = $c->get_unified_stash_data();    # User's complete stash structure
     
-    # Remove page from unified stash data structure
-    delete $unified->{stashes}{$page_key};         # Delete page from stash collection
-    $c->db->save_unified_stashes($user_id, $unified);  # DB: persist updated stash data
+    delete $unified->{stashes}{$page_key};
+    foreach my $cat (@{$unified->{dashboard_categories} || []}) {
+        $cat->{stashes} = [ grep { $_ ne $page_key } @{$cat->{stashes} || []} ];
+    }
+    $c->db->save_unified_stashes($user_id, $unified);
     
     return $c->redirect_to("/stash");              # Redirect to main stash view
 }
@@ -83,11 +84,16 @@ sub rename {
     # If alias is changing, handle the key move
     if ($new_name && $new_name ne $old_name) {
         # Check for naming conflicts before proceeding with move
-        return $c->alert("Page '$new_name' already exists.", 409) 
+        return $c->alert("Page '$new_name' already exists.", 409)
             if exists $unified->{stashes}{$new_name};
-            
+
         # Atomic key move
         $unified->{stashes}{$new_name} = delete $unified->{stashes}{$old_name};
+
+        foreach my $cat (@{$unified->{dashboard_categories} || []}) {
+            $cat->{stashes} = [ map { $_ eq $old_name ? $new_name : $_ } @{$cat->{stashes} || []} ];
+        }
+
         $old_name = $new_name; # Continue with new alias for title update
     }
 
@@ -248,19 +254,21 @@ sub add_category {
 
     my $title = $c->param('title') || 'New Category';
     my $id = 'cat_' . Mojo::Util::hmac_sha1_sum(time() . rand(), 'stash');
-    
-    my $structure = $c->get_dashboard_structure();
-    push @$structure, {
-        id => $id,
-        title => $title,
-        stashes => [],
+
+    my $user_id = $c->current_user_id;
+    my $unified = $c->get_unified_stash_data();
+    $unified->{dashboard_categories} ||= [];
+    push @{$unified->{dashboard_categories}}, {
+        id       => $id,
+        title    => $title,
+        stashes  => [],
         collapsed => 0
     };
-    
-    if ($c->save_dashboard_structure($structure)) {
+
+    if ($c->db->save_unified_stashes($user_id, $unified)) {
         return $c->render(json => { success => 1, id => $id, title => $title });
     }
-    
+
     return $c->render(json => { error => 'Failed to add category' }, status => 500);
 }
 
@@ -277,23 +285,24 @@ sub rename_category {
 
     my $id = $c->param('id');
     my $new_title = $c->param('title');
-    
+
     return $c->render(json => { error => 'Missing parameters' }, status => 400) unless $id && $new_title;
-    
-    my $structure = $c->get_dashboard_structure();
+
+    my $user_id = $c->current_user_id;
+    my $unified = $c->get_unified_stash_data();
     my $found = 0;
-    foreach my $cat (@$structure) {
+    foreach my $cat (@{$unified->{dashboard_categories} || []}) {
         if ($cat->{id} eq $id) {
             $cat->{title} = $new_title;
             $found = 1;
             last;
         }
     }
-    
-    if ($found && $c->save_dashboard_structure($structure)) {
+
+    if ($found && $c->db->save_unified_stashes($user_id, $unified)) {
         return $c->render(json => { success => 1 });
     }
-    
+
     return $c->render(json => { error => 'Category not found or save failed' }, status => 404);
 }
 
@@ -310,14 +319,16 @@ sub delete_category {
 
     my $id = $c->param('id');
     return $c->render(json => { error => 'Missing category ID' }, status => 400) unless $id;
-    
-    my $structure = $c->get_dashboard_structure();
-    my @new_structure = grep { $_->{id} ne $id } @$structure;
-    
-    if ($c->save_dashboard_structure(\@new_structure)) {
+
+    my $user_id = $c->current_user_id;
+    my $unified = $c->get_unified_stash_data();
+    my @new_cats = grep { $_->{id} ne $id } @{$unified->{dashboard_categories} || []};
+    $unified->{dashboard_categories} = \@new_cats;
+
+    if ($c->db->save_unified_stashes($user_id, $unified)) {
         return $c->render(json => { success => 1 });
     }
-    
+
     return $c->render(json => { error => 'Failed to delete category' }, status => 500);
 }
 
