@@ -176,7 +176,7 @@ function openRenameModal(pageName) {
 /**
  * Rename Modal Closure
  * 
- * Closes the rename modal and cleans up any temporary state
+ * Closes the rename modal and resets ephemeral UI state
  */
 function closeRenameModal() {
     document.getElementById('renameModal').classList.add('hidden');
@@ -209,7 +209,7 @@ function openCloneModal(pageName) {
 /**
  * Clone Modal Closure
  * 
- * Closes the clone modal and resets any temporary state
+ * Closes the clone modal and resets ephemeral UI state
  */
 function closeCloneModal() {
     document.getElementById('cloneModal').classList.add('hidden');
