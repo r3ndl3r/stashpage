@@ -115,7 +115,7 @@ body {
  * Establish positioning context for absolutely positioned child elements
  * Targets: All drag-handle containers (both view and edit modes)
  * Effect: Creates containing block for absolute positioning of action buttons
- * Note: Required for absolute positioning to work relative to drag-handle
+ * Required for absolute positioning to work relative to drag-handle
  */
 .drag-handle {
     position: relative;
