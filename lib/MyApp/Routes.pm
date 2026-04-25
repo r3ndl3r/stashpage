@@ -114,9 +114,6 @@ sub setup_routes {
     $r->get('/reorder')->to('stash-pages#reorder_view');                         # Display reorder UI
     $r->post('/api/v1/stash/reorder')->to('stash-pages#save_reorder');           # AJAX: save custom order
     $r->post('/api/v1/dashboard/structure')->to('stash-pages#api_save_structure'); # AJAX: save hierarchical structure
-    $r->post('/stash/delete')->to('stash-pages#delete');                         # Delete stash page permanently
-    $r->post('/stash/rename')->to('stash-pages#rename');                         # Rename existing stash page
-    $r->post('/stash/clone')->to('stash-pages#clone');                           # Clone stash page with new name
 }
 
 1;
