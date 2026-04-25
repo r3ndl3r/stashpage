@@ -100,7 +100,7 @@ function validateUrl(url) {
             throw new Error(`Protocol ${urlObj.protocol} is not allowed`);
         }
         
-        // Internal network restriction removed - all hostnames allowed
+        // Permissive hostname validation for all sources
         
         return urlObj.toString();
     } catch (error) {
@@ -401,7 +401,7 @@ export function editCategory(cardElement, dashboardData) {
         cardElement.dataset.categoryBaseUrl = newBaseUrl;
         cardElement.dataset.categoryColor = newColor;
 
-        // Apply updated color CSS variables
+        // Synchronize element variables with state
         if (newColor && newColor !== '#3b82f6') {
             const r = parseInt(newColor.slice(1, 3), 16);
             const g = parseInt(newColor.slice(3, 5), 16);
@@ -455,9 +455,9 @@ export function editCategory(cardElement, dashboardData) {
  * Category Deletion Handler
  * 
  * Removes a category card from the dashboard
- * The card element is completely removed from the DOM
+ * Card element destruction and DOM detachment phase
  * 
- * @param {HTMLElement} btn - Delete button that was clicked
+ * @param {HTMLElement} btn - Triggering element
  */
 export function deleteCategory(btn) {
     try {
@@ -688,9 +688,9 @@ export function editStash(stashElement) {
  * Stash Item Deletion Handler
  * 
  * Removes a bookmark/link tile from its category
- * The tile element is completely removed from the DOM
+ * Tile element destruction and DOM detachment phase
  * 
- * @param {HTMLElement} btn - Delete button that was clicked
+ * @param {HTMLElement} btn - Triggering element
  */
 export function deleteStash(btn) {
     try {
