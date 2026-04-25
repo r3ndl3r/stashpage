@@ -206,7 +206,7 @@ sub register {
         message => "New user registered: $username (email: $email)"
     );
     
-    # Check if user was auto-approved (first user)
+    # First-user idempotent auto-approval check
     my $user_info = $c->db->get_user_by_username($username);
     if ($user_info && $user_info->{status} eq 'approved') {
         return $c->alert("Registration successful!<br>You can now log in with your credentials.", 200);
