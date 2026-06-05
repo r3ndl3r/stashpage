@@ -74,6 +74,7 @@ sub setup_routes {
     # Primary dashboard and viewing routes
     $r->get('/')->to('stash-display#index');                           # Home dashboard (root route)
     $r->get('/stash')->to('stash-display#index');                      # Stash dashboard (explicit route)
+    $r->get('/search')->to('stash-display#index');                       # Dashboard with global search open
     $r->get('/edit')->to('stash-display#edit');                        # Edit interface for stash pages
 
     # =============================================================================
