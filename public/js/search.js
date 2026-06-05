@@ -6,7 +6,7 @@
  * This module provides cross-stash search functionality allowing users to search
  * for bookmarks across all their stashes from the index page. Features include:
  * - Real-time search with debouncing to minimize API calls
- * - Keyboard shortcuts for quick access (Ctrl/Cmd + K, Escape)
+ * - Keyboard shortcuts for quick access (Ctrl/Cmd + F, /, Escape)
  * - Visual result highlighting with stash context badges
  * - Click-to-open bookmark functionality
  * - Loading states and error handling
@@ -119,12 +119,20 @@ function closeGlobalSearch() {
  * Keyboard Shortcut Handler
  * 
  * Processes keyboard events for search shortcuts:
+ * - Ctrl/Cmd + F: Toggle search bar
  * - / (forward slash): Open search bar (common pattern like GitHub, Slack)
  * - Escape: Close search bar
  * 
  * @param {KeyboardEvent} e - Keyboard event object
  */
 function handleSearchKeyboard(e) {
+    // Toggle search with Ctrl/Cmd + F and use the same path as clicking the icon.
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+        e.preventDefault();
+        elements.toggle.click();
+        return;
+    }
+
     // Open search with forward slash (/) - like GitHub, Slack, etc.
     if (e.key === '/' && !isInputFocused()) {
         e.preventDefault();
