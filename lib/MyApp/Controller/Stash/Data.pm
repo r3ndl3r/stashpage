@@ -213,8 +213,8 @@ sub search {
     return $c->render(json => { error => 'Unauthorized' }, status => 401) 
         unless $c->is_logged_in;
     
-    my $query = $c->param('q') || '';
-    $query = lc($query);
+    my $query = lc($c->param('q') || '');
+    my @query_tokens = _search_tokens($query);
     
     return $c->render(json => { error => 'Query too short', results => [] }) 
         if length($query) < 2;
@@ -235,7 +235,7 @@ sub search {
                 my $name = lc($link->{name} || '');
                 my $url = lc($link->{url} || '');
                 
-                if ($name =~ /\Q$query\E/ || $url =~ /\Q$query\E/) {
+                if (_search_matches($query, \@query_tokens, $name, $url)) {
                     push @results, {
                         name  => $link->{name},
                         url   => $link->{url},
@@ -248,6 +248,30 @@ sub search {
     }
     
     $c->render(json => { results => \@results });
+}
+
+sub _search_tokens {
+    my ($value) = @_;
+    $value = lc($value || '');
+    $value =~ s/[^a-z0-9]+/ /g;
+    return grep { length $_ } split /\s+/, $value;
+}
+
+sub _search_matches {
+    my ($query, $query_tokens, @values) = @_;
+
+    for my $value (@values) {
+        return 1 if $value =~ /\Q$query\E/;
+
+        my @value_tokens = _search_tokens($value);
+        return 1 if @$query_tokens &&
+            !grep {
+                my $query_token = $_;
+                !grep { index($_, $query_token) != -1 } @value_tokens;
+            } @$query_tokens;
+    }
+
+    return 0;
 }
 
 1;
