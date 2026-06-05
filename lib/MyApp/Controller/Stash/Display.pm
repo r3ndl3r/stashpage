@@ -128,6 +128,10 @@ sub index {
             }
         }
 
+        my $auto_open_search = $c->req->url->path->to_string eq '/search'
+            ? 1
+            : ($c->stash('auto_open_search') || 0);
+
         $c->stash(
             dashboard_structure => $dashboard_structure,
             page_stats => \%page_stats,
@@ -135,6 +139,7 @@ sub index {
             total_categories => $total_categories,
             total_links => $total_links,
             show_index_page => 1,
+            auto_open_search => $auto_open_search,
             categories => [],
             page_key => ''
         );
