@@ -150,6 +150,34 @@ body {
   border-radius: var(--border-radius);                        /* Consistent corner rounding (0.5rem default) */
   will-change: transform, box-shadow;                         /* GPU acceleration hint for hover animations */
 }
+
+body.edit-mode .card-window {
+  inline-size: var(--card-min-width) !important;             /* Use the standard 280px desktop card width */
+  min-inline-size: var(--card-min-width) !important;         /* Prevent content from shrinking the card */
+  max-inline-size: var(--card-min-width) !important;         /* Prevent long titles from widening the card */
+  box-sizing: border-box;                                    /* Include padding and borders in the fixed width */
+}
+
+.category-title-container {
+  flex: 1 1 auto;                                            /* Consume the header space not used by controls */
+  min-width: 0;                                              /* Permit flex content to shrink below text width */
+  width: 100%;                                               /* Provide a stable measurement boundary */
+  padding-inline-end: 6rem;                                  /* Reserve space for add/edit/delete buttons */
+  box-sizing: border-box;                                    /* Keep reserved control space within the header */
+}
+
+.category-title-heading {
+  width: 100%;
+  min-width: 0;
+}
+
+.category-title-text {
+  display: block;                                            /* Expose client and scroll widths for fitting */
+  flex: 1 1 auto;                                            /* Fill the heading space after an optional icon */
+  min-width: 0;                                              /* Allow overflow measurement without card growth */
+  overflow: hidden;                                          /* Avoid a full-size flash before JavaScript fits */
+  white-space: nowrap;                                       /* Keep category names on one fitted line */
+}
 /**
  * Canvas Center Reference Marker
  * 

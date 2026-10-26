@@ -65,6 +65,51 @@ const MOBILE_BREAKPOINT = 768;             // Pixel width threshold for mobile v
 const VIEWPORT_CENTER_DELAY = 50;          // Milliseconds to wait before initial centering
 const RESIZE_DEBOUNCE_DELAY = 100;         // Milliseconds to debounce window resize events
 
+let categoryTitleObserver;                  // Shared observer for existing and newly created category titles
+
+/**
+ * Shrink a category title just enough to fit beside the edit controls.
+ *
+ * @param {HTMLElement} title - Category title span
+ */
+function fitCategoryTitle(title) {
+    const baseSize = Number(title.dataset.baseFontSize)
+        || parseFloat(window.getComputedStyle(title).fontSize);
+
+    title.dataset.baseFontSize = baseSize;
+    title.style.fontSize = `${baseSize}px`;
+
+    const availableWidth = title.clientWidth;
+    const requiredWidth = title.scrollWidth;
+
+    if (availableWidth > 0 && requiredWidth > availableWidth) {
+        title.style.fontSize = `${baseSize * (availableWidth / requiredWidth)}px`;
+    }
+}
+
+/**
+ * Fit a title now and whenever its available width changes.
+ *
+ * @param {HTMLElement} title - Category title span
+ */
+function observeCategoryTitle(title) {
+    if (!categoryTitleObserver) {
+        categoryTitleObserver = new ResizeObserver(entries => {
+            entries.forEach(entry => fitCategoryTitle(entry.target));
+        });
+    }
+
+    fitCategoryTitle(title);
+    categoryTitleObserver.observe(title);
+}
+
+/**
+ * Register every server-rendered category title for initial and responsive fitting.
+ */
+function initializeCategoryTitleFitting() {
+    document.querySelectorAll('.category-title-text').forEach(observeCategoryTitle);
+}
+
 /**
  * Global Function Exposure
  * 
@@ -250,6 +295,7 @@ function handleCanvasClick(event) {
  * - Implementing keyboard shortcuts for power users
  */
 function init() {
+    initializeCategoryTitleFitting();
     
     // Build initial dashboardData array from server-rendered DOM elements
     document.querySelectorAll('#dashboard-canvas .card-window').forEach(card => {
@@ -350,6 +396,8 @@ function handleEditModeKeyboard(e) {
 
 // Expose applyCategoryColors globally for use in actions.js
 window.applyCategoryColors = applyCategoryColors;
+window.fitCategoryTitle = fitCategoryTitle;
+window.observeCategoryTitle = observeCategoryTitle;
 
 // Apply colors when page loads and after category operations
 document.addEventListener('DOMContentLoaded', applyCategoryColors);

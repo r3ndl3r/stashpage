@@ -248,15 +248,15 @@ function createCategoryCard({ title, icon, baseUrl, color, x = CONFIG.CANVAS.CEN
     // Build complete card structure with drag handle, title, and action buttons
     card.innerHTML = `
         <div class="drag-handle flex justify-between items-center mb-2 pb-2 border-b border-gray-600/50 cursor-move hover:border-gray-500 transition-colors">
-            <div class="flex items-center">
+            <div class="category-title-container flex items-center">
                 <div class="drag-indicator mr-3 text-gray-500 hover:text-gray-400 transition-colors">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M7 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V4a2 2 0 00-2-2H7zM8 4h4v2H8V4zm0 4h4v2H8V8zm0 4h4v2H8v-2z"></path>
                     </svg>
                 </div>
-                <h2 class="text-xl font-bold text-white flex items-center">
+                <h2 class="category-title-heading text-xl font-bold text-white flex items-center">
                     ${iconHtml}
-                    <span>${escapeHtml(title)}</span>
+                    <span class="category-title-text">${escapeHtml(title)}</span>
                 </h2>
             </div>
             
@@ -442,6 +442,11 @@ export function editCategory(cardElement, dashboardData) {
         } else if (oldIcon) {
             oldIcon.remove();
         }
+
+        // Recalculate after a title or optional icon changes the available width
+        if (titleElement && window.fitCategoryTitle) {
+            requestAnimationFrame(() => window.fitCategoryTitle(titleElement));
+        }
         
         closeModal();
     } catch (error) {
@@ -518,6 +523,12 @@ export function addCategory() {
         const canvas = document.getElementById('dashboard-canvas');
         if (canvas) {
             canvas.appendChild(cardElement);
+
+            // Include dynamically created cards in responsive title fitting
+            const titleElement = cardElement.querySelector('.category-title-text');
+            if (titleElement && window.observeCategoryTitle) {
+                window.observeCategoryTitle(titleElement);
+            }
             
             // Enable drag and drop functionality for the new card
             makeDraggable(cardElement);

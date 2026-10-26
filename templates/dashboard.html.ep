@@ -28,18 +28,18 @@
                 <!-- Exact match of edit mode drag-handle structure -->
                 <div class="drag-handle flex justify-between items-center mb-2 pb-2 border-b border-gray-600/50 cursor-pointer hover:border-gray-500 transition-colors"
                      onclick="toggleCategory('<%= $page_key %>', '<%= $category->{title} %>')">
-                    <div class="flex items-center">
+                    <div class="category-title-container flex items-center">
                         <!-- Invisible drag indicator (exact match) -->
                         <div class="drag-indicator mr-3 text-gray-500 hover:text-gray-400 transition-colors" style="visibility: hidden;">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M7 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V4a2 2 0 00-2-2H7zM8 4h4v2H8V4zm0 4h4v2H8V8zm0 4h4v2H8v-2z"></path>
                             </svg>
                         </div>
-                        <h2 class="text-xl font-black bg-gradient-to-br from-amber-200 via-orange-400 to-pink-600 bg-clip-text text-transparent [text-shadow:_0_2px_8px_rgb(251_191_36_/_0.4)] flex items-center">
+                        <h2 class="category-title-heading text-xl font-black bg-gradient-to-br from-amber-200 via-orange-400 to-pink-600 bg-clip-text text-transparent [text-shadow:_0_2px_8px_rgb(251_191_36_/_0.4)] flex items-center">
                             <% if ($category->{icon}) { %>
                                 <img src="<%= $category->{icon} %>" alt="" class="h-6 w-6 mr-2">
                             <% } %>
-                            <span><%= $category->{title} %></span>
+                            <span class="category-title-text"><%= $category->{title} %></span>
                         </h2>
                     </div>
                     

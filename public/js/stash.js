@@ -34,6 +34,41 @@ const INITIAL_CENTER_DELAY = 100;          // Delay for initial dashboard center
 const PAGE_NAME_PATTERN = /^[\w-.]+$/;     // Allowed characters for page names (security)
 
 /**
+ * Shrink a category title just enough to fit its fixed-width card header.
+ *
+ * @param {HTMLElement} title - Category title span
+ */
+function fitCategoryTitle(title) {
+    const baseSize = Number(title.dataset.baseFontSize)
+        || parseFloat(window.getComputedStyle(title).fontSize);
+
+    title.dataset.baseFontSize = baseSize;
+    title.style.fontSize = `${baseSize}px`;
+
+    const availableWidth = title.clientWidth;
+    const requiredWidth = title.scrollWidth;
+
+    if (availableWidth > 0 && requiredWidth > availableWidth) {
+        title.style.fontSize = `${baseSize * (availableWidth / requiredWidth)}px`;
+    }
+}
+
+/**
+ * Keep category headings fitted when their available width changes.
+ */
+function initializeCategoryTitleFitting() {
+    const titles = document.querySelectorAll('.category-title-text');
+    const observer = new ResizeObserver(entries => {
+        entries.forEach(entry => fitCategoryTitle(entry.target));
+    });
+
+    titles.forEach(title => {
+        fitCategoryTitle(title);
+        observer.observe(title);
+    });
+}
+
+/**
  * Global State Management
  * 
  * Centralized state variables for managing dashboard behavior and timing
@@ -219,6 +254,7 @@ function centerDashboardView() {
 function initializeDashboard() {
     // Apply saved collapse states from server data
     applyCollapseStates();
+    initializeCategoryTitleFitting();
     
     // Only enable advanced dashboard features on desktop devices
     if (window.innerWidth > MOBILE_BREAKPOINT) {

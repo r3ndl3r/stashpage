@@ -56,13 +56,13 @@
      * of limited screen space and provide larger touch targets for interaction.
      * 
      */
-    .card-window {
+    body.edit-mode .card-window {
         position: relative !important;         /* Natural document flow instead of absolute positioning */
         left: auto !important;                 /* Remove canvas positioning coordinates */
         top: auto !important;                  /* Remove canvas positioning coordinates */
-        width: 100% !important;                /* Full width maximizes screen real estate usage */
-        max-width: none !important;            /* Remove desktop width constraints */
-        min-width: auto !important;            /* Remove desktop minimum width requirements */
+        inline-size: 100% !important;          /* Full width maximizes screen real estate usage */
+        max-inline-size: none !important;      /* Remove desktop width constraints */
+        min-inline-size: 0 !important;         /* Remove desktop minimum width requirements */
         margin-bottom: 1.5rem;                 /* Comfortable spacing between cards for thumb navigation */
         will-change: transform;                /* GPU hint for responsive repositioning */
     }

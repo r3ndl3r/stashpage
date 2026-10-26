@@ -97,12 +97,33 @@ body.dashboard-canvas {
  * they are absolutely positioned and draggable. Uses glass morphism effects
  * to maintain visual consistency while enabling free-form arrangement.
  */
-.card-window {
+body.dashboard-canvas .card-window {
     position: absolute;                           /* Enable free positioning anywhere on canvas */
     background-color: rgba(0, 0, 0, 0.4);       /* Dark semi-transparent background for content contrast */
     backdrop-filter: blur(6px);                   /* Blur effect maintains readability over background */
     border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border for card definition */
-    min-width: 280px;                             /* Minimum width ensures readability on all screen sizes */
+    inline-size: 280px !important;                /* Keep long category titles from widening the card */
+    min-inline-size: 280px !important;
+    max-inline-size: 280px !important;
+    box-sizing: border-box;
+}
+
+.category-title-container {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.category-title-heading {
+    width: 100%;
+    min-width: 0;
+}
+
+.category-title-text {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 /* Remove action buttons from layout flow in view mode while keeping drag-handle flex intact */
@@ -375,11 +396,13 @@ body.dashboard-canvas .drag-handle > div:last-child:not(.collapse-icon) {
      * stack that's optimized for thumb navigation and touch interaction
      * on mobile devices.
      */
-    .card-window {
+    body.dashboard-canvas .card-window {
         position: relative !important;        /* Natural document flow instead of absolute positioning */
         left: auto !important;                /* Remove canvas positioning coordinates */
         top: auto !important;                 /* Remove canvas positioning coordinates */
-        width: 100%;                          /* Full width maximizes screen real estate */
+        inline-size: 100% !important;         /* Full width maximizes screen real estate */
+        min-inline-size: 0 !important;
+        max-inline-size: none !important;     /* Release the fixed desktop card width */
         margin-bottom: 1.5rem;                /* Consistent spacing between stacked cards */
     }
 
