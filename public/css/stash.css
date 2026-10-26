@@ -708,6 +708,13 @@ body.dashboard-canvas .stash-drag-handle[style*="visibility: hidden"] {
     background-color: rgba(55, 65, 81, 0.8);
 }
 
+/* Active/selected search result item (keyboard navigation) */
+.global-search-result-item-active {
+    background-color: rgba(59, 130, 246, 0.2) !important;
+    outline: 1px solid rgba(59, 130, 246, 0.5);
+    outline-offset: -1px;
+}
+
 /* Bookmark icon in search results */
 .global-search-icon {
     width: 32px;

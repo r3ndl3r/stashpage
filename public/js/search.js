@@ -45,6 +45,7 @@ const elements = {
  * Tracks timing for debouncing search requests
  */
 let searchTimeout = null;
+let selectedIndex = -1;
 
 /**
  * Global Search Initialization
@@ -75,6 +76,9 @@ function setupSearchEventListeners() {
 
     // Real-time search with debouncing
     elements.input.addEventListener('input', handleSearchInput);
+
+    // Keyboard navigation for search results
+    elements.input.addEventListener('keydown', handleSearchResultNavigation);
 
     // Clear search and reset state
     elements.clearBtn.addEventListener('click', clearGlobalSearch);
@@ -145,6 +149,51 @@ function handleSearchKeyboard(e) {
     // Close search with Escape key
     if (e.key === 'Escape' && !elements.container.classList.contains('hidden')) {
         closeGlobalSearch();
+    }
+}
+
+/**
+ * Keyboard Navigation for Search Results
+ * 
+ * Handles arrow keys to navigate and Enter to open a selected result
+ * 
+ * @param {KeyboardEvent} e - Keyboard event object
+ */
+function handleSearchResultNavigation(e) {
+    const items = elements.resultsList.querySelectorAll('.global-search-result-item');
+    if (items.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (selectedIndex < items.length - 1) {
+            selectedIndex++;
+        }
+        updateSelectedResult(items);
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (selectedIndex > 0) {
+            selectedIndex--;
+        } else if (selectedIndex <= 0) {
+            selectedIndex = -1;
+        }
+        updateSelectedResult(items);
+    } else if (e.key === 'Enter' && selectedIndex >= 0) {
+        e.preventDefault();
+        items[selectedIndex].click();
+    }
+}
+
+/**
+ * Update visual selection state for search results
+ * 
+ * @param {NodeList} items - List of search result elements
+ */
+function updateSelectedResult(items) {
+    items.forEach((item, index) => {
+        item.classList.toggle('global-search-result-item-active', index === selectedIndex);
+    });
+    if (selectedIndex >= 0 && selectedIndex < items.length) {
+        items[selectedIndex].scrollIntoView({ block: 'nearest' });
     }
 }
 
@@ -266,6 +315,7 @@ function showSearchError(message) {
 function displaySearchResults(results, query) {
     elements.resultsList.innerHTML = '';
     elements.status.classList.remove('text-red-400');
+    selectedIndex = -1;
 
     // Handle empty results
     if (!results || results.length === 0) {
@@ -280,8 +330,8 @@ function displaySearchResults(results, query) {
     elements.results.classList.remove('hidden');
 
     // Render each result item
-    results.forEach(result => {
-        const resultItem = createSearchResultItem(result, query);
+    results.forEach((result, index) => {
+        const resultItem = createSearchResultItem(result, query, index);
         elements.resultsList.appendChild(resultItem);
     });
 }
@@ -296,12 +346,25 @@ function displaySearchResults(results, query) {
  * @param {string} query - Search query for text highlighting
  * @returns {HTMLElement} Complete result item element
  */
-function createSearchResultItem(result, query) {
+function createSearchResultItem(result, query, index) {
     const item = document.createElement('div');
     item.className = 'global-search-result-item flex items-center gap-3';
+    item.dataset.index = index;
     
     // Make entire item clickable
     item.onclick = () => window.open(result.url, '_blank');
+
+    // Hover updates keyboard selection index
+    item.addEventListener('mouseenter', () => {
+        selectedIndex = index;
+        const items = elements.resultsList.querySelectorAll('.global-search-result-item');
+        updateSelectedResult(items);
+    });
+    item.addEventListener('mouseleave', () => {
+        selectedIndex = -1;
+        const items = elements.resultsList.querySelectorAll('.global-search-result-item');
+        updateSelectedResult(items);
+    });
 
     // Generate icon HTML with fallback for missing icons
     let iconHTML = '';

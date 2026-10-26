@@ -247,6 +247,8 @@ sub search {
         }
     }
     
+    @results = sort { lc($a->{name}) cmp lc($b->{name}) } @results;
+    
     $c->render(json => { results => \@results });
 }
 
