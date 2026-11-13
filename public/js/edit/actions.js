@@ -249,11 +249,6 @@ function createCategoryCard({ title, icon, baseUrl, color, x = CONFIG.CANVAS.CEN
     card.innerHTML = `
         <div class="drag-handle flex justify-between items-center mb-2 pb-2 border-b border-gray-600/50 cursor-move hover:border-gray-500 transition-colors">
             <div class="category-title-container flex items-center">
-                <div class="drag-indicator mr-3 text-gray-500 hover:text-gray-400 transition-colors">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M7 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V4a2 2 0 00-2-2H7zM8 4h4v2H8V4zm0 4h4v2H8V8zm0 4h4v2H8v-2z"></path>
-                    </svg>
-                </div>
                 <h2 class="category-title-heading text-xl font-bold text-white flex items-center">
                     ${iconHtml}
                     <span class="category-title-text">${escapeHtml(title)}</span>

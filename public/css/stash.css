@@ -635,15 +635,6 @@ body.dashboard-canvas .drag-handle > div.flex.items-center.space-x-2[style*="vis
 }
 
 /* 
- * Hide drag indicators completely in view mode  
- * Targets: Drag handle icons with inline visibility:hidden
- * Effect: Removes ~32px (20px icon + 12px margin) of reserved space
- */
-body.dashboard-canvas .drag-indicator[style*="visibility: hidden"] {
-    display: none !important;
-}
-
-/* 
  * Hide stash item drag handles completely in view mode
  * Targets: Individual stash tile drag handles with inline visibility:hidden  
  * Effect: Removes drag handle spacing from stash item layout calculation

@@ -52,21 +52,6 @@
 
 
 /**
- * Drag Indicator Icon Enhancement
- * 
- * Provides subtle scaling animation for the drag handle icon to reinforce
- * interactivity and provide engaging hover feedback. The icon serves as a
- * visual anchor that helps users identify where to grab draggable elements.
- */
-.drag-indicator {
-  transition: all var(--animation-duration) ease; /* Smooth scaling transitions */
-}
-
-.drag-handle:hover .drag-indicator {
-  transform: scale(1.1);                    /* Subtle enlargement draws attention to drag functionality */
-}
-
-/**
  * Stash Tile Shimmer Animation System
  * 
  * Creates an elegant sliding highlight effect that sweeps across stash tiles
