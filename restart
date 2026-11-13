@@ -1,3 +1,9 @@
-#!/bin/bash
-hypnotoad -s stashpage.pl
-hypnotoad stashpage.pl
+#!/bin/sh
+
+set -eu
+
+cd "$(dirname "$0")"
+
+./stop
+
+exec hypnotoad stashpage.pl
