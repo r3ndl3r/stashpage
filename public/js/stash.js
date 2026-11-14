@@ -1,6 +1,12 @@
 // /js/stash.js
 
 import { applyCategoryColors, normalizeColor } from './utils/colours.js';
+import {
+    hasPrimaryModifier,
+    isComposingKey,
+    isEditableTarget,
+    isUnmodifiedKey
+} from './utils/keyboard.js';
 
 /**
  * Stash Dashboard View Controller Module
@@ -577,10 +583,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const pageNameInput = document.getElementById('page-name-input');
         if (pageNameInput) {
             // Enable Enter key submission for quick page creation
-            pageNameInput.addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    goToPage();
-                }
+            pageNameInput.addEventListener('keydown', function(event) {
+                if (!isUnmodifiedKey(event, 'Enter')) return;
+                if (isComposingKey(event) || event.defaultPrevented || event.repeat) return;
+
+                event.preventDefault();
+                goToPage();
             });
         }
         
@@ -597,13 +605,19 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Global keyboard shortcut handler for modal management
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                // Escape key closes all modal dialogs
-                closeRenameModal();
-                closeCloneModal();
-                closeImportModal();
-                closeDeleteModal();
-            }
+            if (!isUnmodifiedKey(e, 'Escape')) return;
+            if (isComposingKey(e) || e.defaultPrevented) return;
+            if (e.repeat) return;
+            if (!isIndexModalOpen()) return;
+
+            closeRenameModal();
+            closeCloneModal();
+            closeImportModal();
+            closeDeleteModal();
+
+            // Claim Escape for the dialog so the search handler does not also
+            // close the search interface behind the overlay.
+            e.preventDefault();
         });
     }
 
@@ -649,61 +663,58 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /**
- * Keyboard Shortcut Handler for Dashboard
- * 
- * Processes keyboard shortcuts for quick actions in view mode:
- * - Ctrl/Cmd + E: Switch to edit mode for current stash
- * 
- * @param {KeyboardEvent} e - Keyboard event object
+ * Check whether an index-page dialog is visible.
+ *
+ * Rename, clone, and import dialogs are hidden by a class and shown with an
+ * inline display value; the delete confirmation is inserted only while open.
+ *
+ * @returns {boolean} True when a dialog is open
  */
-function handleDashboardKeyboard(e) {
-    // Enter edit mode with Ctrl/Cmd + E
-    if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
-        e.preventDefault();
-        
-        // Only trigger if not typing in an input field
-        if (isInputFocused()) {
-            return;
-        }
-        
-        // Get current stash name from URL parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        const stashName = urlParams.get('n');
-        
-        if (stashName) {
-            // Navigate to edit mode
-            window.location.href = `/edit?n=${encodeURIComponent(stashName)}`;
-        }
-    }
+function isIndexModalOpen() {
+    if (document.getElementById('deleteConfirmModal')) return true;
+
+    return ['renameModal', 'cloneModal', 'importModal'].some(id => {
+        const modal = document.getElementById(id);
+        if (!modal || modal.style.display === 'none') return false;
+        return modal.style.display === 'flex' || !modal.classList.contains('hidden');
+    });
 }
 
 /**
- * Check if an input element is currently focused
- * 
- * Prevents keyboard shortcuts from triggering when user is typing in a text field.
- * 
- * @returns {boolean} True if an input/textarea is focused
+ * Keyboard Shortcut Handler for Dashboard
+ *
+ * Opens edit mode with Ctrl/Cmd + E only on an editable dashboard, and only
+ * when no dialog or editable control owns the key. Alt, Shift, composition,
+ * and repeat events do not navigate. A dialog or editable control keeps the
+ * browser's native Ctrl+E behaviour.
+ *
+ * @param {KeyboardEvent} e - Keyboard event object
  */
-function isInputFocused() {
-    const activeElement = document.activeElement;
-    return activeElement && (
-        activeElement.tagName === 'INPUT' ||
-        activeElement.tagName === 'TEXTAREA' ||
-        activeElement.isContentEditable
-    );
+function handleDashboardKeyboard(e) {
+    if (isComposingKey(e) || e.defaultPrevented) return;
+    if (!hasPrimaryModifier(e) || (e.key || '').toLowerCase() !== 'e') return;
+
+    // Let the focused control keep native shortcuts such as macOS Ctrl+E.
+    if (isIndexModalOpen() ||
+        isEditableTarget(e.target) ||
+        isEditableTarget(document.activeElement)) {
+        return;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const stashName = urlParams.get('n');
+
+    // The edit affordance marks an owned, editable dashboard; public read-only
+    // views and the index page must not consume the shortcut.
+    if (!stashName || !document.querySelector('.edit-button')) return;
+
+    e.preventDefault();
+    if (e.repeat) return;
+
+    window.location.href = `/edit?n=${encodeURIComponent(stashName)}`;
 }
 
-// Initialize keyboard shortcuts when page loads
 document.addEventListener('keydown', handleDashboardKeyboard);
-
-// Initialize dashboard keyboard shortcuts
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
-        document.addEventListener('keydown', handleDashboardKeyboard);
-    });
-} else {
-    document.addEventListener('keydown', handleDashboardKeyboard);
-}
 
 /**
  * Clipboard Copy with Browser Compatibility

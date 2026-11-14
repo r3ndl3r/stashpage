@@ -1,5 +1,12 @@
 // /js/search.js
 
+import {
+    hasPrimaryModifier,
+    isComposingKey,
+    isEditableTarget,
+    isUnmodifiedKey
+} from './utils/keyboard.js';
+
 /**
  * Global Cross-Stash Search Module
  * 
@@ -46,6 +53,7 @@ const elements = {
  */
 let searchTimeout = null;
 let selectedIndex = -1;
+let slashOpenedSearch = false;   // Slash key is being held after opening search
 
 /**
  * Global Search Initialization
@@ -73,6 +81,7 @@ function setupSearchEventListeners() {
 
     // Keyboard shortcuts for accessibility
     document.addEventListener('keydown', handleSearchKeyboard);
+    document.addEventListener('keyup', handleSearchKeyup);
 
     // Real-time search with debouncing
     elements.input.addEventListener('input', handleSearchInput);
@@ -116,50 +125,106 @@ function closeGlobalSearch() {
     elements.container.classList.add('hidden');
     elements.input.value = '';
     elements.clearBtn.classList.add('hidden');
+    slashOpenedSearch = false;
     clearSearchResults();
 }
 
 /**
+ * Check whether an index-page dialog is visible.
+ *
+ * Rename, clone, and import dialogs are hidden by a class and shown with an
+ * inline display value; the delete confirmation is inserted only while open.
+ *
+ * @returns {boolean} True when a dialog is open
+ */
+function isIndexModalOpen() {
+    if (document.getElementById('deleteConfirmModal')) return true;
+
+    return ['renameModal', 'cloneModal', 'importModal'].some(id => {
+        const modal = document.getElementById(id);
+        if (!modal || modal.style.display === 'none') return false;
+        return modal.style.display === 'flex' || !modal.classList.contains('hidden');
+    });
+}
+
+/**
  * Keyboard Shortcut Handler
- * 
+ *
  * Processes keyboard events for search shortcuts:
- * - Ctrl/Cmd + F: Toggle search bar
- * - / (forward slash): Open search bar (common pattern like GitHub, Slack)
- * - Escape: Close search bar
- * 
+ * - Ctrl/Cmd + F: Toggle search bar unless a dialog is open
+ * - / (forward slash): Open or refocus search bar without Ctrl, Command, or Alt
+ * - Escape: Close search bar unless a dialog has priority or the key is repeating
+ *
  * @param {KeyboardEvent} e - Keyboard event object
  */
 function handleSearchKeyboard(e) {
+    if (isComposingKey(e) || e.defaultPrevented) return;
+
+    // A fresh slash press is normal typing; only a held slash that opened the
+    // search bar should keep its repeats out of the input.
+    if (e.key === '/' && !e.repeat) {
+        slashOpenedSearch = false;
+    }
+
     // Toggle search with Ctrl/Cmd + F and use the same path as clicking the icon.
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
+    if (hasPrimaryModifier(e) && (e.key || '').toLowerCase() === 'f') {
         e.preventDefault();
+        if (isIndexModalOpen() || e.repeat) return;
         elements.toggle.click();
         return;
     }
 
-    // Open search with forward slash (/) - like GitHub, Slack, etc.
-    if (e.key === '/' && !isInputFocused()) {
-        e.preventDefault();
-        if (elements.container.classList.contains('hidden')) {
-            openGlobalSearch();
+    // Open or refocus search with a forward slash that has no Ctrl, Command,
+    // or Alt modifier. Shift is allowed because some layouts produce "/" with it.
+    if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        if (e.repeat && slashOpenedSearch && document.activeElement === elements.input) {
+            e.preventDefault();
+            return;
         }
+
+        if (isIndexModalOpen()) return;
+        if (isEditableTarget(e.target) || isEditableTarget(document.activeElement)) return;
+
+        e.preventDefault();
+        slashOpenedSearch = true;
+        openGlobalSearch();
         return;
     }
-    
-    // Close search with Escape key
-    if (e.key === 'Escape' && !elements.container.classList.contains('hidden')) {
+
+    // Close search with Escape unless a dialog owns the key.
+    if (isUnmodifiedKey(e, 'Escape')) {
+        if (e.repeat) return;
+        if (isIndexModalOpen()) return;
+        if (elements.container.classList.contains('hidden')) return;
+
         closeGlobalSearch();
     }
 }
 
 /**
+ * Clear the slash transfer guard when the slash key is released.
+ *
+ * @param {KeyboardEvent} e - Keyboard event object
+ */
+function handleSearchKeyup(e) {
+    if (e.key === '/') {
+        slashOpenedSearch = false;
+    }
+}
+
+/**
  * Keyboard Navigation for Search Results
- * 
- * Handles arrow keys to navigate and Enter to open a selected result
- * 
+ *
+ * Handles arrow keys to navigate and Enter to open a selected result. Events
+ * from IME composition, modified keys, and already-handled events are ignored.
+ *
  * @param {KeyboardEvent} e - Keyboard event object
  */
 function handleSearchResultNavigation(e) {
+    if (isComposingKey(e) || e.defaultPrevented) return;
+    if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+    if (isIndexModalOpen()) return;
+
     const items = elements.resultsList.querySelectorAll('.global-search-result-item');
     if (items.length === 0) return;
 
@@ -179,6 +244,7 @@ function handleSearchResultNavigation(e) {
         updateSelectedResult(items);
     } else if (e.key === 'Enter' && selectedIndex >= 0) {
         e.preventDefault();
+        if (e.repeat) return;
         items[selectedIndex].click();
     }
 }
@@ -195,24 +261,6 @@ function updateSelectedResult(items) {
     if (selectedIndex >= 0 && selectedIndex < items.length) {
         items[selectedIndex].scrollIntoView({ block: 'nearest' });
     }
-}
-
-/**
- * Check if an input element is currently focused
- * 
- * Prevents '/' shortcut from triggering when user is typing in a text field.
- * This ensures the shortcut only works when the user intends to start a search,
- * not when they're typing a URL or entering other text data.
- * 
- * @returns {boolean} True if an input/textarea is focused
- */
-function isInputFocused() {
-    const activeElement = document.activeElement;
-    return activeElement && (
-        activeElement.tagName === 'INPUT' ||
-        activeElement.tagName === 'TEXTAREA' ||
-        activeElement.isContentEditable
-    );
 }
 
 /**

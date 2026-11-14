@@ -44,6 +44,12 @@ import {
 } from './actions.js';
 
 import { applyCategoryColors, normalizeColor } from '../utils/colours.js';
+import {
+    hasPrimaryModifier,
+    isComposingKey,
+    isEditableTarget,
+    isUnmodifiedKey
+} from '../utils/keyboard.js';
 
 /**
  * Application State Management
@@ -123,15 +129,19 @@ window.showConfirm = showConfirm;
 
 /**
  * Dashboard Save Handler
- * 
+ *
  * Synchronizes current dashboard state with the hidden form field and submits
  * the form to persist changes to the server. This function is exposed globally
- * to allow calling from save buttons and keyboard shortcuts
+ * to allow calling from save buttons and keyboard shortcuts. It refuses to
+ * submit while the editor dialog is open so pending modal fields are not lost.
  */
 window.saveDashboard = function() {
     const form = document.getElementById('stashForm');
     if (!form) return;
-    
+
+    // The dialog owns unsaved fields; submitting now would discard them.
+    if (isEditorModalOpen()) return;
+
     // Update the hidden form field with current dashboard state
     syncDataForSubmission();
     
@@ -285,6 +295,26 @@ function handleCanvasClick(event) {
 }
 
 /**
+ * Check whether the editor dialog is visible.
+ *
+ * @returns {boolean} True when the shared editor modal is open
+ */
+function isEditorModalOpen() {
+    const modal = document.getElementById('modal');
+    return Boolean(modal && !modal.classList.contains('hidden'));
+}
+
+/**
+ * Check whether a keyboard event belongs to an editable control.
+ *
+ * @param {KeyboardEvent} event - Keyboard event to inspect
+ * @returns {boolean} True when the event target or focused element is editable
+ */
+function isEditableEventTarget(event) {
+    return isEditableTarget(event.target) || isEditableTarget(document.activeElement);
+}
+
+/**
  * Dashboard Initialization System
  * 
  * Bootstraps the entire dashboard application by:
@@ -345,12 +375,17 @@ function init() {
         });
     });
     
-    // Enable Ctrl+S / Cmd+S keyboard shortcut for quick saving
+    // Save with Ctrl/Cmd+S unless a dialog or editable control owns the key.
     document.addEventListener('keydown', function(e) {
-        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-            e.preventDefault();                     // Prevent browser's default save dialog
-            window.saveDashboard(); 
-        }
+        if (isComposingKey(e) || e.defaultPrevented) return;
+        if (!hasPrimaryModifier(e) || (e.key || '').toLowerCase() !== 's') return;
+
+        // Keep the browser's save dialog out of the way, but do not submit
+        // while modal fields or another editable control are pending.
+        e.preventDefault();
+        if (e.repeat || isEditorModalOpen() || isEditableEventTarget(e)) return;
+
+        window.saveDashboard();
     });
 
     // Configure responsive behavior based on device capabilities
@@ -374,24 +409,39 @@ function init() {
 
 /**
  * Keyboard Shortcut Handler for Edit Mode
- * 
+ *
  * Processes keyboard shortcuts in edit mode:
- * - Ctrl/Cmd + E: Return to view mode
- * 
+ * - Escape: Close the open editor dialog
+ * - Ctrl/Cmd + E: Return to view mode when no dialog or editable control owns the key
+ *
  * @param {KeyboardEvent} e - Keyboard event object
  */
 function handleEditModeKeyboard(e) {
-    // Return to view mode with Ctrl/Cmd + E
-    if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+    if (isComposingKey(e) || e.defaultPrevented) return;
+
+    if (isUnmodifiedKey(e, 'Escape')) {
+        if (e.repeat) return;
+        if (!isEditorModalOpen()) return;
+
         e.preventDefault();
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const stashName = urlParams.get('n');
-        
-        if (stashName) {
-            window.location.href = `/stash?n=${encodeURIComponent(stashName)}`;
-        }
+        closeModal();
+        return;
     }
+
+    if (!hasPrimaryModifier(e) || (e.key || '').toLowerCase() !== 'e') return;
+
+    // Let the focused control keep native shortcuts such as macOS Ctrl+E.
+    if (isEditorModalOpen() || isEditableEventTarget(e)) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const stashName = urlParams.get('n');
+
+    if (!stashName) return;
+
+    e.preventDefault();
+    if (e.repeat) return;
+
+    window.location.href = `/stash?n=${encodeURIComponent(stashName)}`;
 }
 
 // Expose applyCategoryColors globally for use in actions.js
